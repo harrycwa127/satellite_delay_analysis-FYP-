@@ -90,6 +90,11 @@ col_num = 1
 
 # ------初始化所有卫星
 sat_list = []
+# sat_data = []
+# sat_f = open('../settings/OBSERVATION.txt', 'r')
+# for line in sat_f.readlines():
+#     sat_data.append(line.split(' '))
+# obs_f.close()
 first_Omega = 0  # 第一个轨道的升交点赤经
 even_Omega = 180 / (m-1)
 for orbit_id in range(m):
@@ -100,6 +105,7 @@ for orbit_id in range(m):
         M_o = math.radians(first_M + sat_id * even_M)
         # 令卫星的当前时间为simulation的开始时间
         s = Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+        
         sat_list = sat_list + [s]
 
 # ------穷举搜索
