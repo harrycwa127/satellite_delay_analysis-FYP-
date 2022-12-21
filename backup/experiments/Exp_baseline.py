@@ -3,7 +3,7 @@ import os
 import xlwt
 import time
 import numpy as np
-from include.imaging import *
+from backup.imaging import *
 from include.communication import *
 from include.greenwich import *
 from include.satclass import *
