@@ -11,7 +11,7 @@ from include import service
 from include import validation
 from include.greenwich import *
 from include.satclass import *
-from include.gdclass import *
+from backup.gdclass import *
 from include.gsclass import *
 from include.requestclass import *
 

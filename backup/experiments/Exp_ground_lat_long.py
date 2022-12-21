@@ -3,7 +3,7 @@ import xlwt
 from backup import imaging
 from include.greenwich import *
 from include.satclass import *
-from include.gdclass import *
+from backup.gdclass import *
 
 
 # ---------read start time and end time

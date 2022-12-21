@@ -5,7 +5,7 @@ from backup import imaging
 from include import curve
 from include.greenwich import *
 from include.satclass import *
-from include.gdclass import *
+from backup.gdclass import *
 
 
 # ---------read start time and end time

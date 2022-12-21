@@ -7,7 +7,7 @@ import backup.imaging as imaging
 import include.communication as communication
 import include.greenwich as greenwich
 import include.satclass as satclass
-import include.gdclass as gdclass
+import backup.gdclass as gdclass
 import include.gsclass as gsclass
 
 start_time = time.time()
@@ -32,14 +32,14 @@ for line in obs_f.readlines():
     gd_lines.append(line.split(' '))
 obs_f.close()
 gd_accounts = len(gd_lines)
-gd_list = []
-for g in range(gd_accounts):
-    region_lat = float(gd_lines[g][0])
-    region_long = float(gd_lines[g][1])
-    region_lat_rad = math.radians(region_lat)       # 弧度
-    region_long_rad = math.radians(region_long)     # 弧度
-    gd = gdclass.GD(region_lat_rad, region_long_rad)
-    gd_list.append(gd)
+# gd_list = []
+# for g in range(gd_accounts):
+#     region_lat = float(gd_lines[g][0])
+#     region_long = float(gd_lines[g][1])
+#     region_lat_rad = math.radians(region_lat)       # 弧度
+#     region_long_rad = math.radians(region_long)     # 弧度
+#     gd = gdclass.GD(region_lat_rad, region_long_rad)
+#     gd_list.append(gd)
 
 # ---------read ground stations
 gs_lines = []
@@ -69,8 +69,8 @@ i_o = math.radians(97)
 e_o = 0
 omega_o = 0
 circle_o = 14
-m = 9
-n = 25
+m = 9                  # number of orbit
+n = 25                 # number of sat
 
 request_period = 600   # request period (s)
 request_postpone = 60  # request postpone (s)

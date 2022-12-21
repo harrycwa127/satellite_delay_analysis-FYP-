@@ -7,7 +7,7 @@ from backup.imaging import *
 from include.communication import *
 from include.greenwich import *
 from include.satclass import *
-from include.gdclass import *
+from backup.gdclass import *
 from include.gsclass import *
 
 start_time = time.time()
