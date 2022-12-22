@@ -19,8 +19,10 @@ class Sat(object):
     a_o = 0              # # 卫星轨道半长轴a (m)
     n_o = 0              # mean anomaly velocity (rad/s)
     r = 0                # radius of satellite at current time (m)
+    orbit_id = 0         # a id for identify orbit
+    sat_id = 0      # a id for identify satellite
 
-    def __init__(self, current_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian):
+    def __init__(self, current_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian, orbit_id, sat_id):
         self.current_julian = current_julian
         self.i_o = i_o
         self.Omega_o = Omega_o
