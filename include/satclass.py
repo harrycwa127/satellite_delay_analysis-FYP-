@@ -36,6 +36,9 @@ class Sat(object):
         self.a_o = (miu * self.T_o * self.T_o / 4 / math.pi / math.pi) ** (1 / 3)
         self.r = self.a_o
 
+        self.orbit_id = orbit_id
+        self.sat_id = sat_id
+
     def __str__(self):
         return "Omega: %s; M: %s" % (self.Omega_o, self.M_o)
 

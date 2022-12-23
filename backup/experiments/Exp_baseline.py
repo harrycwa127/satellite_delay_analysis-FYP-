@@ -3,11 +3,11 @@ import os
 import xlwt
 import time
 import numpy as np
-from backup.imaging import *
+from backup.include.imaging import *
 from include.communication import *
 from include.greenwich import *
 from include.satclass import *
-from backup.gdclass import *
+from backup.include.gdclass import *
 from include.gsclass import *
 
 start_time = time.time()

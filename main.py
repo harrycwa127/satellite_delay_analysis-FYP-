@@ -14,7 +14,7 @@ start_time = time.time()
 requestNum = 144
 
 # ---------read start time and end time
-time_f = open('../settings/TIME_INTERVAL.txt', 'r')
+time_f = open('settings/TIME_INTERVAL.txt', 'r')
 time_lines = []
 for line in time_f.readlines():
     time_lines.append(line.split())
@@ -27,7 +27,7 @@ start_greenwich = (greenwich.greenwich(start_time_julian)) % 360   # 转到0到3
 
 # ---------read ground stations
 gs_lines = []
-input_f2 = open('../settings/SELECT_GROUND_STATION2.txt', 'r')
+input_f2 = open('settings/SELECT_GROUND_STATION2.txt', 'r')
 for line in input_f2.readlines():
     tmpl = line.strip()
     gs_lines.append(tmpl.split(' '))
@@ -68,7 +68,7 @@ if os.path.exists("results/baseline_result.xls"):
     os.remove("results/baseline_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
 sheet = book.add_sheet('baseline_result', cell_overwrite_ok=True)
-col = ('ground latitude', 'ground longitude', 'feasible')
+col = ('satellite id', 'orbit id', 'communicatable with ground station')
 for i in range(0, 3):
     sheet.write(0, i, col[i])
 col_num = 1
@@ -91,12 +91,21 @@ for orbit_id in range(m):
 # 看能否通信
 target_gs = gs_list[0]
 for s in sat_list:
+    sheet.write(col_num, 0, s.sat_id)
+    sheet.write(col_num, 1, s.orbit_id)
     gs_off_nadir = math.asin(satclass.Re * math.cos(target_gs.ele_rad) / s.r)
     if communication.is_communicable(0, s, gs, gs_off_nadir, start_greenwich):
         print("satellite", s.sat_id,"in orbit", s.orbit_id, "can communication with target ground satation")
+        sheet.write(col_num, 2, "True")
+    else:
+        sheet.write(col_num, 2, "False")
+
+    col_num+=1
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)
 book.save('results/baseline_result.xls')
 
 
+#     sheet.write(col_num, 0, math.degrees(gd_list[i].lat_rad))
+    # sheet.write(col_num, 1, math.degrees(gd_list[i].long_rad))
