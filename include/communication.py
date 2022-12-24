@@ -34,14 +34,27 @@ def is_gs_communicable(t, satellite: satclass.Sat, gs: gsclass.GS, gs_off_nadir,
         return False
 
 def is_sat_communicable(t, from_satellite: satclass.Sat, to_satellite: satclass.Sat, start_greenwich):
-    M = (from_satellite.n_o * t + from_satellite.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
-    f = M  # 假设是圆轨道
-    r = from_satellite.a_o  # 假设是圆轨道
-    u = from_satellite.omega_o + f
-    alpha = satcompute.sat_alpha(r, from_satellite.Omega_o, u, from_satellite.i_o)
-    delta = math.asin(math.sin(u) * math.sin(from_satellite.i_o))  # t时刻卫星赤纬
-    phi = delta  # t时刻卫星地心纬度
-    lam = alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度
+    from_M = (from_satellite.n_o * t + from_satellite.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
+    from_f = from_M  # 假设是圆轨道
+    from_r = from_satellite.a_o  # 假设是圆轨道
+    from_u = from_satellite.omega_o + from_f
+    from_alpha = satcompute.sat_alpha(from_r, from_satellite.Omega_o, from_u, from_satellite.i_o)
+    from_delta = math.asin(math.sin(from_u) * math.sin(from_satellite.i_o))  # t时刻卫星赤纬
+    from_phi = from_delta  # t时刻卫星地心纬度
+    from_lam = from_alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度
+
+    to_M = (to_satellite.n_o * t + to_satellite.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
+    to_f = to_M  # 假设是圆轨道
+    to_r = to_satellite.a_o  # 假设是圆轨道
+    to_u = to_satellite.omega_o + to_f
+    to_alpha = satcompute.sat_alpha(to_r, to_satellite.Omega_o, to_u, to_satellite.i_o)
+    to_delta = math.asin(math.sin(to_u) * math.sin(to_satellite.i_o))  # t时刻卫星赤纬
+    to_phi = to_delta  # t时刻卫星地心纬度
+    to_lam = to_alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度
+
+    # idea: find out from_sat to to_sat whether pass through the earth sphere, if yes, then the communication is false
+    # method: may check by horizon line of a satellite
+    # refer to https://physics.stackexchange.com/questions/151388/how-to-calculate-the-horizon-line-of-a-satellite
 
 
 # simulate一段时间内，卫星和地面站通信的时间段
