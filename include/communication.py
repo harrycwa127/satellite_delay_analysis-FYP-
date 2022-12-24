@@ -11,7 +11,7 @@ import math
 #      4.由地面站通信的最小仰角得到的最大的off_nadir角
 #      4.开始时刻0经度所处的赤经
 # 输出：TRUE OR FALSE
-def is_communicable(t, satellite: satclass.Sat, gs: gsclass.GS, gs_off_nadir, start_greenwich):
+def is_gs_communicable(t, satellite: satclass.Sat, gs: gsclass.GS, gs_off_nadir, start_greenwich):
     M = (satellite.n_o * t + satellite.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
     f = M  # 假设是圆轨道
     r = satellite.a_o  # 假设是圆轨道
@@ -32,6 +32,9 @@ def is_communicable(t, satellite: satclass.Sat, gs: gsclass.GS, gs_off_nadir, st
         return True
     else:
         return False
+
+def is_sat_communicable(t, from_satellite: satclass.Sat, to_satellite: satclass.Sat, start_greenwich):
+    pass
 
 
 # simulate一段时间内，卫星和地面站通信的时间段
@@ -77,7 +80,7 @@ def communicable(time_interval, start_greenwich, satellite: satclass.Sat, gs: gs
         if abandon == 0:
             t = t1
             while t < t2+1:
-                if is_communicable(t, satellite, gs, gs_off_nadir, start_greenwich):
+                if is_gs_communicable(t, satellite, gs, gs_off_nadir, start_greenwich):
                     if test == 0:
                         #print('t1:', t)
                         test = 1
@@ -111,7 +114,7 @@ def communicable(time_interval, start_greenwich, satellite: satclass.Sat, gs: gs
         if abandon == 0:
             t = t3
             while t < t4+1:
-                if is_communicable(t, satellite, gs, gs_off_nadir, start_greenwich):
+                if is_gs_communicable(t, satellite, gs, gs_off_nadir, start_greenwich):
                     if test == 0:
                         #print('t3:', t)
                         test = 1

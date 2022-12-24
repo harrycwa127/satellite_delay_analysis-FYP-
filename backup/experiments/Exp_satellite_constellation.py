@@ -1,11 +1,11 @@
 import math
 import os
 import xlwt
-from backup import imaging
+from backup.include import imaging
 from include import curve
 from include.greenwich import *
 from include.satclass import *
-from backup.gdclass import *
+from backup.include.gdclass import *
 
 
 # ---------read start time and end time

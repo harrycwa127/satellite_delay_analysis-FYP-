@@ -64,11 +64,11 @@ com_cost = 15          # communication cost (s)
 ser_ddl = 150          # service delay (s)
 
 # 删除output文件
-if os.path.exists("results/baseline_result.xls"):
-    os.remove("results/baseline_result.xls")
+if os.path.exists("results/satellite_to_ground_communicable_result.xls"):
+    os.remove("results/satellite_to_ground_communicable_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
-sheet = book.add_sheet('baseline_result', cell_overwrite_ok=True)
-col = ('satellite id', 'orbit id', 'communicatable with ground station')
+sheet = book.add_sheet('satellite_to_ground_communicable_result', cell_overwrite_ok=True)
+col = ('satellite id', 'orbit id', 'communicable with ground station')
 for i in range(0, 3):
     sheet.write(0, i, col[i])
 col_num = 1
@@ -94,7 +94,7 @@ for s in sat_list:
     sheet.write(col_num, 0, s.sat_id)
     sheet.write(col_num, 1, s.orbit_id)
     gs_off_nadir = math.asin(satclass.Re * math.cos(target_gs.ele_rad) / s.r)
-    if communication.is_communicable(0, s, gs, gs_off_nadir, start_greenwich):
+    if communication.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
         print("satellite", s.sat_id,"in orbit", s.orbit_id, "can communication with target ground satation")
         sheet.write(col_num, 2, "True")
     else:
@@ -104,8 +104,4 @@ for s in sat_list:
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)
-book.save('results/baseline_result.xls')
-
-
-#     sheet.write(col_num, 0, math.degrees(gd_list[i].lat_rad))
-    # sheet.write(col_num, 1, math.degrees(gd_list[i].long_rad))
+book.save('results/satellite_to_ground_communicable_result.xls')

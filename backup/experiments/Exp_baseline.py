@@ -134,7 +134,7 @@ for i in range(gd_accounts):
                         communicate_dur = 0  # 将通信时段初始值设为0
                         flag = 0
                         for ct in np.arange(t, t+151, 0.1):
-                            if is_communicable(ct, s, gs, gs_off_nadir, start_greenwich):
+                            if is_gs_communicable(ct, s, gs, gs_off_nadir, start_greenwich):
                                 communicate_dur = communicate_dur+1
                             else:
                                 communicate_dur = 0
