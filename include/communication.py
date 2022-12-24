@@ -34,7 +34,14 @@ def is_gs_communicable(t, satellite: satclass.Sat, gs: gsclass.GS, gs_off_nadir,
         return False
 
 def is_sat_communicable(t, from_satellite: satclass.Sat, to_satellite: satclass.Sat, start_greenwich):
-    pass
+    M = (from_satellite.n_o * t + from_satellite.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
+    f = M  # 假设是圆轨道
+    r = from_satellite.a_o  # 假设是圆轨道
+    u = from_satellite.omega_o + f
+    alpha = satcompute.sat_alpha(r, from_satellite.Omega_o, u, from_satellite.i_o)
+    delta = math.asin(math.sin(u) * math.sin(from_satellite.i_o))  # t时刻卫星赤纬
+    phi = delta  # t时刻卫星地心纬度
+    lam = alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度
 
 
 # simulate一段时间内，卫星和地面站通信的时间段
