@@ -62,7 +62,16 @@ def is_sat_communicable(t, from_satellite: satclass.Sat, to_satellite: satclass.
     if to_lam < -math.pi:
         to_lam = to_lam + 2 * math.pi
 
-    to_h = to_satellite.r
+    # may not correct, copy from sat to ground
+    theta = from_lam - to_lam
+    cos_psi = math.cos(to_phi) * math.cos(from_phi) * math.cos(theta) + math.sin(to_phi) * math.sin(from_phi)
+    psi = math.acos(cos_psi)
+    beta = math.atan(satclass.Re * math.sin(psi) / (from_r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
+
+    # if cos_psi > satclass.Re / r and beta <= gs_off_nadir:
+    #     return True
+    # else:
+    #     return False
 
     # idea: find out from_sat to to_sat whether pass through the earth sphere, if yes, then the communication is false
     # method: may check by horizon line of a satellite
