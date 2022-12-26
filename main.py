@@ -9,6 +9,7 @@ import include.greenwich as greenwich
 import include.satclass as satclass
 # import backup.include.gdclass as gdclass
 import include.gsclass as gsclass
+import include.satcompute as satcompute
 
 start_time = time.time()
 requestNum = 144
@@ -67,9 +68,9 @@ ser_ddl = 150          # service delay (s)
 if os.path.exists("results/satellite_to_ground_communicable_result.xls"):
     os.remove("results/satellite_to_ground_communicable_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
-sheet = book.add_sheet('satellite_to_ground_communicable_result', cell_overwrite_ok=True)
-col = ('satellite id', 'orbit id', 'communicable with ground station')
-for i in range(0, 3):
+sheet = book.add_sheet('sat_ground_communicable_result', cell_overwrite_ok=True)
+col = ('satellite id', 'orbit id', 'Geocentric Latitude', 'Geocentric Longitude', 'communicable with ground station')
+for i in range(0, 5):
     sheet.write(0, i, col[i])
 col_num = 1
 
@@ -91,14 +92,30 @@ for orbit_id in range(m):
 # 看能否通信
 target_gs = gs_list[0]
 for s in sat_list:
+    # find out the lat lon
+    M = (s.n_o * 0 + s.M_o) % (2 * math.pi)  
+    f = M  
+    r = s.a_o  
+    u = s.omega_o + f
+    alpha = satcompute.sat_alpha(r, s.Omega_o, u, s.i_o)
+    delta = math.asin(math.sin(u) * math.sin(s.i_o))  
+    phi = delta  
+    lam = alpha - (math.radians(start_greenwich) + satclass.omega_e * 0) % (2 * math.pi)  
+
+    # write data to xls
     sheet.write(col_num, 0, s.sat_id)
     sheet.write(col_num, 1, s.orbit_id)
+    sheet.write(col_num, 2, phi)
+    sheet.write(col_num, 3, lam)
+    sheet.write(col_num, 4, s.r)
+
+    # check communicable and write result to xls
     gs_off_nadir = math.asin(satclass.Re * math.cos(target_gs.ele_rad) / s.r)
     if communication.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
         print("satellite", s.sat_id,"in orbit", s.orbit_id, "can communication with target ground satation")
-        sheet.write(col_num, 2, "True")
+        sheet.write(col_num, 5, "True")
     else:
-        sheet.write(col_num, 2, "False")
+        sheet.write(col_num, 5, "False")
 
     col_num+=1
 
