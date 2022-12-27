@@ -12,66 +12,33 @@ import math
 #      4.开始时刻0经度所处的赤经
 # 输出：TRUE OR FALSE
 def is_gs_communicable(t, satellite: satclass.Sat, gs: gsclass.GS, gs_off_nadir, start_greenwich):
-    M = (satellite.n_o * t + satellite.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
-    f = M  # 假设是圆轨道
-    r = satellite.a_o  # 假设是圆轨道
-    u = satellite.omega_o + f
-    alpha = satcompute.sat_alpha(r, satellite.Omega_o, u, satellite.i_o)
-    delta = math.asin(math.sin(u) * math.sin(satellite.i_o))  # t时刻卫星赤纬
-    phi = delta  # t时刻卫星地心纬度
-    lam = alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度
-    if lam > math.pi:
-        lam = lam - 2 * math.pi
-    if lam < -math.pi:
-        lam = lam + 2 * math.pi
+    phi, lam = satcompute.get_sat_geo_lat_lon(sat = satellite, t = t, start_greenwich = start_greenwich)
+    
     theta = lam - gs.long_rad
     cos_psi = math.cos(gs.lat_rad) * math.cos(phi) * math.cos(theta) + math.sin(gs.lat_rad) * math.sin(phi)
     psi = math.acos(cos_psi)
-    beta = math.atan(satclass.Re * math.sin(psi) / (r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
-    if cos_psi > satclass.Re / r and beta <= gs_off_nadir:
+    beta = math.atan(satclass.Re * math.sin(psi) / (satellite.r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
+    if cos_psi > satclass.Re / satellite.r and beta <= gs_off_nadir:
         return True
     else:
         return False
 
 def is_sat_communicable(t, from_satellite: satclass.Sat, to_satellite: satclass.Sat, start_greenwich):
-    from_M = (from_satellite.n_o * t + from_satellite.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
-    from_f = from_M  # 假设是圆轨道
-    from_r = from_satellite.a_o  # 假设是圆轨道
-    from_u = from_satellite.omega_o + from_f
-    from_alpha = satcompute.sat_alpha(from_r, from_satellite.Omega_o, from_u, from_satellite.i_o)
-    from_delta = math.asin(math.sin(from_u) * math.sin(from_satellite.i_o))  # t时刻卫星赤纬
-    from_phi = from_delta  # Geocentric Latitude in time t
-    from_lam = from_alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # Geocentric Longitude in time t
-    if from_lam > math.pi:
-        from_lam = from_lam - 2 * math.pi
-    if from_lam < -math.pi:
-        from_lam = from_lam + 2 * math.pi
+    from_phi, from_lam = satcompute.get_sat_geo_lat_lon(sat = from_satellite, t = t, start_greenwich = start_greenwich)
 
-    horizon_angle = math.asin(satclass.Re/from_satellite.r)
-
-    to_M = (to_satellite.n_o * t + to_satellite.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
-    to_f = to_M  # 假设是圆轨道
-    to_r = to_satellite.a_o  # 假设是圆轨道
-    to_u = to_satellite.omega_o + to_f
-    to_alpha = satcompute.sat_alpha(to_r, to_satellite.Omega_o, to_u, to_satellite.i_o)
-    to_delta = math.asin(math.sin(to_u) * math.sin(to_satellite.i_o))  # t时刻卫星赤纬
-    to_phi = to_delta  # Geocentric Latitude in time t
-    to_lam = to_alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # Geocentric Longitude in time t
-    if to_lam > math.pi:
-        to_lam = to_lam - 2 * math.pi
-    if to_lam < -math.pi:
-        to_lam = to_lam + 2 * math.pi
+    to_phi, to_lam = satcompute.get_sat_geo_lat_lon(sat = to_satellite, t = t, start_greenwich = start_greenwich)
 
     # may not correct, copy from sat to ground
     theta = from_lam - to_lam
     cos_psi = math.cos(to_phi) * math.cos(from_phi) * math.cos(theta) + math.sin(to_phi) * math.sin(from_phi)
     psi = math.acos(cos_psi)
-    beta = math.atan(satclass.Re * math.sin(psi) / (from_r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
+    beta = math.atan(satclass.Re * math.sin(psi) / (from_satellite.r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
 
-    # if cos_psi > satclass.Re / r and beta <= gs_off_nadir:
-    #     return True
-    # else:
-    #     return False
+    horizon_angle = math.asin(satclass.Re/from_satellite.r)
+    if cos_psi > satclass.Re / from_satellite.r and beta > horizon_angle:
+        return True
+    else:
+        return False
 
     # idea: find out from_sat to to_sat whether pass through the earth sphere, if yes, then the communication is false
     # method: may check by horizon line of a satellite

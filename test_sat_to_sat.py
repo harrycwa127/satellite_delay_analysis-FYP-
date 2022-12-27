@@ -26,27 +26,27 @@ end_time_julian = greenwich.julian2(int(time_lines[1][0]), int(time_lines[1][1])
 time_interval = (end_time_julian-start_time_julian)*86400  # 单位s
 start_greenwich = (greenwich.greenwich(start_time_julian)) % 360   # 转到0到360°
 
-# ---------read ground stations
-gs_lines = []
-input_f2 = open('settings/SELECT_GROUND_STATION2.txt', 'r')
-for line in input_f2.readlines():
-    tmpl = line.strip()
-    gs_lines.append(tmpl.split(' '))
-input_f2.close()
-gs_accounts = len(gs_lines)
-gs_list = []
-for g in range(gs_accounts):
-    gs_lat = float(gs_lines[g][0])
-    gs_long = float(gs_lines[g][1])
-    if gs_long < 0:
-        gs_long = 360 + gs_long
-    gs_ele = float(gs_lines[g][2])
-    # gs_ele = 10
-    gs_lat_rad = math.radians(gs_lat)  # 弧度
-    gs_long_rad = math.radians(gs_long)  # 弧度
-    gs_ele_rad = math.radians(gs_ele)  # 弧度
-    gs = gsclass.GS(gs_lat_rad, gs_long_rad, gs_ele_rad)
-    gs_list.append(gs)
+# # ---------read ground stations
+# gs_lines = []
+# input_f2 = open('settings/SELECT_GROUND_STATION2.txt', 'r')
+# for line in input_f2.readlines():
+#     tmpl = line.strip()
+#     gs_lines.append(tmpl.split(' '))
+# input_f2.close()
+# gs_accounts = len(gs_lines)
+# gs_list = []
+# for g in range(gs_accounts):
+#     gs_lat = float(gs_lines[g][0])
+#     gs_long = float(gs_lines[g][1])
+#     if gs_long < 0:
+#         gs_long = 360 + gs_long
+#     gs_ele = float(gs_lines[g][2])
+#     # gs_ele = 10
+#     gs_lat_rad = math.radians(gs_lat)  # 弧度
+#     gs_long_rad = math.radians(gs_long)  # 弧度
+#     gs_ele_rad = math.radians(gs_ele)  # 弧度
+#     gs = gsclass.GS(gs_lat_rad, gs_long_rad, gs_ele_rad)
+#     gs_list.append(gs)
 
 # ----------main section
 off_nadir = math.radians(45)
@@ -90,7 +90,7 @@ for orbit_id in range(m):
         sat_list = sat_list + [s]
 
 # 看能否通信
-target_gs = gs_list[0]
+target_sat = sat_list[0]
 for s in sat_list:
     # find out the lat lon
     M = (s.n_o * 0 + s.M_o) % (2 * math.pi)  

@@ -31,6 +31,23 @@ def sat_alpha(r, Omega_o, u, i_o):
     return s_alpha
 
 
+def get_sat_geo_lat_lon(sat: satclass.Sat, t, start_greenwich):
+    M = (sat.n_o * t + sat.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
+    f = M  # 假设是圆轨道
+    r = sat.a_o  # 假设是圆轨道
+    u = sat.omega_o + f
+    alpha = sat_alpha(r, sat.Omega_o, u, sat.i_o)
+    delta = math.asin(math.sin(u) * math.sin(sat.i_o))  # t时刻卫星赤纬
+    phi = delta  # t时刻卫星地心纬度
+    lam = alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度
+    if lam > math.pi:
+        lam = lam - 2 * math.pi
+    if lam < -math.pi:
+        lam = lam + 2 * math.pi
+
+    return phi, lam
+
+
 # 根据给定的最大off_nadir角和地面点，求卫星可能观测到的纬度带
 # 输入：1.最大off_nadir角 2.卫星半径 3.地面点纬度
 # 输出：1.卫星与地心的连线和地面点与地心的连线之间最大的可视夹角 2.纬度带最小值 3.纬度带最大值
@@ -117,4 +134,3 @@ def get_gd_alpha_range(psi, phi_min, phi_max, i_o, alpha_min1, alpha_max1, alpha
         gd_rang_of_alpha1 = [(alpha_max1 - theta_fax) % (2 * math.pi), (alpha_min1 + theta_fin) % (2 * math.pi)]
         gd_rang_of_alpha2 = [(alpha_min2 - theta_fin) % (2 * math.pi), (alpha_max2 + theta_fax) % (2 * math.pi)]
     return all_seen, gd_rang_of_alpha1, gd_rang_of_alpha2
-

@@ -16,7 +16,7 @@ class Sat(object):
     M_o = 0              # mean anomaly (rad)
     circle_o = 0         # mean motion (revolutions per day)
     T_o = 0              # period
-    a_o = 0              # # 卫星轨道半长轴a (m)
+    a_o = 0              # 卫星轨道半长轴a (m)
     n_o = 0              # mean anomaly velocity (rad/s)
     r = 0                # radius of satellite at current time (m), inlcude the earth radius
     orbit_id = 0         # a id for identify orbit
