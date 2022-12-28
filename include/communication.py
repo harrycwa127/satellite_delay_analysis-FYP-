@@ -18,7 +18,8 @@ def is_gs_communicable(t, satellite: satclass.Sat, gs: gsclass.GS, gs_off_nadir,
     cos_psi = math.cos(gs.lat_rad) * math.cos(phi) * math.cos(theta) + math.sin(gs.lat_rad) * math.sin(phi)
     psi = math.acos(cos_psi)
     beta = math.atan(satclass.Re * math.sin(psi) / (satellite.r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
-    if cos_psi > satclass.Re / satellite.r and beta <= gs_off_nadir:
+
+    if cos_psi > (satclass.Re / satellite.r) and beta <= gs_off_nadir:
         return True
     else:
         return False
@@ -32,13 +33,14 @@ def is_sat_communicable(t, from_satellite: satclass.Sat, to_satellite: satclass.
     theta = from_lam - to_lam
     cos_psi = math.cos(to_phi) * math.cos(from_phi) * math.cos(theta) + math.sin(to_phi) * math.sin(from_phi)
     psi = math.acos(cos_psi)
-    beta = math.atan(satclass.Re * math.sin(psi) / (from_satellite.r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
+    beta = math.atan(to_satellite.r * math.sin(psi) / (from_satellite.r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
 
-    horizon_angle = math.asin(satclass.Re/from_satellite.r)
+    off_nadir_limit = math.asin(satclass.Re/from_satellite.r)
+    print(off_nadir_limit)
 
-    if beta > horizon_angle:
+    if beta > off_nadir_limit:
         return True
-    elif cos_psi > (to_satellite.r / from_satellite.r) and beta <= horizon_angle:  #when to_sat in from_sat horizon_angle and 
+    elif cos_psi > (to_satellite.r / from_satellite.r) and beta <= off_nadir_limit:  #when to_sat in from_sat horizon_angle and 
         return True
     else:
         return False

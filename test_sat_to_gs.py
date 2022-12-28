@@ -23,8 +23,8 @@ start_time_julian = greenwich.julian2(int(time_lines[0][0]), int(time_lines[0][1
                                       int(time_lines[0][3]), int(time_lines[0][4]), int(time_lines[0][5]))
 end_time_julian = greenwich.julian2(int(time_lines[1][0]), int(time_lines[1][1]), int(time_lines[1][2]),
                                     int(time_lines[1][3]), int(time_lines[1][4]), int(time_lines[1][5]))
-time_interval = (end_time_julian-start_time_julian)*86400  # 单位s
-start_greenwich = (greenwich.greenwich(start_time_julian)) % 360   # 转到0到360°
+time_interval = (end_time_julian-start_time_julian)*86400  # in sec
+start_greenwich = (greenwich.greenwich(start_time_julian)) % 360   # 0 to 360 degree
 
 # ---------read ground stations
 gs_lines = []
@@ -42,9 +42,9 @@ for g in range(gs_accounts):
         gs_long = 360 + gs_long
     gs_ele = float(gs_lines[g][2])
     # gs_ele = 10
-    gs_lat_rad = math.radians(gs_lat)  # 弧度
-    gs_long_rad = math.radians(gs_long)  # 弧度
-    gs_ele_rad = math.radians(gs_ele)  # 弧度
+    gs_lat_rad = math.radians(gs_lat)  # rad
+    gs_long_rad = math.radians(gs_long)  # rad
+    gs_ele_rad = math.radians(gs_ele)  # rad
     gs = gsclass.GS(gs_lat_rad, gs_long_rad, gs_ele_rad)
     gs_list.append(gs)
 
@@ -57,34 +57,27 @@ circle_o = 14
 m = 9                  # number of orbit
 n = 25                 # number of sat
 
-# request_period = 600   # request period (s)
-# request_postpone = 60  # request postpone (s)
-
-# img_cost = 1           # imaging cost (s)
-# com_cost = 15          # communication cost (s)
-# ser_ddl = 150          # service delay (s)
-
-# 删除output文件
+# remove existed output file
 if os.path.exists("results/satellite_to_ground_communicable_result.xls"):
     os.remove("results/satellite_to_ground_communicable_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
 sheet = book.add_sheet('sat_ground_communicable_result', cell_overwrite_ok=True)
-col = ('satellite id', 'orbit id', 'Geocentric Latitude', 'Geocentric Longitude', 'communicable with ground station')
+col = ('satellite id', 'orbit id', 'Geocentric Latitude', 'Geocentric Longitude', 'communicable')
 for i in range(0, 5):
     sheet.write(0, i, col[i])
 col_num = 1
 
-# ------初始化所有卫星
+# init satellite
 sat_list = []
-first_Omega = 0  # 第一个轨道的升交点赤经
+first_Omega = 0  # longitude of ascending node of the first orbit
 even_Omega = 180 / (m-1)
 for orbit_id in range(m):
     Omega_o = math.radians(first_Omega + orbit_id * even_Omega)
-    first_M = 0  # 轨道上的第一个卫星的位置
+    first_M = 0  # first satellite postion of this orbit
     even_M = 360 / n
     for sat_id in range(n):
         M_o = math.radians(first_M + sat_id * even_M)
-        # 令卫星的当前时间为simulation的开始时间
+        # set current time to start time
         s = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian, orbit_id, sat_id)
         
         sat_list = sat_list + [s]
