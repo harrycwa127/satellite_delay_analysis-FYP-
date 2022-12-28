@@ -65,11 +65,11 @@ com_cost = 15          # communication cost (s)
 ser_ddl = 150          # service delay (s)
 
 # 删除output文件
-if os.path.exists("results/satellite_to_ground_communicable_result.xls"):
-    os.remove("results/satellite_to_ground_communicable_result.xls")
+if os.path.exists("results/sat_sat_communicable_result.xls"):
+    os.remove("results/sat_sat_communicable_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
-sheet = book.add_sheet('sat_ground_communicable_result', cell_overwrite_ok=True)
-col = ('satellite id', 'orbit id', 'Geocentric Latitude', 'Geocentric Longitude', 'communicable with ground station')
+sheet = book.add_sheet('sat_sat_communicable_result', cell_overwrite_ok=True)
+col = ('satellite id', 'orbit id', 'Geocentric Latitude', 'Geocentric Longitude', 'communicable with target')
 for i in range(0, 5):
     sheet.write(0, i, col[i])
 col_num = 1
@@ -91,7 +91,7 @@ for orbit_id in range(m):
 
 # 看能否通信
 target_sat = sat_list[0]
-for s in sat_list:
+for s in (len(sat_list)-1):
     # find out the lat lon
     M = (s.n_o * 0 + s.M_o) % (2 * math.pi)  
     f = M  
@@ -110,8 +110,8 @@ for s in sat_list:
     sheet.write(col_num, 4, s.r)
 
     # check communicable and write result to xls
-    gs_off_nadir = math.asin(satclass.Re * math.cos(target_gs.ele_rad) / s.r)
-    if communication.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
+    # gs_off_nadir = math.asin(satclass.Re * math.cos(target_gs.ele_rad) / s.r)
+    if communication.is_sat_communicable(0, s[i], s[i-1], start_greenwich):
         print("satellite", s.sat_id,"in orbit", s.orbit_id, "can communication with target ground satation")
         sheet.write(col_num, 5, "True")
     else:
