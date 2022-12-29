@@ -12,23 +12,13 @@ import math
 #      5.开始时刻0经度所处的赤经
 # 输出：TRUE OR FALSE
 def is_visible(t, satellite: satclass.Sat, gd: gdclass.GD, off_nadir, start_greenwich):
-    M = (satellite.n_o * t + satellite.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
-    f = M  # 假设是圆轨道
-    r = satellite.a_o  # 假设是圆轨道
-    u = satellite.omega_o + f
-    alpha = satcompute.sat_alpha(r, satellite.Omega_o, u, satellite.i_o)
-    delta = math.asin(math.sin(u) * math.sin(satellite.i_o))  # t时刻卫星赤纬
-    phi = delta  # t时刻卫星地心纬度
-    lam = alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度
-    if lam > math.pi:
-        lam = lam - 2 * math.pi
-    if lam < -math.pi:
-        lam = lam + 2 * math.pi
+    phi, lam = satcompute.get_sat_geo_lat_lon(sat = satellite, t = t, start_greenwich = start_greenwich)
+
     theta = lam - gd.long_rad
     cos_psi = math.cos(gd.lat_rad) * math.cos(phi) * math.cos(theta) + math.sin(gd.lat_rad) * math.sin(phi)
     psi = math.acos(cos_psi)
-    beta = math.atan(satclass.Re * math.sin(psi) / (r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
-    if cos_psi > satclass.Re / r and beta <= off_nadir:
+    beta = math.atan(satclass.Re * math.sin(psi) / (satellite.r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
+    if cos_psi > satclass.Re / satellite.r and beta <= off_nadir:
         return True
     else:
         return False
