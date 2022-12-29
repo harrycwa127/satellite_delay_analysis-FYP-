@@ -36,7 +36,6 @@ def is_sat_communicable(t, from_satellite: satclass.Sat, to_satellite: satclass.
     beta = math.atan(to_satellite.r * math.sin(psi) / (from_satellite.r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
 
     off_nadir_limit = math.asin(satclass.Re/from_satellite.r)
-    print(off_nadir_limit)
 
     if beta > off_nadir_limit:
         return True

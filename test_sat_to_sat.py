@@ -31,8 +31,7 @@ i_o = math.radians(97)
 e_o = 0
 omega_o = 0
 circle_o = 14
-m = 9                  # number of orbit
-n = 25                 # number of sat
+n = 200                 # number of sat
 
 
 # 删除output文件
@@ -48,21 +47,21 @@ col_num = 1
 # init satellites
 sat_list = []
 first_Omega = 0  # longitude of ascending node of the first orbit
-even_Omega = 180 / (m-1)
-for orbit_id in range(m):
-    Omega_o = math.radians(first_Omega + orbit_id * even_Omega)
-    first_M = 0  # first satellite position in this orbit
-    even_M = 360 / n
-    for sat_id in range(n):
-        M_o = math.radians(first_M + sat_id * even_M)
-        # set current time to start time
-        s = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian, orbit_id, sat_id)
-        
-        sat_list = sat_list + [s]
+Omega_o = math.radians(first_Omega)
+first_M = 0  # first satellite position in this orbit
+even_M = 360 / n
+for sat_id in range(n):
+    M_o = math.radians(first_M + sat_id * even_M)
+    # set current time to start time
+    s = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian, 0, sat_id)
+    
+    sat_list = sat_list + [s]
 
 # 看能否通信
-target_sat = sat_list[0]
-for s in sat_list[1:]:
+target_sat = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, first_M, 15, start_time_julian, 0, -1)
+phi, lam = satcompute.get_sat_geo_lat_lon(sat = target_sat, t = 0, start_greenwich = start_greenwich)
+print(phi, lam, target_sat.r)
+for s in sat_list:
     # find out the lat lon
     phi, lam = satcompute.get_sat_geo_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
 
