@@ -1,9 +1,9 @@
 import math
 
 # ---------constant value(orbit is circle)
-miu = 3.9860047e14            # 地球引力常数(m^3/s^2)
-omega_e = 2*math.pi/86400     # 地球转速(rad/s)
-Re = 6371000                  # 地球的平均半径
+miu = 3.9860047e14            # earth gravity (m^3/s^2)
+omega_e = 2*math.pi/86400     # earth rotation(rad/s)
+Re = 6371000                  # earth average radius(m)
 
 
 # ---------satellite class
@@ -19,8 +19,8 @@ class Sat(object):
     a_o = 0              # 卫星轨道半长轴a (m)
     n_o = 0              # mean anomaly velocity (rad/s)
     r = 0                # radius of satellite at current time (m), inlcude the earth radius
-    orbit_id = 0         # a id for identify orbit
-    sat_id = 0      # a id for identify satellite
+    orbit_id = -1        # a id for identify orbit
+    sat_id = -1          # a id for identify satellite
 
     def __init__(self, current_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian, orbit_id, sat_id):
         self.current_julian = current_julian
