@@ -54,7 +54,7 @@ for sat_id in range(n):
     sat_list = sat_list + [s]
 
 # 看能否通信
-target_sat = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, first_M, 10, start_time_julian, 0, -1)
+target_sat = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, first_M, 15, start_time_julian, 0, -1)
 phi, lam = satcompute.get_sat_geo_lat_lon(sat = target_sat, t = 0, start_greenwich = start_greenwich)
 for s in sat_list:
     # find out the lat lon
@@ -69,7 +69,7 @@ for s in sat_list:
 
     # check communicable and write result to xls
     # gs_off_nadir = math.asin(satclass.Re * math.cos(target_gs.ele_rad) / s.r)
-    if communication.is_sat_communicable(0, target_sat, s, start_greenwich):
+    if communication.is_sat_communicable(0, target_sat, s):
         # print("satellite", s.sat_id,"in orbit", s.orbit_id, "can communication with the target satellite")
         sheet.write(col_num, 5, "True")
     else:

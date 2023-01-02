@@ -2,7 +2,6 @@ from include import satclass
 from include import gsclass
 from include import satcompute
 import math
-import pyproj
 
 
 # 判断当前时刻卫星是否能和地面站通信
@@ -25,34 +24,14 @@ def is_gs_communicable(t, satellite: satclass.Sat, gs: gsclass.GS, gs_off_nadir,
     else:
         return False
 
-def is_sat_communicable(t, from_satellite: satclass.Sat, to_satellite: satclass.Sat, start_greenwich):
-    from_phi, from_lam = satcompute.get_sat_geo_lat_lon(sat = from_satellite, t = t, start_greenwich = start_greenwich)
+def is_sat_communicable(t, from_satellite: satclass.Sat, to_satellite: satclass.Sat):
 
-    to_phi, to_lam = satcompute.get_sat_geo_lat_lon(sat = to_satellite, t = t, start_greenwich = start_greenwich)
-
-    from_u = from_satellite.omega_o + (from_satellite.n_o * t + from_satellite.M_o) % (2 * math.pi)
-    from_alpha = satcompute.sat_alpha(from_satellite.r, from_satellite.Omega_o, from_u, from_satellite.i_o) # right ascension
-    from_delta = math.asin(math.sin(from_u) * math.sin(from_satellite.i_o))  # in time t
-
-    from_x = from_satellite.r * math.cos(from_delta) * math.cos(from_alpha)
-    from_y = from_satellite.r * math.cos(from_delta) * math.sin(from_alpha)
-    from_z = from_satellite.r * math.sin(from_delta)
-
-    to_u = to_satellite.omega_o + (to_satellite.n_o * t + to_satellite.M_o) % (2 * math.pi)
-    to_alpha = satcompute.sat_alpha(to_satellite.r, to_satellite.Omega_o, to_u, to_satellite.i_o)   # right ascension in time t
-    to_delta = math.asin(math.sin(to_u) * math.sin(to_satellite.i_o))  # declination in time t
-
-    to_x = to_satellite.r * math.cos(to_delta) * math.cos(to_alpha)
-    to_y = to_satellite.r * math.cos(to_delta) * math.sin(to_alpha)
-    to_z = to_satellite.r * math.sin(to_delta)
-    
-    r3 = ((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2) **(1/2)
+    r3 = satcompute.sat_distance(t, from_satellite, to_satellite)
 
     beta = math.acos((r3**2 + from_satellite.r**2 - to_satellite.r**2) / (2 * r3 * from_satellite.r))
 
     off_nadir_limit = math.asin(satclass.Re/from_satellite.r)
 
-    # print(beta, off_nadir_limit)
     if beta > off_nadir_limit:
         return True
     else:

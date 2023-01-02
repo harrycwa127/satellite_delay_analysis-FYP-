@@ -47,6 +47,24 @@ def get_sat_geo_lat_lon(sat: satclass.Sat, t, start_greenwich):
 
     return phi, lam
 
+def sat_distance(t, sat_1: satclass.Sat, sat_2: satclass.Sat):
+    from_u = sat_1.omega_o + (sat_1.n_o * t + sat_1.M_o) % (2 * math.pi)
+    from_alpha = sat_alpha(sat_1.r, sat_1.Omega_o, from_u, sat_1.i_o) # right ascension
+    from_delta = math.asin(math.sin(from_u) * math.sin(sat_1.i_o))  # in time t
+
+    from_x = sat_1.r * math.cos(from_delta) * math.cos(from_alpha)
+    from_y = sat_1.r * math.cos(from_delta) * math.sin(from_alpha)
+    from_z = sat_1.r * math.sin(from_delta)
+
+    to_u = sat_2.omega_o + (sat_2.n_o * t + sat_2.M_o) % (2 * math.pi)
+    to_alpha = sat_alpha(sat_2.r, sat_2.Omega_o, to_u, sat_2.i_o)   # right ascension in time t
+    to_delta = math.asin(math.sin(to_u) * math.sin(sat_2.i_o))  # declination in time t
+
+    to_x = sat_2.r * math.cos(to_delta) * math.cos(to_alpha)
+    to_y = sat_2.r * math.cos(to_delta) * math.sin(to_alpha)
+    to_z = sat_2.r * math.sin(to_delta)
+    
+    return ((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2) **(1/2)
 
 # 根据给定的最大off_nadir角和地面点，求卫星可能观测到的纬度带
 # 输入：1.最大off_nadir角 2.卫星半径 3.地面点纬度
