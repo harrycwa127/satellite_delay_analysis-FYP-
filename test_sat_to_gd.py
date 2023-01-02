@@ -22,10 +22,10 @@ start_time_julian = julian2(int(time_lines[0][0]), int(time_lines[0][1]), int(ti
                                       int(time_lines[0][3]), int(time_lines[0][4]), int(time_lines[0][5]))
 end_time_julian = julian2(int(time_lines[1][0]), int(time_lines[1][1]), int(time_lines[1][2]),
                                     int(time_lines[1][3]), int(time_lines[1][4]), int(time_lines[1][5]))
-time_interval = (end_time_julian-start_time_julian)*86400  # 单位s
-start_greenwich = (greenwich(start_time_julian)) % 360   # 转到0到360°
+time_interval = (end_time_julian-start_time_julian)*86400  # in sec
+start_greenwich = (greenwich(start_time_julian)) % 360   # from 0 degree to 360 degree
 
-# ----------观测区域经纬度
+# obervation lat lon
 gd_lines = []
 obs_f = open('../settings/OBSERVATION.txt', 'r')
 for line in obs_f.readlines():
@@ -36,8 +36,8 @@ gd_list = []
 for g in range(gd_accounts):
     region_lat = float(gd_lines[g][0])
     region_long = float(gd_lines[g][1])
-    region_lat_rad = math.radians(region_lat)       # 弧度
-    region_long_rad = math.radians(region_long)     # 弧度
+    region_lat_rad = math.radians(region_lat)       # rad
+    region_long_rad = math.radians(region_long)     # rad
     gd = GD(region_lat_rad, region_long_rad)
     gd_list.append(gd)
 
@@ -57,9 +57,9 @@ for g in range(gs_accounts):
         gs_long = 360 + gs_long
     gs_ele = float(gs_lines[g][2])
     # gs_ele = 10
-    gs_lat_rad = math.radians(gs_lat)  # 弧度
-    gs_long_rad = math.radians(gs_long)  # 弧度
-    gs_ele_rad = math.radians(gs_ele)  # 弧度
+    gs_lat_rad = math.radians(gs_lat)  # rad
+    gs_long_rad = math.radians(gs_long)  # rad
+    gs_ele_rad = math.radians(gs_ele)  # rad
     gs = GS(gs_lat_rad, gs_long_rad, gs_ele_rad)
     gs_list.append(gs)
 
@@ -79,7 +79,7 @@ img_cost = 1           # imaging cost (s)
 com_cost = 15          # communication cost (s)
 ser_ddl = 150          # service delay (s)
 
-# 删除output文件
+# remove orginal output file
 if os.path.exists("results/baseline_result.xls"):
     os.remove("results/baseline_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
@@ -89,21 +89,21 @@ for i in range(0, 3):
     sheet.write(0, i, col[i])
 col_num = 1
 
-# ------初始化所有卫星
+# init satellite
 sat_list = []
-first_Omega = 0  # 第一个轨道的升交点赤经
+first_Omega = 0  # first right ascension of ascending node (rad)
 even_Omega = 180 / (m-1)
 for orbit_id in range(m):
     Omega_o = math.radians(first_Omega + orbit_id * even_Omega)
-    first_M = 0  # 轨道上的第一个卫星的位置
+    first_M = 0  # first satellite posistion in the orbit
     even_M = 360 / n
     for sat_id in range(n):
         M_o = math.radians(first_M + sat_id * even_M)
-        # 令卫星的当前时间为simulation的开始时间
+        # set time to the start time
         s = Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
         sat_list = sat_list + [s]
 
-# ------穷举搜索
+# search
 for i in range(gd_accounts):
     sheet.write(col_num, 0, math.degrees(gd_list[i].lat_rad))
     sheet.write(col_num, 1, math.degrees(gd_list[i].long_rad))
@@ -111,7 +111,7 @@ for i in range(gd_accounts):
     for offset_start in np.arange(0, 600, 0.1):
         result_lst = [0]*requestNum
         result = 0
-        for reqNum in range(requestNum):  # check 144个t
+        for reqNum in range(requestNum):  # check 144 t
             t_start = offset_start+request_period*reqNum
             # 由于request有postpone=60s，因此需要遍历，step=0.1s
             for t in np.arange(t_start, t_start+request_postpone, 0.1):

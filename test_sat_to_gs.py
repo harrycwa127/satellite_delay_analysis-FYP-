@@ -82,7 +82,7 @@ for orbit_id in range(m):
         
         sat_list = sat_list + [s]
 
-# 看能否通信
+# satellite to ground station visible
 target_gs = gs_list[0]
 for s in sat_list:
     # find out the lat lon

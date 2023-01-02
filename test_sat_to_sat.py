@@ -3,16 +3,12 @@ import xlwt
 import time
 import numpy as np
 import math
-# import backup.include.imaging as imaging
 import include.communication as communication
 import include.greenwich as greenwich
 import include.satclass as satclass
-# import backup.include.gdclass as gdclass
-import include.gsclass as gsclass
 import include.satcompute as satcompute
 
 start_time = time.time()
-requestNum = 144
 
 # ---------read start time and end time
 time_f = open('settings/TIME_INTERVAL.txt', 'r')
@@ -34,13 +30,13 @@ circle_o = 14
 n = 200                 # number of sat
 
 
-# 删除output文件
+# remove orginal output file
 if os.path.exists("results/sat_to_sat_communicable_result.xls"):
     os.remove("results/sat_to_sat_communicable_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
 sheet = book.add_sheet('sat_to_sat_communicable_result', cell_overwrite_ok=True)
-col = ('satellite id', 'orbit id', 'Geocentric Latitude', 'Geocentric Longitude', 'communicable')
-for i in range(0, 5):
+col = ('satellite id', 'orbit id', 'Geocentric Latitude', 'Geocentric Longitude', 'Radius of Orbit', 'communicable')
+for i in range(0, 6):
     sheet.write(0, i, col[i])
 col_num = 1
 
@@ -58,9 +54,8 @@ for sat_id in range(n):
     sat_list = sat_list + [s]
 
 # 看能否通信
-target_sat = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, first_M, 15, start_time_julian, 0, -1)
+target_sat = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, first_M, 10, start_time_julian, 0, -1)
 phi, lam = satcompute.get_sat_geo_lat_lon(sat = target_sat, t = 0, start_greenwich = start_greenwich)
-print(phi, lam, target_sat.r)
 for s in sat_list:
     # find out the lat lon
     phi, lam = satcompute.get_sat_geo_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
@@ -75,7 +70,7 @@ for s in sat_list:
     # check communicable and write result to xls
     # gs_off_nadir = math.asin(satclass.Re * math.cos(target_gs.ele_rad) / s.r)
     if communication.is_sat_communicable(0, target_sat, s, start_greenwich):
-        print("satellite", s.sat_id,"in orbit", s.orbit_id, "can communication with the target satellite")
+        # print("satellite", s.sat_id,"in orbit", s.orbit_id, "can communication with the target satellite")
         sheet.write(col_num, 5, "True")
     else:
         sheet.write(col_num, 5, "False")

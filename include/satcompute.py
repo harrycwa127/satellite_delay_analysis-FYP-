@@ -33,13 +33,13 @@ def sat_alpha(r, Omega_o, u, i_o):
 
 def get_sat_geo_lat_lon(sat: satclass.Sat, t, start_greenwich):
     M = (sat.n_o * t + sat.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
-    f = M  # 假设是圆轨道
-    r = sat.a_o  # 假设是圆轨道
+    f = M  # if circular orbit
+    r = sat.a_o  # if circular orbit
     u = sat.omega_o + f
     alpha = sat_alpha(r, sat.Omega_o, u, sat.i_o)
     delta = math.asin(math.sin(u) * math.sin(sat.i_o))  # t时刻卫星赤纬
-    phi = delta  # t时刻卫星地心纬度
-    lam = alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度
+    phi = delta  # t时刻卫星地心纬度, lat
+    lam = alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度, lon
     if lam > math.pi:
         lam = lam - 2 * math.pi
     if lam < -math.pi:
