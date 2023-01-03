@@ -35,8 +35,8 @@ if os.path.exists("results/sat_to_sat_communicable_result.xls"):
     os.remove("results/sat_to_sat_communicable_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
 sheet = book.add_sheet('sat_to_sat_communicable_result', cell_overwrite_ok=True)
-col = ('satellite id', 'orbit id', 'Geocentric Latitude', 'Geocentric Longitude', 'Radius of Orbit', 'communicable')
-for i in range(0, 6):
+col = ('Geocentric Latitude', 'Geocentric Longitude', 'Radius of Orbit', 'communicable')
+for i in range(0, 4):
     sheet.write(0, i, col[i])
 col_num = 1
 
@@ -49,7 +49,7 @@ even_M = 360 / n
 for sat_id in range(n):
     M_o = math.radians(first_M + sat_id * even_M)
     # set current time to start time
-    s = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian, 0, sat_id)
+    s = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
     
     sat_list = sat_list + [s]
 
@@ -61,19 +61,17 @@ for s in sat_list:
     phi, lam = satcompute.get_sat_geo_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
 
     # write data to xls
-    sheet.write(col_num, 0, s.sat_id)
-    sheet.write(col_num, 1, s.orbit_id)
-    sheet.write(col_num, 2, phi)
-    sheet.write(col_num, 3, lam)
-    sheet.write(col_num, 4, s.r)
+    sheet.write(col_num, 0, phi)
+    sheet.write(col_num, 1, lam)
+    sheet.write(col_num, 2, s.r)
 
     # check communicable and write result to xls
     # gs_off_nadir = math.asin(satclass.Re * math.cos(target_gs.ele_rad) / s.r)
     if communication.is_sat_communicable(0, target_sat, s):
         # print("satellite", s.sat_id,"in orbit", s.orbit_id, "can communication with the target satellite")
-        sheet.write(col_num, 5, "True")
+        sheet.write(col_num, 3, "True")
     else:
-        sheet.write(col_num, 5, "False")
+        sheet.write(col_num, 3, "False")
 
     col_num+=1
 

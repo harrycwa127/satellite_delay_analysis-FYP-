@@ -62,8 +62,8 @@ if os.path.exists("results/satellite_to_ground_communicable_result.xls"):
     os.remove("results/satellite_to_ground_communicable_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
 sheet = book.add_sheet('sat_ground_communicable_result', cell_overwrite_ok=True)
-col = ('satellite id', 'orbit id', 'Geocentric Latitude', 'Geocentric Longitude', 'communicable')
-for i in range(0, 5):
+col = ('Geocentric Latitude', 'Geocentric Longitude', 'Radius of Orbit', 'communicable')
+for i in range(0, 4):
     sheet.write(0, i, col[i])
 col_num = 1
 
@@ -78,32 +78,35 @@ for orbit_id in range(m):
     for sat_id in range(n):
         M_o = math.radians(first_M + sat_id * even_M)
         # set current time to start time
-        s = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian, orbit_id, sat_id)
+        s = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
         
         sat_list = sat_list + [s]
 
 # satellite to ground station visible
-target_gs = gs_list[0]
-for s in sat_list:
-    # find out the lat lon
-    phi, lam = satcompute.get_sat_geo_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
+for gs in gs_list:
+    sheet.write(col_num, 0, math.degrees(gs.lat_rad))
+    sheet.write(col_num, 1, math.degrees(gs.long_rad))
+    visited_sats = []
+    gs_off_nadir = math.asin(satclass.Re * math.cos(gs.ele_rad) / s.r)
+    # search for all sat
+    for s in sat_list:
+        if communication.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
+            visited_sats.append(s)
 
-    # write data to xls
-    sheet.write(col_num, 0, s.sat_id)
-    sheet.write(col_num, 1, s.orbit_id)
-    sheet.write(col_num, 2, phi)
-    sheet.write(col_num, 3, lam)
-    sheet.write(col_num, 4, s.r)
+    if visited_sats:
+        for s in visited_sats:
+            phi, lam = satcompute.get_sat_geo_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
+            phi = phi * (180/math.pi)
+            lam = lam * (180/math.pi)
+            
+            temp = "[%f, %f, %f]" % (phi, lam, s.r)
 
-    # check communicable and write result to xls
-    gs_off_nadir = math.asin(satclass.Re * math.cos(target_gs.ele_rad) / s.r)
-    if communication.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
-        print("satellite", s.sat_id,"in orbit", s.orbit_id, "can communication with target ground satation")
-        sheet.write(col_num, 5, "True")
+            sheet.write(col_num, 2, temp)
     else:
-        sheet.write(col_num, 5, "False")
+        sheet.write(col_num, 2, '-')
+                
 
-    col_num+=1
+    col_num += 1
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)

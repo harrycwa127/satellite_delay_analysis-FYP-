@@ -1,33 +1,31 @@
-import random
 import os
 import xlwt
 import time
-import numpy as np
-from include.imaging import *
-from include.communication import *
-from include.greenwich import *
-from include.satclass import *
-from include.gdclass import *
-from include.gsclass import *
+import math
+import include.imaging as imaging
+import include.greenwich as greenwich
+import include.satclass as satclass
+import include.gdclass as gdclass
+import include.satcompute as satcompute
 
 start_time = time.time()
 requestNum = 144
 
 # ---------read start time and end time
-time_f = open('../settings/TIME_INTERVAL.txt', 'r')
+time_f = open('settings/TIME_INTERVAL.txt', 'r')
 time_lines = []
 for line in time_f.readlines():
     time_lines.append(line.split())
-start_time_julian = julian2(int(time_lines[0][0]), int(time_lines[0][1]), int(time_lines[0][2]),
+start_time_julian = greenwich.julian2(int(time_lines[0][0]), int(time_lines[0][1]), int(time_lines[0][2]),
                                       int(time_lines[0][3]), int(time_lines[0][4]), int(time_lines[0][5]))
-end_time_julian = julian2(int(time_lines[1][0]), int(time_lines[1][1]), int(time_lines[1][2]),
+end_time_julian = greenwich.julian2(int(time_lines[1][0]), int(time_lines[1][1]), int(time_lines[1][2]),
                                     int(time_lines[1][3]), int(time_lines[1][4]), int(time_lines[1][5]))
 time_interval = (end_time_julian-start_time_julian)*86400  # in sec
-start_greenwich = (greenwich(start_time_julian)) % 360   # from 0 degree to 360 degree
+start_greenwich = (greenwich.greenwich(start_time_julian)) % 360   # from 0 degree to 360 degree
 
 # obervation lat lon
 gd_lines = []
-obs_f = open('../settings/OBSERVATION.txt', 'r')
+obs_f = open('settings/OBSERVATION.txt', 'r')
 for line in obs_f.readlines():
     gd_lines.append(line.split(' '))
 obs_f.close()
@@ -38,30 +36,8 @@ for g in range(gd_accounts):
     region_long = float(gd_lines[g][1])
     region_lat_rad = math.radians(region_lat)       # rad
     region_long_rad = math.radians(region_long)     # rad
-    gd = GD(region_lat_rad, region_long_rad)
+    gd = gdclass.GD(region_lat_rad, region_long_rad)
     gd_list.append(gd)
-
-# ---------read ground stations
-gs_lines = []
-input_f2 = open('../settings/SELECT_GROUND_STATION2.txt', 'r')
-for line in input_f2.readlines():
-    tmpl = line.strip()
-    gs_lines.append(tmpl.split(' '))
-input_f2.close()
-gs_accounts = len(gs_lines)
-gs_list = []
-for g in range(gs_accounts):
-    gs_lat = float(gs_lines[g][0])
-    gs_long = float(gs_lines[g][1])
-    if gs_long < 0:
-        gs_long = 360 + gs_long
-    gs_ele = float(gs_lines[g][2])
-    # gs_ele = 10
-    gs_lat_rad = math.radians(gs_lat)  # rad
-    gs_long_rad = math.radians(gs_long)  # rad
-    gs_ele_rad = math.radians(gs_ele)  # rad
-    gs = GS(gs_lat_rad, gs_long_rad, gs_ele_rad)
-    gs_list.append(gs)
 
 # ----------main section
 off_nadir = math.radians(45)
@@ -71,23 +47,6 @@ omega_o = 0
 circle_o = 14
 m = 9
 n = 25
-
-request_period = 600   # request period (s)
-request_postpone = 60  # request postpone (s)
-
-img_cost = 1           # imaging cost (s)
-com_cost = 15          # communication cost (s)
-ser_ddl = 150          # service delay (s)
-
-# remove orginal output file
-if os.path.exists("results/baseline_result.xls"):
-    os.remove("results/baseline_result.xls")
-book = xlwt.Workbook(encoding='utf-8', style_compression=0)
-sheet = book.add_sheet('baseline_result', cell_overwrite_ok=True)
-col = ('ground latitude', 'ground longitude', 'feasible')
-for i in range(0, 3):
-    sheet.write(0, i, col[i])
-col_num = 1
 
 # init satellite
 sat_list = []
@@ -100,71 +59,45 @@ for orbit_id in range(m):
     for sat_id in range(n):
         M_o = math.radians(first_M + sat_id * even_M)
         # set time to the start time
-        s = Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+        s = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
         sat_list = sat_list + [s]
+
+# remove orginal output file
+if os.path.exists("results/test_sat_to_gd.xls"):
+    os.remove("results/test_sat_to_gd.xls")
+book = xlwt.Workbook(encoding='utf-8', style_compression=0)
+sheet = book.add_sheet('test_sat_to_gd', cell_overwrite_ok=True)
+col = ('Obervation Latitude', 'Obervation Longitude', 'Visited Satellite')
+for i in range(0, 3):
+    sheet.write(0, i, col[i])
+col_num = 1
 
 # search
 for i in range(gd_accounts):
     sheet.write(col_num, 0, math.degrees(gd_list[i].lat_rad))
     sheet.write(col_num, 1, math.degrees(gd_list[i].long_rad))
-    valid = 0
-    for offset_start in np.arange(0, 600, 0.1):
-        result_lst = [0]*requestNum
-        result = 0
-        for reqNum in range(requestNum):  # check 144 t
-            t_start = offset_start+request_period*reqNum
-            # 由于request有postpone=60s，因此需要遍历，step=0.1s
-            for t in np.arange(t_start, t_start+request_postpone, 0.1):
-                imaging_sats = []      # 所有可在[t,t+1]观测到地面点的卫星集合
-                for s in sat_list:
-                    if is_visible(t, s, gd_list[i], off_nadir, start_greenwich) and is_visible(t+1, s, gd_list[i]
-                            , off_nadir, start_greenwich):
-                        imaging_sats = imaging_sats+[s]
-                # 若没有卫星可看到地面点，则该次搜索失败，直接下次搜索
-                if not imaging_sats:
-                    print('can not image the ground')
-                    continue
-                #print('can image the ground')
-                # 看能否通信
-                communicate_flag = 0
-                for s in imaging_sats:
-                    for g in range(gs_accounts):
-                        gs = gs_list[g]
-                        gs_off_nadir = math.asin(satclass.Re * math.cos(gs.ele_rad) / s.r)
-                        communicate_dur = 0  # 将通信时段初始值设为0
-                        flag = 0
-                        for ct in np.arange(t, t+151, 0.1):
-                            if is_gs_communicable(ct, s, gs, gs_off_nadir, start_greenwich):
-                                communicate_dur = communicate_dur+1
-                            else:
-                                communicate_dur = 0
-                            if communicate_dur >= 150:
-                                communicate_flag = 1
-                                break
-                        if communicate_flag == 1:
-                            break
-                    if communicate_flag == 1:
-                        break
-                if communicate_flag == 1:
-                    result_lst[reqNum] = 1
-                    result = result+1
-                    break
-            if result_lst[reqNum] == 0:
-                print("offset fail!!")
-                break
-        print("result list:", result_lst)
-        if result == requestNum:
-            valid = 1
-            break
-    if valid:
-        sheet.write(col_num, 2, 'V')
-        print('valid')
+    imaging_sats = []
+    for s in sat_list:
+        if imaging.is_visible(0, s, gd_list[i], off_nadir, start_greenwich):
+            imaging_sats.append(s)
+
+    # 若没有卫星可看到地面点，则该次搜索失败，直接下次搜索
+    if imaging_sats:
+        for s in imaging_sats:
+            phi, lam = satcompute.get_sat_geo_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
+            phi = phi * (180/math.pi)
+            lam = lam * (180/math.pi)
+            
+            temp = "[%f, %f, %f]" % (phi, lam, s.r)
+
+            sheet.write(col_num, 2, temp)
     else:
         sheet.write(col_num, 2, '-')
-        print('invalid')
-    col_num = col_num+1
+                
+
+    col_num += 1
 end_time = time.time()
 print('overall time:',  end_time-start_time)
-book.save('results/baseline_result.xls')
+book.save('results/test_sat_to_gd.xls')
 
 
