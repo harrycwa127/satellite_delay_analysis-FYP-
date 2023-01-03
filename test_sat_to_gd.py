@@ -9,7 +9,6 @@ import include.gdclass as gdclass
 import include.satcompute as satcompute
 
 start_time = time.time()
-requestNum = 144
 
 # ---------read start time and end time
 time_f = open('settings/TIME_INTERVAL.txt', 'r')
