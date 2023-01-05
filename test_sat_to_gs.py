@@ -1,15 +1,12 @@
 import os
 import xlwt
 import time
-# import numpy as np
 import math
-# import backup.include.imaging as imaging
-import include.communication as communication
-import include.greenwich as greenwich
-import include.satclass as satclass
-# import backup.include.gdclass as gdclass
-import include.gsclass as gsclass
-import include.satcompute as satcompute
+from include import greenwich
+from include import satclass
+from include import gsclass
+from include import satcompute
+from include import visibility
 
 start_time = time.time()
 
@@ -53,12 +50,12 @@ i_o = math.radians(97)
 e_o = 0
 omega_o = 0
 circle_o = 14
-m = 9                  # number of orbit
-n = 25                 # number of sat
+m = 3                  # number of orbit
+n = 10                 # number of sat
 
 # remove existed output file
-if os.path.exists("results/satellite_to_ground_communicable_result.xls"):
-    os.remove("results/satellite_to_ground_communicable_result.xls")
+if os.path.exists("results/sat_to_sat_communicable_result.xls"):
+    os.remove("results/sat_to_sat_communicable_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
 sheet = book.add_sheet('sat_ground_communicable_result', cell_overwrite_ok=True)
 col = ('Geocentric Latitude', 'Geocentric Longitude', 'Radius of Orbit', 'communicable')
@@ -89,7 +86,7 @@ for gs in gs_list:
     gs_off_nadir = math.asin(satclass.Re * math.cos(gs.ele_rad) / s.r)
     # search for all sat
     for s in sat_list:
-        if communication.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
+        if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
             visited_sats.append(s)
 
     if visited_sats:
@@ -109,4 +106,4 @@ for gs in gs_list:
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)
-book.save('results/satellite_to_ground_communicable_result.xls')
+book.save('results/sat_to_sat_communicable_result.xls')

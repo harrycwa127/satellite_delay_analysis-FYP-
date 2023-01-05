@@ -2,11 +2,11 @@ import os
 import xlwt
 import time
 import math
-import include.imaging as imaging
-import include.greenwich as greenwich
-import include.satclass as satclass
-import include.gdclass as gdclass
-import include.satcompute as satcompute
+from include import greenwich
+from include import satclass
+from include import gdclass
+from include import satcompute
+from include import visibility
 
 start_time = time.time()
 
@@ -62,10 +62,10 @@ for orbit_id in range(m):
         sat_list = sat_list + [s]
 
 # remove orginal output file
-if os.path.exists("results/test_sat_to_gd.xls"):
-    os.remove("results/test_sat_to_gd.xls")
+if os.path.exists("results/sat_to_gd_communicable_result.xls"):
+    os.remove("results/sat_to_gd_communicable_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
-sheet = book.add_sheet('test_sat_to_gd', cell_overwrite_ok=True)
+sheet = book.add_sheet('sat_to_gd_communicable_result', cell_overwrite_ok=True)
 col = ('Obervation Latitude', 'Obervation Longitude', 'Visited Satellite')
 for i in range(0, 3):
     sheet.write(0, i, col[i])
@@ -77,7 +77,7 @@ for i in range(gd_accounts):
     sheet.write(col_num, 1, math.degrees(gd_list[i].long_rad))
     imaging_sats = []
     for s in sat_list:
-        if imaging.is_visible(0, s, gd_list[i], off_nadir, start_greenwich):
+        if visibility.is_visible(0, s, gd_list[i], off_nadir, start_greenwich):
             imaging_sats.append(s)
 
     # 若没有卫星可看到地面点，则该次搜索失败，直接下次搜索
@@ -95,8 +95,9 @@ for i in range(gd_accounts):
                 
 
     col_num += 1
+    
 end_time = time.time()
 print('overall time:',  end_time-start_time)
-book.save('results/test_sat_to_gd.xls')
+book.save('results/sat_to_gd_communicable_result.xls')
 
 

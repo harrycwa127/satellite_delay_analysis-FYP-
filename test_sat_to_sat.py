@@ -1,12 +1,11 @@
 import os
 import xlwt
 import time
-import numpy as np
 import math
-import include.communication as communication
-import include.greenwich as greenwich
-import include.satclass as satclass
-import include.satcompute as satcompute
+from include import greenwich
+from include import satclass
+from include import satcompute
+from include import visibility
 
 start_time = time.time()
 
@@ -67,7 +66,7 @@ for s in sat_list:
 
     # check communicable and write result to xls
     # gs_off_nadir = math.asin(satclass.Re * math.cos(target_gs.ele_rad) / s.r)
-    if communication.is_sat_communicable(0, target_sat, s):
+    if visibility.is_sat_communicable(0, target_sat, s):
         # print("satellite", s.sat_id,"in orbit", s.orbit_id, "can communication with the target satellite")
         sheet.write(col_num, 3, "True")
     else:

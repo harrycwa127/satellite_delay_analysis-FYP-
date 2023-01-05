@@ -1,27 +1,9 @@
 from include import satclass
 from include import gdclass
 from include import satcompute
+from include import visibility
 import math
 
-
-# 判断当前时刻卫星是否能看到地面点
-# 输入：1.当前时刻t（相对于开始时刻的时间）
-#      2.卫星class
-#      3.地面点class
-#      4.off_nadir角
-#      5.开始时刻0经度所处的赤经
-# 输出：TRUE OR FALSE
-def is_visible(t, satellite: satclass.Sat, gd: gdclass.GD, off_nadir, start_greenwich):
-    phi, lam = satcompute.get_sat_geo_lat_lon(sat = satellite, t = t, start_greenwich = start_greenwich)
-
-    theta = lam - gd.long_rad
-    cos_psi = math.cos(gd.lat_rad) * math.cos(phi) * math.cos(theta) + math.sin(gd.lat_rad) * math.sin(phi)
-    psi = math.acos(cos_psi)
-    beta = math.atan(satclass.Re * math.sin(psi) / (satellite.r - satclass.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
-    if cos_psi > satclass.Re / satellite.r and beta <= off_nadir:
-        return True
-    else:
-        return False
 
 
 # simulate一段时间内，卫星可观测到地面点的时间段
@@ -66,7 +48,7 @@ def visible(time_interval, start_greenwich, satellite: satclass.Sat, gd: gdclass
         if abandon == 0:
             t = t1
             while t < t2+1:
-                if is_visible(t, satellite, gd, off_nadir, start_greenwich):
+                if visibility.is_visible(t, satellite, gd, off_nadir, start_greenwich):
                     if test == 0:
                         #print('t1:', t)
                         test = 1
@@ -100,7 +82,7 @@ def visible(time_interval, start_greenwich, satellite: satclass.Sat, gd: gdclass
         if abandon == 0:
             t = t3
             while t < t4+1:
-                if is_visible(t, satellite, gd, off_nadir, start_greenwich):
+                if visibility.is_visible(t, satellite, gd, off_nadir, start_greenwich):
                     if test == 0:
                         #print('t3:', t)
                         test = 1
