@@ -1,5 +1,5 @@
 import math
-from include import satclass
+from include import Satellite_class
 
 
 # 根据轨道六要素求卫星当前位置赤经
@@ -31,7 +31,7 @@ def sat_alpha(r, Omega_o, u, i_o):
     return s_alpha
 
 
-def get_sat_geo_lat_lon(sat: satclass.Sat, t, start_greenwich):
+def get_sat_geo_lat_lon(sat: Satellite_class.Satellite, t, start_greenwich):
     M = (sat.n_o * t + sat.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
     f = M  # if circular orbit
     r = sat.a_o  # if circular orbit
@@ -39,7 +39,7 @@ def get_sat_geo_lat_lon(sat: satclass.Sat, t, start_greenwich):
     alpha = sat_alpha(r, sat.Omega_o, u, sat.i_o)
     delta = math.asin(math.sin(u) * math.sin(sat.i_o))  # t时刻卫星赤纬
     phi = delta  # t时刻卫星地心纬度, lat
-    lam = alpha - (math.radians(start_greenwich) + satclass.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度, lon
+    lam = alpha - (math.radians(start_greenwich) + Satellite_class.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度, lon
     if lam > math.pi:
         lam = lam - 2 * math.pi
     if lam < -math.pi:
@@ -47,7 +47,7 @@ def get_sat_geo_lat_lon(sat: satclass.Sat, t, start_greenwich):
 
     return phi, lam
 
-def sat_distance(t, sat_1: satclass.Sat, sat_2: satclass.Sat):
+def sat_distance(t, sat_1: Satellite_class.Satellite, sat_2: Satellite_class.Satellite):
     from_u = sat_1.omega_o + (sat_1.n_o * t + sat_1.M_o) % (2 * math.pi)
     from_alpha = sat_alpha(sat_1.r, sat_1.Omega_o, from_u, sat_1.i_o) # right ascension
     from_delta = math.asin(math.sin(from_u) * math.sin(sat_1.i_o))  # in time t
@@ -70,11 +70,11 @@ def sat_distance(t, sat_1: satclass.Sat, sat_2: satclass.Sat):
 # 输入：1.最大off_nadir角 2.卫星半径 3.地面点纬度
 # 输出：1.卫星与地心的连线和地面点与地心的连线之间最大的可视夹角 2.纬度带最小值 3.纬度带最大值
 def get_sat_phi_range(off_nadir, r, gd_lat_rad):
-    temp = r * math.sin(off_nadir) / satclass.Re
+    temp = r * math.sin(off_nadir) / Satellite_class.Re
     if temp <= 1:
         psi = math.asin(temp) - off_nadir
     else:
-        psi = math.acos(satclass.Re / r)
+        psi = math.acos(Satellite_class.Re / r)
     phi_min = max(gd_lat_rad - psi, -math.pi / 2)
     phi_max = min(gd_lat_rad + psi, math.pi / 2)
     return psi, phi_min, phi_max
@@ -91,7 +91,7 @@ def get_sat_phi_range(off_nadir, r, gd_lat_rad):
 #      6.卫星到达alpha_max1对应的时刻 t_max1
 #      7.卫星到达alpha_min2对应的时刻 t_min2
 #      8.卫星到达alpha_max2对应的时刻 t_max2
-def get_sat_alpha_range(phi_min, phi_max, sat: satclass.Sat):
+def get_sat_alpha_range(phi_min, phi_max, sat: Satellite_class.Satellite):
     sin_u_min1 = math.sin(phi_min) / math.sin(sat.i_o)
     sin_u_max1 = math.sin(phi_max) / math.sin(sat.i_o)
     if abs(sin_u_min1) <= 1:
@@ -128,7 +128,7 @@ def get_sat_alpha_range(phi_min, phi_max, sat: satclass.Sat):
 #      8.第二个赤经范围：卫星纬度到达纬度带最大值时的赤经 alpha_max2
 # 输出：1.是否地面点在整个赤经范围内都可能被观测到（这在地面点近极点时可能发生）
 #      2.地面点的赤经范围[gd_rang_of_alpha1, gd_rang_of_alpha2]
-def get_gd_alpha_range(psi, phi_min, phi_max, i_o, alpha_min1, alpha_max1, alpha_min2, alpha_max2):
+def get_observation_alpha_range(psi, phi_min, phi_max, i_o, alpha_min1, alpha_max1, alpha_min2, alpha_max2):
     cos_theta_fin = (math.cos(psi) - math.sin(phi_min) ** 2) / (math.cos(phi_min) ** 2)
     cos_theta_fax = (math.cos(psi) - math.sin(phi_max) ** 2) / (math.cos(phi_max) ** 2)
     # phi_min对应的最大theta值

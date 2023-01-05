@@ -1,9 +1,9 @@
 from backup import gdclass
-from include import gsclass
+from include import GroundStation_class
 import math
 
 
-def exclude_ground_station(gd: gdclass.GD, gs: gsclass.GS, max_rad):
+def exclude_ground_station(gd: gdclass.Observation, gs: GroundStation_class.GroundStation, max_rad):
     delta_phi = gd.lat_rad-gs.lat_rad
     delta_lam = gd.long_rad-gs.long_rad
     temp1 = math.sin(delta_phi/2)**2

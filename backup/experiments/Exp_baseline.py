@@ -6,9 +6,9 @@ import numpy as np
 from include.imaging import *
 from include.communication import *
 from include.greenwich import *
-from include.satclass import *
-from include.gdclass import *
-from include.gsclass import *
+from include.Satellite_class import *
+from include.observation_class import *
+from include.GroundStation_class import *
 
 start_time = time.time()
 requestNum = 144
@@ -38,7 +38,7 @@ for g in range(gd_accounts):
     region_long = float(gd_lines[g][1])
     region_lat_rad = math.radians(region_lat)       # 弧度
     region_long_rad = math.radians(region_long)     # 弧度
-    gd = GD(region_lat_rad, region_long_rad)
+    gd = Observation(region_lat_rad, region_long_rad)
     gd_list.append(gd)
 
 # ---------read ground stations
@@ -60,7 +60,7 @@ for g in range(gs_accounts):
     gs_lat_rad = math.radians(gs_lat)  # 弧度
     gs_long_rad = math.radians(gs_long)  # 弧度
     gs_ele_rad = math.radians(gs_ele)  # 弧度
-    gs = GS(gs_lat_rad, gs_long_rad, gs_ele_rad)
+    gs = GroundStation(gs_lat_rad, gs_long_rad, gs_ele_rad)
     gs_list.append(gs)
 
 # ----------main section
@@ -100,7 +100,7 @@ for orbit_id in range(m):
     for sat_id in range(n):
         M_o = math.radians(first_M + sat_id * even_M)
         # 令卫星的当前时间为simulation的开始时间
-        s = Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+        s = Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
         sat_list = sat_list + [s]
 
 # ------穷举搜索
@@ -130,7 +130,7 @@ for i in range(gd_accounts):
                 for s in imaging_sats:
                     for g in range(gs_accounts):
                         gs = gs_list[g]
-                        gs_off_nadir = math.asin(satclass.Re * math.cos(gs.ele_rad) / s.r)
+                        gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
                         communicate_dur = 0  # 将通信时段初始值设为0
                         flag = 0
                         for ct in np.arange(t, t+151, 0.1):

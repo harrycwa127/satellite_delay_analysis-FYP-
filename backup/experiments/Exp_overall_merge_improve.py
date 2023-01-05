@@ -10,9 +10,9 @@ from include import curve
 from include import service
 from include import validation
 from include.greenwich import *
-from include.satclass import *
+from include.Satellite_class import *
 from backup.gdclass import *
-from include.gsclass import *
+from include.GroundStation_class import *
 from include.requestclass import *
 
 
@@ -42,7 +42,7 @@ start_greenwich = (greenwich(start_time_julian)) % 360   # 转到0到360°
 #     region_long = float(gd_lines[g][1])
 #     region_lat_rad = math.radians(region_lat)       # 弧度
 #     region_long_rad = math.radians(region_long)     # 弧度
-#     gd = GD(region_lat_rad, region_long_rad)
+#     gd = Observation(region_lat_rad, region_long_rad)
 #     gd_list.append(gd)
 gd_accounts = 1
 gd_list = []
@@ -52,7 +52,7 @@ print("lat:", region_lat)
 print("long:", region_long)
 region_lat_rad = math.radians(region_lat)       # 弧度
 region_long_rad = math.radians(region_long)     # 弧度
-gd = GD(region_lat_rad, region_long_rad)
+gd = Observation(region_lat_rad, region_long_rad)
 gd_list.append(gd)
 
 # ---------read ground stations
@@ -74,7 +74,7 @@ for g in range(gs_accounts):
     gs_lat_rad = math.radians(gs_lat)  # 弧度
     gs_long_rad = math.radians(gs_long)  # 弧度
     gs_ele_rad = math.radians(gs_ele)  # 弧度
-    gs = GS(gs_lat_rad, gs_long_rad, gs_ele_rad)
+    gs = GroundStation(gs_lat_rad, gs_long_rad, gs_ele_rad)
     gs_list.append(gs)
 
 # ----------main section
@@ -114,7 +114,7 @@ for orbit_id in range(m):
     for sat_id in range(n):
         M_o = math.radians(first_M + sat_id * even_M)
         # 令卫星的当前时间为simulation的开始时间
-        s = Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+        s = Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
         sat_list = sat_list + [s]
 
 for i in range(gd_accounts):

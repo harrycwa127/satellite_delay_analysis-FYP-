@@ -1,5 +1,5 @@
 # the observation point
-class GD(object):
+class Observation(object):
     lat_rad = 0      # latitude (rad)
     long_rad = 0     # longitude (rad)
 

@@ -2,7 +2,7 @@ import os
 import xlwt
 from backup import imaging
 from include.greenwich import *
-from include.satclass import *
+from include.Satellite_class import *
 from backup.include.gdclass import *
 
 
@@ -41,9 +41,9 @@ for i in range(0, 4):
 
 col_num = 1
 for i_o in i_list:
-    s = Sat(start_time_julian, math.radians(i_o), Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+    s = Satellite(start_time_julian, math.radians(i_o), Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
     for ground_lat in ground_lat_list:
-        gd = GD(math.radians(ground_lat), math.radians(ground_long))
+        gd = Observation(math.radians(ground_lat), math.radians(ground_long))
         circle_num_list = []
         duration_list = []
         imaging_curve = imaging.visible(time_interval, start_greenwich, s, gd, math.radians(off_nadir))

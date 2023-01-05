@@ -1,4 +1,4 @@
-from include.satclass import *
+from include.Satellite_class import *
 from include.requestclass import *
 from backup.include.voteclass import *
 from include import curve

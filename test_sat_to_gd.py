@@ -3,8 +3,8 @@ import xlwt
 import time
 import math
 from include import greenwich
-from include import satclass
-from include import gdclass
+from include import Satellite_class
+from include import observation_class
 from include import satcompute
 from include import visibility
 
@@ -35,7 +35,7 @@ for g in range(gd_accounts):
     region_long = float(gd_lines[g][1])
     region_lat_rad = math.radians(region_lat)       # rad
     region_long_rad = math.radians(region_long)     # rad
-    gd = gdclass.GD(region_lat_rad, region_long_rad)
+    gd = observation_class.Observation(region_lat_rad, region_long_rad)
     gd_list.append(gd)
 
 # ----------main section
@@ -58,7 +58,7 @@ for orbit_id in range(m):
     for sat_id in range(n):
         M_o = math.radians(first_M + sat_id * even_M)
         # set time to the start time
-        s = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+        s = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
         sat_list = sat_list + [s]
 
 # remove orginal output file

@@ -4,7 +4,7 @@ import xlwt
 from include import imaging
 from include import curve
 from include.greenwich import *
-from include.satclass import *
+from include.Satellite_class import *
 from backup.include.gdclass import *
 
 
@@ -23,7 +23,7 @@ start_greenwich = (greenwich(start_time_julian)) % 360   # 转到0到360°
 off_nadir = math.radians(45)
 region_lat_rad = math.radians(48)      # 弧度
 region_long_rad = math.radians(9)     # 弧度
-gd = GD(region_lat_rad, region_long_rad)
+gd = Observation(region_lat_rad, region_long_rad)
 
 # ----------main section
 i_o = math.radians(50)
@@ -62,7 +62,7 @@ for m in m_set:
             for sat_id in range(n):
                 M_o = math.radians(first_M + sat_id * even_M)
                 # 令卫星的当前时间为simulation的开始时间
-                s = Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+                s = Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
                 sat_list = sat_list + [s]
         # 对每个卫星求其观测curve，然后merge成星座的观测curve
         for sid in range(m*n):

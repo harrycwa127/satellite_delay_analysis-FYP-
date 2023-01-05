@@ -1,9 +1,8 @@
-from include import satclass
-from include import gdclass
+from include import Satellite_class
+from include import observation_class
 from include import satcompute
 from include import visibility
 import math
-
 
 
 # simulate一段时间内，卫星可观测到地面点的时间段
@@ -13,12 +12,12 @@ import math
 #      4.地面点class
 #      5.off_nadir角
 # 输出：imaging curve
-def visible(time_interval, start_greenwich, satellite: satclass.Sat, gd: gdclass.GD, off_nadir):
+def visible(time_interval, start_greenwich, satellite: Satellite_class.Satellite, gd: observation_class.Observation, off_nadir):
     start_ground = (math.radians(start_greenwich) + gd.long_rad) % (2 * math.pi)
     psi, phi_min, phi_max = satcompute.get_sat_phi_range(off_nadir, satellite.a_o, gd.lat_rad)
     alpha_min1, alpha_max1, alpha_min2, alpha_max2, t_min1, t_max1, t_min2, t_max2 = satcompute.get_sat_alpha_range\
         (phi_min, phi_max, satellite)
-    all_seen, gd_rang_of_alpha1, gd_rang_of_alpha2 = satcompute.get_gd_alpha_range\
+    all_seen, gd_rang_of_alpha1, gd_rang_of_alpha2 = satcompute.get_observation_alpha_range\
         (psi, phi_min, phi_max, satellite.i_o, alpha_min1, alpha_max1, alpha_min2, alpha_max2)
 
     vs = []
@@ -28,8 +27,8 @@ def visible(time_interval, start_greenwich, satellite: satclass.Sat, gd: gdclass
     for n in range(num + 1):
         t1 = min(max(int(t_min1 + n * satellite.T_o), 0), time_interval)
         t2 = min(max(t_max1 + n * satellite.T_o, 0), time_interval)
-        ground_alpha_min = (start_ground + satclass.omega_e * t1) % (2 * math.pi)
-        ground_alpha_max = (start_ground + satclass.omega_e * t2) % (2 * math.pi)
+        ground_alpha_min = (start_ground + Satellite_class.omega_e * t1) % (2 * math.pi)
+        ground_alpha_max = (start_ground + Satellite_class.omega_e * t2) % (2 * math.pi)
         abandon = 0
         if all_seen == 1:
             abandon = 0
@@ -62,8 +61,8 @@ def visible(time_interval, start_greenwich, satellite: satclass.Sat, gd: gdclass
 
         t3 = min(max(int(t_min2 + n * satellite.T_o), 0), time_interval)
         t4 = min(max(t_max2 + n * satellite.T_o, 0), time_interval)
-        ground_alpha_min = (start_ground + satclass.omega_e * t3) % (2 * math.pi)
-        ground_alpha_max = (start_ground + satclass.omega_e * t4) % (2 * math.pi)
+        ground_alpha_min = (start_ground + Satellite_class.omega_e * t3) % (2 * math.pi)
+        ground_alpha_max = (start_ground + Satellite_class.omega_e * t4) % (2 * math.pi)
         abandon = 0
         if all_seen == 1:
             abandon = 0

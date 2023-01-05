@@ -1,5 +1,5 @@
 # the ground station
-class GS(object):
+class GroundStation(object):
     lat_rad = 0      # latitude (rad)
     long_rad = 0     # longitude (rad)
     ele_rad = 0      # elevation

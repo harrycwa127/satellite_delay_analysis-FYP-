@@ -3,8 +3,8 @@ import xlwt
 import time
 import math
 from include import greenwich
-from include import satclass
-from include import gsclass
+from include import Satellite_class
+from include import GroundStation_class
 from include import satcompute
 from include import visibility
 
@@ -41,7 +41,7 @@ for g in range(gs_accounts):
     gs_lat_rad = math.radians(gs_lat)  # rad
     gs_long_rad = math.radians(gs_long)  # rad
     gs_ele_rad = math.radians(gs_ele)  # rad
-    gs = gsclass.GS(gs_lat_rad, gs_long_rad, gs_ele_rad)
+    gs = GroundStation_class.GroundStation(gs_lat_rad, gs_long_rad, gs_ele_rad)
     gs_list.append(gs)
 
 # ----------main section
@@ -74,7 +74,7 @@ for orbit_id in range(m):
     for sat_id in range(n):
         M_o = math.radians(first_M + sat_id * even_M)
         # set current time to start time
-        s = satclass.Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+        s = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
         
         sat_list = sat_list + [s]
 
@@ -83,7 +83,7 @@ for gs in gs_list:
     sheet.write(col_num, 0, math.degrees(gs.lat_rad))
     sheet.write(col_num, 1, math.degrees(gs.long_rad))
     visited_sats = []
-    gs_off_nadir = math.asin(satclass.Re * math.cos(gs.ele_rad) / s.r)
+    gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
     # search for all sat
     for s in sat_list:
         if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):

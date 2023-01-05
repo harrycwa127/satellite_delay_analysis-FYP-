@@ -2,7 +2,7 @@ import os
 import xlwt
 from backup import imaging
 from include.greenwich import *
-from include.satclass import *
+from include.Satellite_class import *
 from backup.gdclass import *
 
 
@@ -39,11 +39,11 @@ col = ('ground latitude', 'ground longitude', 'circle number', 'duration')
 for i in range(0, 4):
     sheet.write(0, i, col[i])
 
-s = Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+s = Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
 col_num = 1
 for ground_lat in ground_lat_list:
     for ground_long in ground_long_list:
-        gd = GD(math.radians(ground_lat), math.radians(ground_long))
+        gd = Observation(math.radians(ground_lat), math.radians(ground_long))
         circle_num_list = []
         duration_list = []
         imaging_curve = imaging.visible(time_interval, start_greenwich, s, gd, math.radians(off_nadir))

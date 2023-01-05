@@ -1,7 +1,7 @@
 import math
-from include import satclass
+from include import Satellite_class
 from include import satcompute
-from include import gsclass
+from include import GroundStation_class
 from include import visibility
 
 
@@ -11,14 +11,14 @@ from include import visibility
 #      3.卫星class
 #      4.地面站class
 # 输出：communication curve
-def communicable(time_interval, start_greenwich, satellite: satclass.Sat, gs: gsclass.GS):
+def communicable(time_interval, start_greenwich, satellite: Satellite_class.Satellite, gs: GroundStation_class.GroundStation):
     # 根据仰角范围求off nadir角最大值
-    gs_off_nadir = math.asin(satclass.Re * math.cos(gs.ele_rad) / satellite.r)
+    gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / satellite.r)
     start_ground = (math.radians(start_greenwich) + gs.long_rad) % (2 * math.pi)
     psi, phi_min, phi_max = satcompute.get_sat_phi_range(gs_off_nadir, satellite.r, gs.lat_rad)
     alpha_min1, alpha_max1, alpha_min2, alpha_max2, t_min1, t_max1, t_min2, t_max2 = satcompute.get_sat_alpha_range\
         (phi_min, phi_max, satellite)
-    all_seen, gd_rang_of_alpha1, gd_rang_of_alpha2 = satcompute.get_gd_alpha_range\
+    all_seen, gd_rang_of_alpha1, gd_rang_of_alpha2 = satcompute.get_observation_alpha_range\
         (psi, phi_min, phi_max, satellite.i_o, alpha_min1, alpha_max1, alpha_min2, alpha_max2)
 
     vs = []
@@ -28,8 +28,8 @@ def communicable(time_interval, start_greenwich, satellite: satclass.Sat, gs: gs
     for n in range(num + 1):
         t1 = min(max(int(t_min1 + n * satellite.T_o), 0), time_interval)
         t2 = min(max(t_max1 + n * satellite.T_o, 0), time_interval)
-        ground_alpha_min = (start_ground + satclass.omega_e * t1) % (2 * math.pi)
-        ground_alpha_max = (start_ground + satclass.omega_e * t2) % (2 * math.pi)
+        ground_alpha_min = (start_ground + Satellite_class.omega_e * t1) % (2 * math.pi)
+        ground_alpha_max = (start_ground + Satellite_class.omega_e * t2) % (2 * math.pi)
         abandon = 0
         if all_seen == 1:
             abandon = 0
@@ -62,8 +62,8 @@ def communicable(time_interval, start_greenwich, satellite: satclass.Sat, gs: gs
 
         t3 = min(max(int(t_min2 + n * satellite.T_o), 0), time_interval)
         t4 = min(max(t_max2 + n * satellite.T_o, 0), time_interval)
-        ground_alpha_min = (start_ground + satclass.omega_e * t3) % (2 * math.pi)
-        ground_alpha_max = (start_ground + satclass.omega_e * t4) % (2 * math.pi)
+        ground_alpha_min = (start_ground + Satellite_class.omega_e * t3) % (2 * math.pi)
+        ground_alpha_max = (start_ground + Satellite_class.omega_e * t4) % (2 * math.pi)
         abandon = 0
         if all_seen == 1:
             abandon = 0

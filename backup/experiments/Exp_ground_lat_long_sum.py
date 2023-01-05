@@ -2,7 +2,7 @@ import os
 import xlwt
 from backup import imaging
 from include.greenwich import *
-from include.satclass import *
+from include.Satellite_class import *
 from backup.gdclass import *
 
 
@@ -39,7 +39,7 @@ col = ('ground latitude', 'min visits', 'max visits', 'average visits', 'min dur
 for i in range(0, 7):
     sheet.write(0, i, col[i])
 
-s = Sat(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+s = Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
 col_num = 1
 for ground_lat in ground_lat_list:
     min_visit = 100
@@ -51,7 +51,7 @@ for ground_lat in ground_lat_list:
     sum_visit = 0
     sum_duration = 0
     for ground_long in ground_long_list:
-        gd = GD(math.radians(ground_lat), math.radians(ground_long))
+        gd = Observation(math.radians(ground_lat), math.radians(ground_long))
         imaging_curve = imaging.visible(time_interval, start_greenwich, s, gd, math.radians(off_nadir))
         visit = len(imaging_curve)
         if visit > max_visit:
