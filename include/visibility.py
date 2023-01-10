@@ -12,7 +12,7 @@ import math
 #      4.off_nadir角
 #      5.开始时刻0经度所处的赤经
 # 输出：TRUE OR FALSE
-def is_visible(t, satellite: Satellite_class.Satellite, gd: observation_class.Observation, off_nadir, start_greenwich):
+def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: observation_class.Observation, off_nadir, start_greenwich):
     phi, lam = satcompute.get_sat_geo_lat_lon(sat = satellite, t = t, start_greenwich = start_greenwich)
 
     theta = lam - gd.long_rad

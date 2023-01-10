@@ -2,31 +2,15 @@ import os
 import xlwt
 import time
 import math
-from include import greenwich
 from include import Satellite_class
 from include import satcompute
 from include import visibility
+from include import read_data
 
 start_time = time.time()
 
 # ---------read start time and end time
-time_f = open('settings/TIME_INTERVAL.txt', 'r')
-time_lines = []
-for line in time_f.readlines():
-    time_lines.append(line.split())
-start_time_julian = greenwich.julian2(int(time_lines[0][0]), int(time_lines[0][1]), int(time_lines[0][2]),
-                                      int(time_lines[0][3]), int(time_lines[0][4]), int(time_lines[0][5]))
-end_time_julian = greenwich.julian2(int(time_lines[1][0]), int(time_lines[1][1]), int(time_lines[1][2]),
-                                    int(time_lines[1][3]), int(time_lines[1][4]), int(time_lines[1][5]))
-time_interval = (end_time_julian-start_time_julian)*86400  # in sec
-start_greenwich = (greenwich.greenwich(start_time_julian)) % 360   # from 0 to 360 degree
-# ----------main section
-off_nadir = math.radians(45)
-i_o = math.radians(97)
-e_o = 0
-omega_o = 0
-circle_o = 14
-n = 200                 # number of sat
+start_time_julian, start_greenwich = read_data.get_start_julian_time()
 
 
 # remove orginal output file
@@ -40,6 +24,13 @@ for i in range(0, 4):
 col_num = 1
 
 # init satellites
+off_nadir = math.radians(45)
+i_o = math.radians(97)
+e_o = 0
+omega_o = 0
+circle_o = 14
+n = 200       # number of sat
+
 sat_list = []
 first_Omega = 0  # longitude of ascending node of the first orbit
 Omega_o = math.radians(first_Omega)
@@ -65,7 +56,6 @@ for s in sat_list:
     sheet.write(col_num, 2, s.r)
 
     # check communicable and write result to xls
-    # gs_off_nadir = math.asin(satclass.Re * math.cos(target_gs.ele_rad) / s.r)
     if visibility.is_sat_communicable(0, target_sat, s):
         # print("satellite", s.sat_id,"in orbit", s.orbit_id, "can communication with the target satellite")
         sheet.write(col_num, 3, "True")

@@ -2,22 +2,23 @@ import os
 import xlwt
 import time
 import math
-from include import greenwich
+import sys
 from include import Satellite_class
-from include import observation_class
-from include import satcompute
+from include import GroundStation_class
 from include import visibility
 from include import read_data
-
 
 start_time = time.time()
 
 # ---------read start time
 start_time_julian, start_greenwich = read_data.get_start_julian_time()
 
-
 # obervation lat lon
-gd_list = read_data.get_observation()
+gd = read_data.get_observation2()
+
+# ---------read ground stations
+gs_list = read_data.get_gs()
+
 
 # init satellite
 off_nadir = math.radians(45)
@@ -42,42 +43,43 @@ for orbit_id in range(m):
         sat_list = sat_list + [s]
 
 # remove orginal output file
-if os.path.exists("results/sat_to_gd_communicable_result.xls"):
-    os.remove("results/sat_to_gd_communicable_result.xls")
+if os.path.exists("results/analysis_result.xls"):
+    os.remove("results/analysis_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
-sheet = book.add_sheet('sat_to_gd_communicable_result', cell_overwrite_ok=True)
+sheet = book.add_sheet('analysis_result', cell_overwrite_ok=True)
 col = ('Obervation Latitude', 'Obervation Longitude', 'Visited Satellite')
 for i in range(0, 3):
     sheet.write(0, i, col[i])
 col_num = 1
 
-# search
-for i in range(len(gd_list)):
-    sheet.write(col_num, 0, math.degrees(gd_list[i].lat_rad))
-    sheet.write(col_num, 1, math.degrees(gd_list[i].long_rad))
-    imaging_sats = []
-    for s in sat_list:
-        if visibility.is_observation_visible(0, s, gd_list[i], off_nadir, start_greenwich):
-            imaging_sats.append(s)
+# search satellite to observation
+imaging_sats = []
+# search for all sat
+for s in sat_list:
+    if visibility.is_observation_visible(0, s, gd, off_nadir, start_greenwich):
+        imaging_sats.append(s)
 
-    # 若没有卫星可看到地面点，则该次搜索失败，直接下次搜索
-    if imaging_sats:
-        for s in imaging_sats:
-            phi, lam = satcompute.get_sat_geo_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
-            phi = phi * (180/math.pi)
-            lam = lam * (180/math.pi)
-            
-            temp = "[%f, %f, %f]" % (phi, lam, s.r)
+if not imaging_sats:
+    print("No Satellite able to visit the observation point!!")
+    sys.exit(-1)
 
-            sheet.write(col_num, 2, temp)
-    else:
-        sheet.write(col_num, 2, '-')
-                
+visited_sats = []
+for gs in gs_list:
+    gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
+    # search for all sat
+    for s in imaging_sats:
+        if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
+            visited_sats.append(s)
 
-    col_num += 1
+if visited_sats:
+    print("Satellite direcly get obervation point and ground station!")
+    sys.exit(0)
+
+# no able to directly transfer data from obervation satellite to ground station
+
     
 end_time = time.time()
 print('overall time:',  end_time-start_time)
-book.save('results/sat_to_gd_communicable_result.xls')
+book.save('results/analysis_result.xls')
 
 

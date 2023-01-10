@@ -47,7 +47,7 @@ def visible(time_interval, start_greenwich, satellite: Satellite_class.Satellite
         if abandon == 0:
             t = t1
             while t < t2+1:
-                if visibility.is_visible(t, satellite, gd, off_nadir, start_greenwich):
+                if visibility.is_observation_visible(t, satellite, gd, off_nadir, start_greenwich):
                     if test == 0:
                         #print('t1:', t)
                         test = 1
@@ -81,7 +81,7 @@ def visible(time_interval, start_greenwich, satellite: Satellite_class.Satellite
         if abandon == 0:
             t = t3
             while t < t4+1:
-                if visibility.is_visible(t, satellite, gd, off_nadir, start_greenwich):
+                if visibility.is_observation_visible(t, satellite, gd, off_nadir, start_greenwich):
                     if test == 0:
                         #print('t3:', t)
                         test = 1

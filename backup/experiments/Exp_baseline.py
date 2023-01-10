@@ -3,7 +3,7 @@ import os
 import xlwt
 import time
 import numpy as np
-from include.imaging import *
+from backup.imaging import *
 from include.communication import *
 from include.greenwich import *
 from include.Satellite_class import *
@@ -117,7 +117,7 @@ for i in range(gd_accounts):
             for t in np.arange(t_start, t_start+request_postpone, 0.1):
                 imaging_sats = []      # 所有可在[t,t+1]观测到地面点的卫星集合
                 for s in sat_list:
-                    if is_visible(t, s, gd_list[i], off_nadir, start_greenwich) and is_visible(t+1, s, gd_list[i]
+                    if is_observation_visible(t, s, gd_list[i], off_nadir, start_greenwich) and is_observation_visible(t+1, s, gd_list[i]
                             , off_nadir, start_greenwich):
                         imaging_sats = imaging_sats+[s]
                 # 若没有卫星可看到地面点，则该次搜索失败，直接下次搜索
