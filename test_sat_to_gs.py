@@ -62,13 +62,17 @@ for gs in gs_list:
         if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
             visited_sats.append(s)
 
+    temp = ''
     if visited_sats:
         for s in visited_sats:
             phi, lam = satcompute.get_sat_geo_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
             phi = phi * (180/math.pi)
             lam = lam * (180/math.pi)
             
-            temp = "[%f, %f, %f]" % (phi, lam, s.r)
+            if temp == '':
+                temp = "[%f, %f, %f]" % (phi, lam, s.r)
+            else:
+                temp += ", [%f, %f, %f]" % (phi, lam, s.r)
 
             sheet.write(col_num, 2, temp)
     else:

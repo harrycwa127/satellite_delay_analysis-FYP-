@@ -60,14 +60,17 @@ for i in range(len(gd_list)):
         if visibility.is_observation_visible(0, s, gd_list[i], off_nadir, start_greenwich):
             imaging_sats.append(s)
 
-    # 若没有卫星可看到地面点，则该次搜索失败，直接下次搜索
+    temp = ''
     if imaging_sats:
         for s in imaging_sats:
             phi, lam = satcompute.get_sat_geo_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
             phi = phi * (180/math.pi)
             lam = lam * (180/math.pi)
             
-            temp = "[%f, %f, %f]" % (phi, lam, s.r)
+            if temp == '':
+                temp = "[%f, %f, %f]" % (phi, lam, s.r)
+            else:
+                temp += ", [%f, %f, %f]" % (phi, lam, s.r)
 
             sheet.write(col_num, 2, temp)
     else:
