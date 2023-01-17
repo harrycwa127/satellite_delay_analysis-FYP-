@@ -42,7 +42,7 @@ first_Omega = 0  # longitude of ascending node of the first orbit
 even_Omega = 180 / (m-1)
 for orbit_id in range(m):
     Omega_o = math.radians(first_Omega + orbit_id * even_Omega)
-    first_M = 0  # first satellite postion of this orbit
+    first_M = 0  # first satellite posGGtion of this orbit
     even_M = 360 / n
     for sat_id in range(n):
         M_o = math.radians(first_M + sat_id * even_M)

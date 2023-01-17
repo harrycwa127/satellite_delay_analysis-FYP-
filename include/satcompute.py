@@ -1,6 +1,6 @@
 import math
 from include import Satellite_class
-
+from include import GroundStation_class
 
 # 根据轨道六要素求卫星当前位置赤经
 # 输入：1.卫星半径 2.升交点赤经 3.卫星轨道面上卫星当前位置与升交点赤经的角度(omega+f) 4.轨道倾角
@@ -31,6 +31,9 @@ def sat_alpha(r, Omega_o, u, i_o):
     return s_alpha
 
 
+# input     1. sat (Satellite Class Object)
+#           2. t (time passed from start_greenwich, in sec)
+#           3. start_greenwich (the greenwich value of datetime for simulation)
 def get_sat_geo_lat_lon(sat: Satellite_class.Satellite, t, start_greenwich):
     M = (sat.n_o * t + sat.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
     f = M  # if circular orbit
@@ -47,7 +50,11 @@ def get_sat_geo_lat_lon(sat: Satellite_class.Satellite, t, start_greenwich):
 
     return phi, lam
 
-def sat_distance(t, sat_1: Satellite_class.Satellite, sat_2: Satellite_class.Satellite):
+
+# input     1. t (time passed from start_greenwich, in sec)
+#           2. sat_1 (first satellite)
+#           3. sat_2 (first satellite)
+def inter_sat_distance(t, sat_1: Satellite_class.Satellite, sat_2: Satellite_class.Satellite):
     from_u = sat_1.omega_o + (sat_1.n_o * t + sat_1.M_o) % (2 * math.pi)
     from_alpha = sat_alpha(sat_1.r, sat_1.Omega_o, from_u, sat_1.i_o) # right ascension
     from_delta = math.asin(math.sin(from_u) * math.sin(sat_1.i_o))  # in time t
@@ -65,6 +72,26 @@ def sat_distance(t, sat_1: Satellite_class.Satellite, sat_2: Satellite_class.Sat
     to_z = sat_2.r * math.sin(to_delta)
     
     return ((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2) **(1/2)
+
+
+# input     1. t (time passed from start_greenwich, in sec)
+#           2. sat_1 (Satellite)
+#           3. gs (Ground Station)
+def sat_ground_distance(t, sat: Satellite_class.Satellite, gs: GroundStation_class.GroundStation):
+    from_u = sat.omega_o + (sat.n_o * t + sat.M_o) % (2 * math.pi)
+    from_alpha = sat_alpha(sat.r, sat.Omega_o, from_u, sat.i_o) # right ascension
+    from_delta = math.asin(math.sin(from_u) * math.sin(sat.i_o))  # in time t
+
+    from_x = sat.r * math.cos(from_delta) * math.cos(from_alpha)
+    from_y = sat.r * math.cos(from_delta) * math.sin(from_alpha)
+    from_z = sat.r * math.sin(from_delta)
+
+    to_x = Satellite_class.Re * math.cos(gs.lat_rad) * math.cos(gs.long_rad)
+    to_y = Satellite_class.Re * math.cos(gs.lat_rad) * math.sin(gs.long_rad)
+    to_z = Satellite_class.Re * math.sin(gs.lat_rad)
+    
+    return ((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2) **(1/2)
+
 
 # 根据给定的最大off_nadir角和地面点，求卫星可能观测到的纬度带
 # 输入：1.最大off_nadir角 2.卫星半径 3.地面点纬度

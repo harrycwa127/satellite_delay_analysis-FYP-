@@ -47,7 +47,7 @@ def is_gs_communicable(t, satellite: Satellite_class.Satellite, gs: GroundStatio
 
 def is_sat_communicable(t, from_satellite: Satellite_class.Satellite, to_satellite: Satellite_class.Satellite):
 
-    r3 = satcompute.sat_distance(t, from_satellite, to_satellite)
+    r3 = satcompute.inter_sat_distance(t, from_satellite, to_satellite)
 
     beta = math.acos((r3**2 + from_satellite.r**2 - to_satellite.r**2) / (2 * r3 * from_satellite.r))
 

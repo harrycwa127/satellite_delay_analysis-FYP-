@@ -115,3 +115,44 @@ def communicable(time_interval, start_greenwich, satellite: Satellite_class.Sate
         exit()
     return curve
 
+# asuum satellite using radio frequencies, because only very less satellite use laser
+# high carrier frequencies and narrow beamwidths
+# The signal delay approximately 20 ms.
+
+# input:    1. t(time passed from start_time_julian)
+#           2. package_size(size of data)
+#           3. signal_speed(speed of signal)
+#           4. from_sat (the satellite hold the data)
+#           5. to_sat (the satellite transfer the data)
+#           6. buffer_delay (the sum of the delays that occur at each hop in the network due to cell queuing)
+#           7. process_delay (the on-board switching and processing delay from satellite)
+
+# reference https://www.researchgate.net/publication/1961144_Analysis_and_Simulation_of_Delay_and_Buffer_Requirements_of_satellite-ATM_Networks_for_TCPIP_Traffic
+
+def inter_sat_commnicate(t, package_size, data_rate, signal_speed, from_sat: Satellite_class.Satellite, to_sat: Satellite_class.Satellite, buffer_delay, process_delay):
+    transmit_delay = package_size / data_rate
+
+    inter_sat_distance = satcompute.inter_sat_distance(t, from_sat, to_sat)
+
+    propagation_delay = inter_sat_distance / signal_speed
+
+    return transmit_delay + propagation_delay + buffer_delay + process_delay
+
+
+# input:    1. t (time passed from start_greenwich, in sec)
+#           2. package_size(size of data)
+#           3. data_rate (data rate of transmission)
+#           4. signal_speed(speed of signal)
+#           5. from_sat (the satellite hold the data)
+#           6. to_sat (the satellite transfer the data)
+#           7. buffer_delay (the sum of the delays that occur at each hop in the network due to cell queuing)
+#           8. process_delay (the on-board switching and processing delay from satellite)
+
+def inter_sat_commnicate(t, package_size, data_rate, signal_speed, sat: Satellite_class.Satellite, ground_station: GroundStation_class.GroundStation, buffer_delay, process_delay):
+    transmit_delay = package_size / data_rate
+
+    distance = satcompute.sat_ground_distance(t, sat, ground_station)
+
+    propagation_delay = distance / signal_speed
+
+    return transmit_delay + propagation_delay + buffer_delay + process_delay
