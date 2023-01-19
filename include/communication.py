@@ -119,13 +119,16 @@ def communicable(time_interval, start_greenwich, satellite: Satellite_class.Sate
 # high carrier frequencies and narrow beamwidths
 # The signal delay approximately 20 ms.
 
-# input:    1. t(time passed from start_time_julian)
+# input:    1. t (time passed from start_time_julian)
 #           2. package_size(size of data)
 #           3. signal_speed(speed of signal)
 #           4. from_sat (the satellite hold the data)
 #           5. to_sat (the satellite transfer the data)
 #           6. buffer_delay (the sum of the delays that occur at each hop in the network due to cell queuing)
 #           7. process_delay (the on-board switching and processing delay from satellite)
+
+# output:   t (the time passed from start_time_julian after commnicate), 
+#           when > 0 commnicate success, < 0 fail
 
 # reference https://www.researchgate.net/publication/1961144_Analysis_and_Simulation_of_Delay_and_Buffer_Requirements_of_satellite-ATM_Networks_for_TCPIP_Traffic
 
@@ -136,7 +139,13 @@ def inter_sat_commnicate(t, package_size, data_rate, signal_speed, from_sat: Sat
 
     propagation_delay = inter_sat_distance / signal_speed
 
-    return transmit_delay + propagation_delay + buffer_delay + process_delay
+    total_delay = transmit_delay + propagation_delay + buffer_delay + process_delay
+    final_t = t + total_delay
+
+    if visibility.is_sat_communicable(final_t, from_sat, to_sat):
+        return final_t
+    else:
+        return -1
 
 
 # input:    1. t (time passed from start_greenwich, in sec)
@@ -148,11 +157,20 @@ def inter_sat_commnicate(t, package_size, data_rate, signal_speed, from_sat: Sat
 #           7. buffer_delay (the delays that occur at each hop in the network due to cell queuing)
 #           8. process_delay (the on-board switching and processing delay from satellite)
 
-def sat_ground_commnicate(t, package_size, data_rate, signal_speed, sat: Satellite_class.Satellite, ground_station: GroundStation_class.GroundStation, buffer_delay, process_delay):
+# output:   t (the time passed from start_time_julian after commnicate), 
+#           when > 0 commnicate success, < 0 fail
+
+def sat_ground_commnicate(t, package_size, data_rate, signal_speed, sat: Satellite_class.Satellite, ground_station: GroundStation_class.GroundStation, buffer_delay, process_delay, gs_off_nadir, start_greenwich):
     transmit_delay = package_size / data_rate
 
     distance = satcompute.sat_ground_distance(t, sat, ground_station)
 
     propagation_delay = distance / signal_speed
 
-    return transmit_delay + propagation_delay + buffer_delay + process_delay
+    total_delay  = transmit_delay + propagation_delay + buffer_delay + process_delay
+    final_t = t + total_delay
+
+    if visibility.is_gs_communicable(final_t, sat, ground_station, gs_off_nadir, start_greenwich):
+        return final_t
+    else:
+        return -1
