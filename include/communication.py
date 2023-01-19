@@ -145,10 +145,10 @@ def inter_sat_commnicate(t, package_size, data_rate, signal_speed, from_sat: Sat
 #           4. signal_speed(speed of signal)
 #           5. from_sat (the satellite hold the data)
 #           6. to_sat (the satellite transfer the data)
-#           7. buffer_delay (the sum of the delays that occur at each hop in the network due to cell queuing)
+#           7. buffer_delay (the delays that occur at each hop in the network due to cell queuing)
 #           8. process_delay (the on-board switching and processing delay from satellite)
 
-def inter_sat_commnicate(t, package_size, data_rate, signal_speed, sat: Satellite_class.Satellite, ground_station: GroundStation_class.GroundStation, buffer_delay, process_delay):
+def sat_ground_commnicate(t, package_size, data_rate, signal_speed, sat: Satellite_class.Satellite, ground_station: GroundStation_class.GroundStation, buffer_delay, process_delay):
     transmit_delay = package_size / data_rate
 
     distance = satcompute.sat_ground_distance(t, sat, ground_station)
