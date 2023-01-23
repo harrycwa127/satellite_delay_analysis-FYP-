@@ -42,6 +42,15 @@ for orbit_id in range(m):
         s = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
         sat_list = sat_list + [s]
 
+
+# data commnication delay init
+buffer_delay  = 0.06        # (sec, e.g. 0.06, 60 ms)
+process_delay = 0           # (sec)
+package_size = 54           # (Bytes) ?????
+data_rate = 0               # (B/s)
+signal_speed = 299792458    #  radio normally near speed of light, 299,792,458 m per second, value in signal_speed is m/s
+
+
 # remove orginal output file
 if os.path.exists("results/analysis_result.xls"):
     os.remove("results/analysis_result.xls")
@@ -51,6 +60,7 @@ col = ('Obervation Latitude', 'Obervation Longitude', 'Visited Satellite')
 for i in range(0, 3):
     sheet.write(0, i, col[i])
 col_num = 1
+
 
 # search satellite to observation
 imaging_sats = []
@@ -76,12 +86,6 @@ if visited_sats:
     sys.exit(0)
 
 # no able to directly transfer data from obervation satellite to ground station
-buffer_delay  = 0.06        # (sec, e.g. 0.06, 60 ms)
-process_delay = 0           # (sec)
-package_size = 54           # (Bytes) ?????
-data_rate = 0               # (B/s)
-signal_speed = 299792458    #  radio normally near speed of light, 299,792,458 m per second, value in signal_speed is m/s
-
 t = 0
 temp = 0
 
