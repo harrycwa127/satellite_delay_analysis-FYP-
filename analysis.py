@@ -4,7 +4,7 @@ import time
 import math
 import sys
 from include import Satellite_class
-from include import GroundStation_class
+from include import communication
 from include import visibility
 from include import read_data
 
@@ -76,8 +76,26 @@ if visited_sats:
     sys.exit(0)
 
 # no able to directly transfer data from obervation satellite to ground station
+buffer_delay  = 0.06        # (sec, e.g. 0.06, 60 ms)
+process_delay = 0           # (sec)
+package_size = 54           # (Bytes) ?????
+data_rate = 0               # (B/s)
+signal_speed = 299792458    #  radio normally near speed of light, 299,792,458 m per second, value in signal_speed is m/s
 
-    
+t = 0
+temp = 0
+
+for img_s in imaging_sats:
+    for s in sat_list:
+        if visibility.is_sat_communicable(t, img_s, s):
+            temp = communication.inter_sat_commnicate(t, package_size, data_rate, signal_speed, img_s, s, buffer_delay, process_delay, package_size)
+            if temp > 0:
+                # commnicate success
+                t = temp
+            else:
+                # commnicate fail
+                pass
+
 end_time = time.time()
 print('overall time:',  end_time-start_time)
 book.save('results/analysis_result.xls')
