@@ -44,11 +44,10 @@ for orbit_id in range(m):
 
 
 # data commnication delay init
-buffer_delay  = 0.06        # (sec, e.g. 0.06, 60 ms)
-process_delay = 0           # (sec)
-package_size = 54           # (Bytes) ?????
-data_rate = 0               # (B/s)
-signal_speed = 299792458    #  radio speed near speed of light, 299,792,458 m per second, value in signal_speed is m/s
+buffer_delay  = 0.05        # (sec, e.g. 0.05, 50 ms)
+process_delay = 0.01        # (sec, e.g. 0.01, 10 ms)
+package_size = 56623104    # (Bytes) 54 Mb, 
+data_rate = 530579456       # (Bytes/s) 506 Mb/s
 
 # time var
 t = 0       # for store the current time passed from start time
@@ -66,40 +65,40 @@ col_num = 1
 
 
 # search satellite to observation
-imaging_sats = []
+imaging_sat = []
 # search for all sat
 for s in sat_list:
     if visibility.is_observation_visible(0, s, gd, off_nadir, start_greenwich):
-        imaging_sats.append(s)
+        imaging_sat = s
+        break
 
-if not imaging_sats:
+# if no any satellite obervate the obervation point, exit
+if not imaging_sat:
     print("No Satellite able to visit the observation point!!")
     sys.exit(-1)
 
-visited_sats = []
-for gs in gs_list:
-    gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
-    # search for all sat
-    for s in imaging_sats:
-        if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
-            temp = communication.sat_ground_commnicate(0, package_size, data_rate, signal_speed, s, gs, buffer_delay, process_delay, package_size)
-            if temp > 0:
-                print("Satellite direcly get obervation point and ground station!")
-                print("Commnication Delay is:" + temp)
-                sys.exit(0)
+# if the satellite obervate the the obervation point and able to directly commincation to the gs
+gs = gs_list[0]         # target ground_station
+gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
+# search for all sat
+if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
+    temp = communication.sat_ground_commnicate(0, package_size, data_rate, imaging_sat, gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
+    if temp > 0:
+        print("Satellite direcly get obervation point and ground station!")
+        print("Commnication Delay is:" + temp)
+        sys.exit(0)
 
 
 # no able to directly transfer data from obervation satellite to ground station
-for img_s in imaging_sats:
-    for s in sat_list:
-        if visibility.is_sat_communicable(t, img_s, s):
-            temp = communication.inter_sat_commnicate(t, package_size, data_rate, signal_speed, img_s, s, buffer_delay, process_delay, package_size)
-            if temp > 0:
-                # commnicate success
-                t = temp
-            else:
-                # commnicate fail
-                pass
+for s in sat_list:
+    if visibility.is_sat_communicable(t, imaging_sat, s):
+        temp = communication.inter_sat_commnicate(t, package_size, data_rate, imaging_sat, s, buffer_delay, process_delay)
+        if temp > 0:
+            # commnicate success
+            t = temp
+        else:
+            # commnicate fail
+            pass
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)

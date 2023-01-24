@@ -132,12 +132,12 @@ def communicable(time_interval, start_greenwich, satellite: Satellite_class.Sate
 
 # reference https://www.researchgate.net/publication/1961144_Analysis_and_Simulation_of_Delay_and_Buffer_Requirements_of_satellite-ATM_Networks_for_TCPIP_Traffic
 
-def inter_sat_commnicate(t, package_size, data_rate, signal_speed, from_sat: Satellite_class.Satellite, to_sat: Satellite_class.Satellite, buffer_delay, process_delay):
+def inter_sat_commnicate(t, package_size, data_rate, from_sat: Satellite_class.Satellite, to_sat: Satellite_class.Satellite, buffer_delay, process_delay):
     transmit_delay = package_size / data_rate
 
     inter_sat_distance = satcompute.inter_sat_distance(t, from_sat, to_sat)
 
-    propagation_delay = inter_sat_distance / signal_speed
+    propagation_delay = inter_sat_distance / 299792458   # radio speed near speed of light, 299,792,458 m per second, value in signal_speed is m/s
 
     total_delay = transmit_delay + propagation_delay + buffer_delay + process_delay
     final_t = t + total_delay
