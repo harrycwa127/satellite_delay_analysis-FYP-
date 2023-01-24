@@ -48,8 +48,11 @@ buffer_delay  = 0.06        # (sec, e.g. 0.06, 60 ms)
 process_delay = 0           # (sec)
 package_size = 54           # (Bytes) ?????
 data_rate = 0               # (B/s)
-signal_speed = 299792458    #  radio normally near speed of light, 299,792,458 m per second, value in signal_speed is m/s
+signal_speed = 299792458    #  radio speed near speed of light, 299,792,458 m per second, value in signal_speed is m/s
 
+# time var
+t = 0       # for store the current time passed from start time
+temp = 0    # for get the result of communication
 
 # remove orginal output file
 if os.path.exists("results/analysis_result.xls"):
@@ -79,16 +82,14 @@ for gs in gs_list:
     # search for all sat
     for s in imaging_sats:
         if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
-            visited_sats.append(s)
+            temp = communication.sat_ground_commnicate(0, package_size, data_rate, signal_speed, s, gs, buffer_delay, process_delay, package_size)
+            if temp > 0:
+                print("Satellite direcly get obervation point and ground station!")
+                print("Commnication Delay is:" + temp)
+                sys.exit(0)
 
-if visited_sats:
-    print("Satellite direcly get obervation point and ground station!")
-    sys.exit(0)
 
 # no able to directly transfer data from obervation satellite to ground station
-t = 0
-temp = 0
-
 for img_s in imaging_sats:
     for s in sat_list:
         if visibility.is_sat_communicable(t, img_s, s):
