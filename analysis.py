@@ -7,6 +7,7 @@ from include import Satellite_class
 from include import communication
 from include import visibility
 from include import read_data
+from include import satcompute
 
 start_time = time.time()
 
@@ -90,15 +91,39 @@ if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
 
 
 # no able to directly transfer data from obervation satellite to ground station
-for s in sat_list:
-    if visibility.is_sat_communicable(t, imaging_sat, s):
-        temp = communication.inter_sat_commnicate(t, package_size, data_rate, imaging_sat, s, buffer_delay, process_delay)
-        if temp > 0:
-            # commnicate success
-            t = temp
-        else:
-            # commnicate fail
-            pass
+min_distance = 0                        # store the min distance from next satellite to gs
+min_sat = Satellite_class.Satellite()   # store the min distance satellite object
+distance = 0
+sat_num = 0
+
+sat_commnicate_path = []
+sat_commnicate_path.append(imaging_sat)
+while visibility.is_gs_communicable(t, sat_commnicate_path[sat_num], gs, gs_off_nadir, start_greenwich) == True:
+    ignore_sat = []
+    ignore = True
+    while ignore:
+        for s in range(len(sat_list)):      # avoid the sat not able to communicate
+            if s not in ignore_sat:
+                distance = satcompute.inter_sat_distance(t, sat_commnicate_path[sat_num], sat_list[s])
+                if min_distance == 0:
+                    min_distance = distance
+                    min_sat = sat_list[s]
+                elif distance < min_distance:
+                    min_distance = distance
+                    min_sat = sat_list[s]
+
+        if visibility.is_sat_communicable(t, sat_commnicate_path[sat_num], min_sat):
+            temp = communication.inter_sat_commnicate(t, package_size, data_rate, sat_commnicate_path[sat_num], min_sat, buffer_delay, process_delay)
+            if temp > 0:
+                # commnicate success
+                t = temp
+                sat_commnicate_path.append(min_sat)
+                sat_num += 1
+                ignore = True
+
+            else:
+                ignore = False
+                ignore_sat.append(min_sat)
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)
