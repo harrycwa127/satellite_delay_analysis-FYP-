@@ -119,10 +119,11 @@ while visibility.is_gs_communicable(t, sat_commnicate_path[sat_num], gs, gs_off_
                 t = temp
                 sat_commnicate_path.append(min_sat)
                 sat_num += 1
-                ignore = True
+                ignore = False
 
             else:
-                ignore = False
+                # commnication fail 
+                ignore = True
                 ignore_sat.append(min_sat)
 
 end_time = time.time()
