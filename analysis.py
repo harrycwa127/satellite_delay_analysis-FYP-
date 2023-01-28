@@ -98,10 +98,11 @@ sat_num = 0         #index of the last element in sat_commnicate_path
 while visibility.is_gs_communicable(t, sat_commnicate_path[sat_num], gs, gs_off_nadir, start_greenwich) == True:
     ignore_sat = []
     ignore = True
-    min_distance = -1        # store the min distance from next satellite to gs
-    min_sat = -1            # store the min distance satellite object
-    distance = 0
     while ignore == True:
+        min_distance = -1        # store the min distance from next satellite to gs
+        min_sat = -1            # store the min distance satellite object
+        distance = 0
+
         for s in range(len(sat_list)):      # avoid the sat not able to communicate
             if s not in ignore_sat and s not in sat_commnicate_path:
                 if visibility.is_sat_communicable(t, sat_commnicate_path[sat_num], sat_list[s]):
@@ -113,18 +114,23 @@ while visibility.is_gs_communicable(t, sat_commnicate_path[sat_num], gs, gs_off_
                         min_distance = distance
                         min_sat = s
 
-        temp = communication.inter_sat_commnicate(t, package_size, data_rate, sat_commnicate_path[sat_num], sat_list[min_sat], buffer_delay, process_delay)
-        if temp > 0:
-            # commnicate success
-            t = temp
-            sat_commnicate_path.append(sat_list[min_sat])
-            sat_num += 1
-            ignore = False
+        # has sat in vibility
+        if min_sat != -1:
+            temp = communication.inter_sat_commnicate(t, package_size, data_rate, sat_commnicate_path[sat_num], sat_list[min_sat], buffer_delay, process_delay)
+            if temp > 0:
+                # commnicate success
+                t = temp
+                sat_commnicate_path.append(sat_list[min_sat])
+                sat_num += 1
+                ignore = False
 
+            else:
+                # commnication fail, loop again and ignore that sat
+                ignore = True
+                ignore_sat.append(min_sat)
+        # wait 1 sec and check visibility again
         else:
-            # commnication fail 
-            ignore = True
-            ignore_sat.append(min_sat)
+            t += 1
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)
