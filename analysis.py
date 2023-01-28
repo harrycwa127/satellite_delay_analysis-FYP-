@@ -66,65 +66,65 @@ col_num = 1
 
 
 # search satellite to observation
-imaging_sat = []
+imaging_sat = -1
 # search for all sat
-for s in sat_list:
-    if visibility.is_observation_visible(0, s, gd, off_nadir, start_greenwich):
+for s in range(len(sat_list)):
+    if visibility.is_observation_visible(0, sat_list[s], gd, off_nadir, start_greenwich):
         imaging_sat = s
         break
 
 # if no any satellite obervate the obervation point, exit
-if not imaging_sat:
+if imaging_sat == -1:
     print("No Satellite able to visit the observation point!!")
     sys.exit(-1)
 
 # if the satellite obervate the the obervation point and able to directly commincation to the gs
 gs = gs_list[0]         # target ground_station
-gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
 # search for all sat
-if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
-    temp = communication.sat_ground_commnicate(0, package_size, data_rate, imaging_sat, gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
-    if temp > 0:
-        print("Satellite direcly get obervation point and ground station!")
-        print("Commnication Delay is:" + temp)
-        sys.exit(0)
+for s in sat_list:
+    gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
+    if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
+        temp = communication.sat_ground_commnicate(0, package_size, data_rate, imaging_sat, gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
+        if temp > 0:
+            print("Satellite direcly get obervation point and ground station!")
+            print("Commnication Delay is:" + temp)
+            sys.exit(0)
 
 
 # no able to directly transfer data from obervation satellite to ground station
-min_distance = 0                        # store the min distance from next satellite to gs
-min_sat = Satellite_class.Satellite()   # store the min distance satellite object
-distance = 0
-sat_num = 0
-
 sat_commnicate_path = []
 sat_commnicate_path.append(imaging_sat)
+sat_num = 0         #index of the last element in sat_commnicate_path
 while visibility.is_gs_communicable(t, sat_commnicate_path[sat_num], gs, gs_off_nadir, start_greenwich) == True:
     ignore_sat = []
     ignore = True
-    while ignore:
+    min_distance = -1        # store the min distance from next satellite to gs
+    min_sat = -1            # store the min distance satellite object
+    distance = 0
+    while ignore == True:
         for s in range(len(sat_list)):      # avoid the sat not able to communicate
-            if s not in ignore_sat:
-                distance = satcompute.inter_sat_distance(t, sat_commnicate_path[sat_num], sat_list[s])
-                if min_distance == 0:
-                    min_distance = distance
-                    min_sat = sat_list[s]
-                elif distance < min_distance:
-                    min_distance = distance
-                    min_sat = sat_list[s]
+            if s not in ignore_sat and s not in sat_commnicate_path:
+                if visibility.is_sat_communicable(t, sat_commnicate_path[sat_num], sat_list[s]):
+                    distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
+                    if min_distance == -1:
+                        min_distance = distance
+                        min_sat = s
+                    elif distance < min_distance:
+                        min_distance = distance
+                        min_sat = s
 
-        if visibility.is_sat_communicable(t, sat_commnicate_path[sat_num], min_sat):
-            temp = communication.inter_sat_commnicate(t, package_size, data_rate, sat_commnicate_path[sat_num], min_sat, buffer_delay, process_delay)
-            if temp > 0:
-                # commnicate success
-                t = temp
-                sat_commnicate_path.append(min_sat)
-                sat_num += 1
-                ignore = False
+        temp = communication.inter_sat_commnicate(t, package_size, data_rate, sat_commnicate_path[sat_num], sat_list[min_sat], buffer_delay, process_delay)
+        if temp > 0:
+            # commnicate success
+            t = temp
+            sat_commnicate_path.append(sat_list[min_sat])
+            sat_num += 1
+            ignore = False
 
-            else:
-                # commnication fail 
-                ignore = True
-                ignore_sat.append(min_sat)
+        else:
+            # commnication fail 
+            ignore = True
+            ignore_sat.append(min_sat)
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)

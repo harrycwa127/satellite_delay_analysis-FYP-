@@ -56,9 +56,10 @@ for gs in gs_list:
     sheet.write(col_num, 0, math.degrees(gs.lat_rad))
     sheet.write(col_num, 1, math.degrees(gs.long_rad))
     visited_sats = []
-    gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
     # search for all sat
     for s in sat_list:
+        gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
+        
         if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
             visited_sats.append(s)
 
