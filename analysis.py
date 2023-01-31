@@ -95,7 +95,7 @@ for s in sat_list:
 sat_commnicate_path = []
 sat_commnicate_path.append(imaging_sat)
 sat_num = 0         #index of the last element in sat_commnicate_path
-while visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs, gs_off_nadir, start_greenwich) == True:
+while visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs, gs_off_nadir, start_greenwich) == False:
     ignore_sat = []
     ignore = True
     while ignore == True:
