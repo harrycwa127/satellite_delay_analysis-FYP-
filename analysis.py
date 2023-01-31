@@ -130,7 +130,15 @@ while visibility.is_gs_communicable(t, sat_commnicate_path[sat_num], gs, gs_off_
                 ignore_sat.append(min_sat)
         # wait 1 sec and check visibility again
         else:
-            t += 1
+                t += 1
+                print("No other Satellites in the visibility, wait 1 sec.")
+
+
+print("Satellite path:")
+for i in sat_commnicate_path:
+    lat, lon = satcompute.get_sat_lat_lon(sat_list[i], 0, start_greenwich)
+    print(lat, lon, sat_list[i].r)
+
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)

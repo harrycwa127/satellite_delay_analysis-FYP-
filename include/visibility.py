@@ -13,7 +13,7 @@ import math
 #      5.开始时刻0经度所处的赤经
 # 输出：TRUE OR FALSE
 def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: observation_class.Observation, off_nadir, start_greenwich):
-    phi, lam = satcompute.get_sat_geo_lat_lon(sat = satellite, t = t, start_greenwich = start_greenwich)
+    phi, lam = satcompute.get_sat_lat_lon(sat = satellite, t = t, start_greenwich = start_greenwich)
 
     theta = lam - gd.long_rad
     cos_psi = math.cos(gd.lat_rad) * math.cos(phi) * math.cos(theta) + math.sin(gd.lat_rad) * math.sin(phi)
@@ -33,7 +33,7 @@ def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: observat
 #      4.开始时刻0经度所处的赤经
 # 输出：TRUE OR FALSE
 def is_gs_communicable(t, satellite: Satellite_class.Satellite, gs: GroundStation_class.GroundStation, gs_off_nadir, start_greenwich):
-    phi, lam = satcompute.get_sat_geo_lat_lon(sat = satellite, t = t, start_greenwich = start_greenwich)
+    phi, lam = satcompute.get_sat_lat_lon(sat = satellite, t = t, start_greenwich = start_greenwich)
     
     theta = lam - gs.long_rad
     cos_psi = math.cos(gs.lat_rad) * math.cos(phi) * math.cos(theta) + math.sin(gs.lat_rad) * math.sin(phi)

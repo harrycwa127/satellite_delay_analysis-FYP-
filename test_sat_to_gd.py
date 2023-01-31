@@ -63,7 +63,7 @@ for i in range(len(gd_list)):
     temp = ''
     if imaging_sats:
         for s in imaging_sats:
-            phi, lam = satcompute.get_sat_geo_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
+            phi, lam = satcompute.get_sat_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
             phi = phi * (180/math.pi)
             lam = lam * (180/math.pi)
             

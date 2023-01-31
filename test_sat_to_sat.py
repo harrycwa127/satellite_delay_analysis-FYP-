@@ -45,10 +45,10 @@ for sat_id in range(n):
 
 # 看能否通信
 target_sat = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, first_M, 10, start_time_julian)
-phi, lam = satcompute.get_sat_geo_lat_lon(sat = target_sat, t = 0, start_greenwich = start_greenwich)
+phi, lam = satcompute.get_sat_lat_lon(sat = target_sat, t = 0, start_greenwich = start_greenwich)
 for s in sat_list:
     # find out the lat lon
-    phi, lam = satcompute.get_sat_geo_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
+    phi, lam = satcompute.get_sat_lat_lon(sat = s, t = 0, start_greenwich = start_greenwich)
 
     # write data to xls
     sheet.write(col_num, 0, phi)

@@ -34,7 +34,7 @@ def sat_alpha(r, Omega_o, u, i_o):
 # input     1. sat (Satellite Class Object)
 #           2. t (time passed from start_greenwich, in sec)
 #           3. start_greenwich (the greenwich value of datetime for simulation)
-def get_sat_geo_lat_lon(sat: Satellite_class.Satellite, t, start_greenwich):
+def get_sat_lat_lon(sat: Satellite_class.Satellite, t, start_greenwich):
     M = (sat.n_o * t + sat.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
     f = M  # if circular orbit
     r = sat.a_o  # if circular orbit
