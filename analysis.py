@@ -133,11 +133,20 @@ while visibility.is_gs_communicable(t, sat_commnicate_path[sat_num], gs, gs_off_
                 t += 1
                 print("No other Satellites in the visibility, wait 1 sec.")
 
+temp = communication.sat_ground_commnicate(t, package_size, data_rate, imaging_sat, gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
+if temp > 0:
+    t = temp
+else:
+    # commnicate with gs fail
+    pass
+
 
 print("Satellite path:")
 for i in sat_commnicate_path:
     lat, lon = satcompute.get_sat_lat_lon(sat_list[i], 0, start_greenwich)
     print(lat, lon, sat_list[i].r)
+
+print("total delay of the commnication is", t, "seconds.")
 
 
 end_time = time.time()

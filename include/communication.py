@@ -160,12 +160,12 @@ def inter_sat_commnicate(t, package_size, data_rate, from_sat: Satellite_class.S
 # output:   t (the time passed from start_time_julian after commnicate), 
 #           when > 0 commnicate success, < 0 fail
 
-def sat_ground_commnicate(t, package_size, data_rate, signal_speed, sat: Satellite_class.Satellite, ground_station: GroundStation_class.GroundStation, buffer_delay, process_delay, gs_off_nadir, start_greenwich):
+def sat_ground_commnicate(t, package_size, data_rate, sat: Satellite_class.Satellite, ground_station: GroundStation_class.GroundStation, buffer_delay, process_delay, gs_off_nadir, start_greenwich):
     transmit_delay = package_size / data_rate
 
     distance = satcompute.sat_ground_distance(t, sat, ground_station)
 
-    propagation_delay = distance / signal_speed
+    propagation_delay = distance / 299792458        # radio speed near speed of light, 299,792,458 m per second, value in signal_speed is m/s
 
     total_delay  = transmit_delay + propagation_delay + buffer_delay + process_delay
     final_t = t + total_delay
