@@ -84,7 +84,7 @@ gs = gs_list[0]         # target ground_station
 for s in sat_list:
     gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
     if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
-        temp = communication.sat_ground_commnicate(0, package_size, data_rate, imaging_sat, gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
+        temp = communication.sat_ground_commnicate(0, package_size, data_rate, sat_list[imaging_sat], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
         if temp > 0:
             print("Satellite direcly get obervation point and ground station!")
             print("Commnication Delay is:" + temp)
@@ -95,7 +95,7 @@ for s in sat_list:
 sat_commnicate_path = []
 sat_commnicate_path.append(imaging_sat)
 sat_num = 0         #index of the last element in sat_commnicate_path
-while visibility.is_gs_communicable(t, sat_commnicate_path[sat_num], gs, gs_off_nadir, start_greenwich) == True:
+while visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs, gs_off_nadir, start_greenwich) == True:
     ignore_sat = []
     ignore = True
     while ignore == True:
@@ -105,7 +105,7 @@ while visibility.is_gs_communicable(t, sat_commnicate_path[sat_num], gs, gs_off_
 
         for s in range(len(sat_list)):      # avoid the sat not able to communicate
             if s not in ignore_sat and s not in sat_commnicate_path:
-                if visibility.is_sat_communicable(t, sat_commnicate_path[sat_num], sat_list[s]):
+                if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
                     distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
                     if min_distance == -1:
                         min_distance = distance
@@ -116,7 +116,7 @@ while visibility.is_gs_communicable(t, sat_commnicate_path[sat_num], gs, gs_off_
 
         # has sat in vibility
         if min_sat != -1:
-            temp = communication.inter_sat_commnicate(t, package_size, data_rate, sat_commnicate_path[sat_num], sat_list[min_sat], buffer_delay, process_delay)
+            temp = communication.inter_sat_commnicate(t, package_size, data_rate, sat_list[sat_commnicate_path[sat_num]], sat_list[min_sat], buffer_delay, process_delay)
             if temp > 0:
                 # commnicate success
                 t = temp
@@ -133,7 +133,7 @@ while visibility.is_gs_communicable(t, sat_commnicate_path[sat_num], gs, gs_off_
                 t += 1
                 print("No other Satellites in the visibility, wait 1 sec.")
 
-temp = communication.sat_ground_commnicate(t, package_size, data_rate, imaging_sat, gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
+temp = communication.sat_ground_commnicate(t, package_size, data_rate, sat_list[imaging_sat], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
 if temp > 0:
     t = temp
 else:
