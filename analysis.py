@@ -120,7 +120,7 @@ while visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], g
             if temp > 0:
                 # commnicate success
                 t = temp
-                sat_commnicate_path.append(sat_list[min_sat])
+                sat_commnicate_path.append(min_sat)
                 sat_num += 1
                 ignore = False
 
