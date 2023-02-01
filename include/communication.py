@@ -132,7 +132,7 @@ def communicable(time_interval, start_greenwich, satellite: Satellite_class.Sate
 
 # reference https://www.researchgate.net/publication/1961144_Analysis_and_Simulation_of_Delay_and_Buffer_Requirements_of_satellite-ATM_Networks_for_TCPIP_Traffic
 
-def inter_sat_commnicate(t, package_size, data_rate, from_sat: Satellite_class.Satellite, to_sat: Satellite_class.Satellite, buffer_delay, process_delay):
+def inter_sat_commnicate(t, package_size, data_rate, from_sat: Satellite_class.Satellite, to_sat: Satellite_class.Satellite, buffer_delay, process_delay) -> float:
     transmit_delay = package_size / data_rate
 
     inter_sat_distance = satcompute.inter_sat_distance(t, from_sat, to_sat)
@@ -160,7 +160,7 @@ def inter_sat_commnicate(t, package_size, data_rate, from_sat: Satellite_class.S
 # output:   t (the time passed from start_time_julian after commnicate), 
 #           when > 0 commnicate success, < 0 fail
 
-def sat_ground_commnicate(t: float, package_size: float, data_rate: float, sat: Satellite_class.Satellite, ground_station: GroundStation_class.GroundStation, buffer_delay: float, process_delay: float, gs_off_nadir, start_greenwich):
+def sat_ground_commnicate(t: float, package_size: float, data_rate: float, sat: Satellite_class.Satellite, ground_station: GroundStation_class.GroundStation, buffer_delay: float, process_delay: float, gs_off_nadir, start_greenwich) -> float:
     transmit_delay = package_size / data_rate
 
     distance = satcompute.sat_ground_distance(t, sat, ground_station)

@@ -12,7 +12,7 @@ import math
 #      4.off_nadir角
 #      5.开始时刻0经度所处的赤经
 # 输出：TRUE OR FALSE
-def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: observation_class.Observation, off_nadir, start_greenwich):
+def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: observation_class.Observation, off_nadir, start_greenwich) -> bool:
     phi, lam = satcompute.get_sat_lat_lon(sat = satellite, t = t, start_greenwich = start_greenwich)
 
     theta = lam - gd.long_rad
@@ -32,7 +32,7 @@ def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: observat
 #      4.由地面站通信的最小仰角得到的最大的off_nadir角
 #      4.开始时刻0经度所处的赤经
 # 输出：TRUE OR FALSE
-def is_gs_communicable(t, satellite: Satellite_class.Satellite, gs: GroundStation_class.GroundStation, gs_off_nadir, start_greenwich):
+def is_gs_communicable(t, satellite: Satellite_class.Satellite, gs: GroundStation_class.GroundStation, gs_off_nadir, start_greenwich) -> bool:
     phi, lam = satcompute.get_sat_lat_lon(sat = satellite, t = t, start_greenwich = start_greenwich)
     
     theta = lam - gs.long_rad
@@ -45,7 +45,7 @@ def is_gs_communicable(t, satellite: Satellite_class.Satellite, gs: GroundStatio
     else:
         return False
 
-def is_sat_communicable(t, from_satellite: Satellite_class.Satellite, to_satellite: Satellite_class.Satellite):
+def is_sat_communicable(t, from_satellite: Satellite_class.Satellite, to_satellite: Satellite_class.Satellite) -> bool:
 
     r3 = satcompute.inter_sat_distance(t, from_satellite, to_satellite)
 
