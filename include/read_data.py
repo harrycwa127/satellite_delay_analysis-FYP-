@@ -49,7 +49,7 @@ def get_observation():
 
 def get_observation2():
     gd_lines = []
-    obs_f = open('settings/OBSERVATION.txt', 'r')
+    obs_f = open('settings/OBSERVATION2.txt', 'r')
     for line in obs_f.readlines():
         gd_lines.append(line.split(' '))
     obs_f.close()

@@ -81,20 +81,22 @@ if imaging_sat == -1:
 # if the satellite obervate the the obervation point and able to directly commincation to the gs
 gs = gs_list[0]         # target ground_station
 # search for all sat
-for s in sat_list:
-    gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
-    if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
-        temp = communication.sat_ground_commnicate(0, package_size, data_rate, sat_list[imaging_sat], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
-        if temp > 0:
-            print("Satellite direcly get obervation point and ground station!")
-            print("Commnication Delay is:" + temp)
-            sys.exit(0)
+# for s in sat_list:
+#     gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
+#     if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
+#         temp = communication.sat_ground_commnicate(0, package_size, data_rate, sat_list[imaging_sat], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
+#         if temp > 0:
+#             print("Satellite direcly get obervation point and ground station!")
+#             print("Commnication Delay is:",  temp)
+#             sys.exit(0)
 
 
 # no able to directly transfer data from obervation satellite to ground station
 sat_commnicate_path = []
 sat_commnicate_path.append(imaging_sat)
 sat_num = 0         #index of the last element in sat_commnicate_path
+
+gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / sat_list[sat_commnicate_path[sat_num]].r)
 while visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs, gs_off_nadir, start_greenwich) == False:
     ignore_sat = []
     ignore = True
@@ -123,11 +125,13 @@ while visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], g
                 sat_commnicate_path.append(min_sat)
                 sat_num += 1
                 ignore = False
+                gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / sat_list[sat_commnicate_path[sat_num]].r)
 
             else:
                 # commnication fail, loop again and ignore that sat
                 ignore = True
                 ignore_sat.append(min_sat)
+                
         # wait 1 sec and check visibility again
         else:
                 t += 1
