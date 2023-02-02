@@ -96,8 +96,10 @@ sat_commnicate_path = []
 sat_commnicate_path.append(imaging_sat)
 sat_num = 0         #index of the last element in sat_commnicate_path
 
+# var for path decision
+end_path = False
 gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / sat_list[sat_commnicate_path[sat_num]].r)
-while visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs, gs_off_nadir, start_greenwich) == False:
+while end_path == False:
     ignore_sat = []
     ignore = True
     while ignore == True:
@@ -126,6 +128,14 @@ while visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], g
                 sat_num += 1
                 ignore = False
                 gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / sat_list[sat_commnicate_path[sat_num]].r)
+
+                if visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs, gs_off_nadir, start_greenwich) == True:
+                    temp = communication.sat_ground_commnicate(t, package_size, data_rate, sat_list[imaging_sat], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
+                    if temp > 0:
+                        t = temp
+                        end_path = True
+                    else:
+                        end_path = False
 
             else:
                 # commnication fail, loop again and ignore that sat
