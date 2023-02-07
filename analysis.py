@@ -59,8 +59,8 @@ if os.path.exists("results/analysis_result.xls"):
     os.remove("results/analysis_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
 sheet = book.add_sheet('analysis_result', cell_overwrite_ok=True)
-col = ('Obervation Latitude', 'Obervation Longitude', 'Visited Satellite')
-for i in range(0, 3):
+col = ('Satellite Latitude', 'Satellite Longitude', 'Satellite Altitude', 'Delay Time' )
+for i in range(0, 4):
     sheet.write(0, i, col[i])
 col_num = 1
 
@@ -96,6 +96,15 @@ sat_commnicate_path = []
 sat_commnicate_path.append(imaging_sat)
 sat_num = 0         #index of the last element in sat_commnicate_path
 
+# write first sat to sheet
+phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[sat_num]], t = 0, start_greenwich = start_greenwich)
+sheet.write(col_num, 0, phi)
+sheet.write(col_num, 1, lam)
+sheet.write(col_num, 2, sat_list[sat_commnicate_path[sat_num]].r)
+sheet.write(col_num, 3, 0)
+
+col_num += 1
+
 # var for path decision
 end_path = False
 gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / sat_list[sat_commnicate_path[sat_num]].r)
@@ -128,6 +137,14 @@ while end_path == False:
                 sat_num += 1
                 ignore = False
                 gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / sat_list[sat_commnicate_path[sat_num]].r)
+
+                # write new sat to sheet
+                phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[sat_num]], t = t, start_greenwich = start_greenwich)
+                sheet.write(col_num, 0, phi)
+                sheet.write(col_num, 1, lam)
+                sheet.write(col_num, 2, sat_list[sat_commnicate_path[sat_num]].r)
+                sheet.write(col_num, 3, t)
+                col_num += 1
 
                 if visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs, gs_off_nadir, start_greenwich) == True:
                     temp = communication.sat_ground_commnicate(t, package_size, data_rate, sat_list[imaging_sat], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
