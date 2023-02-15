@@ -3,6 +3,8 @@ from include import Satellite_class
 from include import satcompute
 from include import GroundStation_class
 from include import visibility
+from include import observation_class
+import sys
 
 
 # simulate一段时间内，卫星和地面站通信的时间段
@@ -132,7 +134,7 @@ def communicable(time_interval, start_greenwich, satellite: Satellite_class.Sate
 
 # reference https://www.researchgate.net/publication/1961144_Analysis_and_Simulation_of_Delay_and_Buffer_Requirements_of_satellite-ATM_Networks_for_TCPIP_Traffic
 
-def inter_sat_commnicate(t, package_size, data_rate, from_sat: Satellite_class.Satellite, to_sat: Satellite_class.Satellite, buffer_delay, process_delay) -> float:
+def inter_sat_commnicate(t, package_size, data_rate, from_sat: Satellite_class.Satellite, to_sat: Satellite_class.Satellite, buffer_delay: float, process_delay: float) -> float:
     transmit_delay = package_size / data_rate
 
     inter_sat_distance = satcompute.inter_sat_distance(t, from_sat, to_sat)
@@ -151,7 +153,7 @@ def inter_sat_commnicate(t, package_size, data_rate, from_sat: Satellite_class.S
 # input:    1. t (time passed from start_greenwich, in sec)
 #           2. package_size(size of data)
 #           3. data_rate (data rate of transmission)
-#           4. signal_speed(speed of signal)
+#           4. 
 #           5. from_sat (the satellite hold the data)
 #           6. to_sat (the satellite transfer the data)
 #           7. buffer_delay (the delays that occur at each hop in the network due to cell queuing)
@@ -174,3 +176,95 @@ def sat_ground_commnicate(t: float, package_size: float, data_rate: float, sat: 
         return final_t
     else:
         return -1
+
+# input:    1. sat_list
+#           2. gd
+#           3. gs
+#           4. offnadir
+#           5. start_greenwich    
+#           6. package_size(size of data)
+#           7. data_rate (data rate of transmission)
+#           8. buffer_delay (the delays that occur at each hop in the network due to cell queuing)
+#           9. process_delay (the on-board switching and processing delay from satellite)
+
+# output:   1. sat_commnicate_path
+#           2. sat_commnicate_delay
+def path_decision(sat_list: list(Satellite_class.Satellite), gd: observation_class.Observation, gs: GroundStation_class.GroundStation,
+    off_nadir: float, start_greenwich, package_size: float, data_rate: float, buffer_delay: float, process_delay: float) -> tuple(list, list(float)):
+
+    t = 0
+
+    imaging_sat = -1
+    # search for all sat
+    for s in range(len(sat_list)):
+        if visibility.is_observation_visible(0, sat_list[s], gd, off_nadir, start_greenwich):
+            imaging_sat = s
+            break
+
+    # if no any satellite obervate the obervation point, exit
+    if imaging_sat == -1:
+        print("No Satellite able to visit the observation point!!")
+        sys.exit(-1)
+
+
+    # no able to directly transfer data from obervation satellite to ground station
+    sat_commnicate_path = []
+    sat_commnicate_path.append(imaging_sat)
+    sat_num = 0         #index of the last element in sat_commnicate_path
+    sat_commnicate_delay = []
+    sat_commnicate_delay.append(0)
+
+    end_path = False
+    gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / sat_list[sat_commnicate_path[sat_num]].r)
+    while end_path == False:
+        ignore_sat = []
+        ignore = True
+        while ignore == True:
+            min_distance = -1        # store the min distance from next satellite to gs
+            min_sat = -1            # store the min distance satellite object
+            distance = 0
+
+            for s in range(len(sat_list)):      # avoid the sat not able to communicate
+                if s not in ignore_sat and s not in sat_commnicate_path:
+                    if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
+                        distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
+                        if min_distance == -1:
+                            min_distance = distance
+                            min_sat = s
+                        elif distance < min_distance:
+                            min_distance = distance
+                            min_sat = s
+
+            # has sat in vibility
+            if min_sat != -1:
+                temp = inter_sat_commnicate(t, package_size, data_rate, sat_list[sat_commnicate_path[sat_num]], sat_list[min_sat], buffer_delay, process_delay)
+                if temp > 0:
+                    # commnicate success
+                    t = temp
+                    sat_commnicate_path.append(min_sat)
+                    sat_num += 1
+                    ignore = False
+                    gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / sat_list[sat_commnicate_path[sat_num]].r)
+
+                    # insert delay
+                    sat_commnicate_delay.append(t)
+
+                    if visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs, gs_off_nadir, start_greenwich) == True:
+                        temp = sat_ground_commnicate(t, package_size, data_rate, sat_list[sat_commnicate_path[sat_num]], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
+                        if temp > 0:
+                            t = temp
+                            end_path = True
+                        else:
+                            end_path = False
+
+                else:
+                    # commnication fail, loop again and ignore that sat
+                    ignore = True
+                    ignore_sat.append(min_sat)
+                    
+            # wait 1 sec and check visibility again
+            else:
+                    t += 1
+                    print("No other Satellites in the visibility, wait 1 sec.")
+
+    return (sat_commnicate_path, sat_commnicate_delay)
