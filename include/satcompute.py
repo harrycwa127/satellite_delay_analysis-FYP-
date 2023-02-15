@@ -1,6 +1,7 @@
 import math
 from include import Satellite_class
 from include import GroundStation_class
+from include.SimParameter_class import SimParameter
 
 # 根据轨道六要素求卫星当前位置赤经
 # 输入：1.卫星半径 2.升交点赤经 3.卫星轨道面上卫星当前位置与升交点赤经的角度(omega+f) 4.轨道倾角
@@ -33,8 +34,7 @@ def sat_alpha(r, Omega_o, u, i_o):
 
 # input     1. sat (Satellite Class Object)
 #           2. t (time passed from start_greenwich, in sec)
-#           3. start_greenwich (the greenwich value of datetime for simulation)
-def get_sat_lat_lon(sat: Satellite_class.Satellite, t, start_greenwich):
+def get_sat_lat_lon(sat: Satellite_class.Satellite, t):
     M = (sat.n_o * t + sat.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
     f = M  # if circular orbit
     r = sat.a_o  # if circular orbit
@@ -42,7 +42,7 @@ def get_sat_lat_lon(sat: Satellite_class.Satellite, t, start_greenwich):
     alpha = sat_alpha(r, sat.Omega_o, u, sat.i_o)
     delta = math.asin(math.sin(u) * math.sin(sat.i_o))  # t时刻卫星赤纬
     phi = delta  # t时刻卫星地心纬度, lat
-    lam = alpha - (math.radians(start_greenwich) + Satellite_class.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度, lon
+    lam = alpha - (math.radians(SimParameter.get_start_greenwich()) + Satellite_class.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度, lon
     if lam > math.pi:
         lam = lam - 2 * math.pi
     if lam < -math.pi:

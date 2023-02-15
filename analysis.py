@@ -8,11 +8,13 @@ from include import communication
 from include import visibility
 from include import read_data
 from include import satcompute
+from include.SimParameter_class import SimParameter
 
 start_time = time.time()
 
 # ---------read start time
 start_time_julian, start_greenwich = read_data.get_start_julian_time()
+SimParameter.set_start_greenwich(start_greenwich)
 
 # obervation lat lon
 gd = read_data.get_observation2()
@@ -22,7 +24,7 @@ gs_list = read_data.get_gs()
 
 
 # init satellite
-off_nadir = math.radians(45)
+SimParameter.set_off_nadir(math.radians(45))
 i_o = math.radians(97)
 e_o = 0
 omega_o = 0
@@ -45,10 +47,11 @@ for orbit_id in range(m):
 
 
 # data commnication delay init
-buffer_delay  = 0.05        # (sec, e.g. 0.05, 50 ms)
-process_delay = 0.01        # (sec, e.g. 0.01, 10 ms)
-package_size = 56623104    # (Bytes) 54 Mb, 
-data_rate = 530579456       # (Bytes/s) 506 Mb/s
+SimParameter.set_buffer_delay(0.05)        # (sec, e.g. 0.05, 50 ms)
+SimParameter.set_process_delay(0.01)        # (sec, e.g. 0.01, 10 ms)
+SimParameter.set_package_size(56623104)    # (Bytes) 54 Mb, 
+SimParameter.set_data_rate(530579456)       # (Bytes/s) 506 Mb/s
+SimParameter.set_signal_speed(299792458)
 
 # time var
 t = 0       # for store the current time passed from start time
@@ -69,7 +72,7 @@ col_num = 1
 imaging_sat = -1
 # search for all sat
 for s in range(len(sat_list)):
-    if visibility.is_observation_visible(0, sat_list[s], gd, off_nadir, start_greenwich):
+    if visibility.is_observation_visible(0, sat_list[s], gd, SimParameter.get_off_nadir()):
         imaging_sat = s
         break
 
@@ -97,7 +100,7 @@ sat_commnicate_path.append(imaging_sat)
 sat_num = 0         #index of the last element in sat_commnicate_path
 
 # write first sat to sheet
-phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[sat_num]], t = 0, start_greenwich = start_greenwich)
+phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[sat_num]], t = 0)
 sheet.write(col_num, 0, phi)
 sheet.write(col_num, 1, lam)
 sheet.write(col_num, 2, sat_list[sat_commnicate_path[sat_num]].r)
@@ -129,7 +132,7 @@ while end_path == False:
 
         # has sat in vibility
         if min_sat != -1:
-            temp = communication.inter_sat_commnicate(t, package_size, data_rate, sat_list[sat_commnicate_path[sat_num]], sat_list[min_sat], buffer_delay, process_delay)
+            temp = communication.inter_sat_commnicate(t, sat_list[sat_commnicate_path[sat_num]], sat_list[min_sat])
             if temp > 0:
                 # commnicate success
                 t = temp
@@ -139,15 +142,15 @@ while end_path == False:
                 gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / sat_list[sat_commnicate_path[sat_num]].r)
 
                 # write new sat to sheet
-                phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[sat_num]], t = t, start_greenwich = start_greenwich)
+                phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[sat_num]], t = t)
                 sheet.write(col_num, 0, phi)
                 sheet.write(col_num, 1, lam)
                 sheet.write(col_num, 2, sat_list[sat_commnicate_path[sat_num]].r)
                 sheet.write(col_num, 3, t)
                 col_num += 1
 
-                if visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs, gs_off_nadir, start_greenwich) == True:
-                    temp = communication.sat_ground_commnicate(t, package_size, data_rate, sat_list[sat_commnicate_path[sat_num]], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
+                if visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs) == True:
+                    temp = communication.sat_ground_commnicate(t, sat_list[sat_commnicate_path[sat_num]], gs)
                     if temp > 0:
                         t = temp
                         end_path = True
@@ -167,7 +170,7 @@ while end_path == False:
 
 print("Satellite path:")
 for i in sat_commnicate_path:
-    lat, lon = satcompute.get_sat_lat_lon(sat_list[i], 0, start_greenwich)
+    lat, lon = satcompute.get_sat_lat_lon(sat_list[i], 0)
     print(lat, lon, sat_list[i].r)
 
 print("total delay of the commnication is", t, "seconds.")
