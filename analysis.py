@@ -147,7 +147,7 @@ while end_path == False:
                 col_num += 1
 
                 if visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs, gs_off_nadir, start_greenwich) == True:
-                    temp = communication.sat_ground_commnicate(t, package_size, data_rate, sat_list[imaging_sat], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
+                    temp = communication.sat_ground_commnicate(t, package_size, data_rate, sat_list[sat_commnicate_path[sat_num]], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
                     if temp > 0:
                         t = temp
                         end_path = True
@@ -163,13 +163,6 @@ while end_path == False:
         else:
                 t += 1
                 print("No other Satellites in the visibility, wait 1 sec.")
-
-temp = communication.sat_ground_commnicate(t, package_size, data_rate, sat_list[imaging_sat], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
-if temp > 0:
-    t = temp
-else:
-    # commnicate with gs fail
-    pass
 
 
 print("Satellite path:")
