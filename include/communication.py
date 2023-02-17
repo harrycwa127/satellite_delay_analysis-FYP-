@@ -260,6 +260,8 @@ def path_decision(sat_list: list(Satellite_class.Satellite), gd: observation_cla
             # wait 1 sec and check visibility again
             else:
                     t += 1
+                    sat_commnicate_path.append(-1)  # mean waiting
+                    sat_commnicate_delay.append(t)
                     print("No other Satellites in the visibility, wait 1 sec.")
 
     return (sat_commnicate_path, sat_commnicate_delay)
