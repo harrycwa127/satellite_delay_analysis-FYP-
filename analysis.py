@@ -170,9 +170,14 @@ sat_commnicate_path, sat_commnicate_delay = communication.path_decision(sat_list
 
 
 print("Satellite path:")
-for i in sat_commnicate_path:
-    lat, lon = satcompute.get_sat_lat_lon(sat_list[i], 0)
-    print(lat, lon, sat_list[i].r)
+for i in range(len(sat_commnicate_path)):
+    phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[i]], t = sat_commnicate_delay[i])
+    sheet.write(col_num, 0, phi)
+    sheet.write(col_num, 1, lam)
+    sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
+    sheet.write(col_num, 3, sat_commnicate_delay[i])
+    # lat, lon = satcompute.get_sat_lat_lon(sat_list[i], 0)
+    # print(lat, lon, sat_list[i].r)
 
 print("total delay of the commnication is", t, "seconds.")
 
