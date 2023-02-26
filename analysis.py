@@ -179,7 +179,7 @@ for i in range(len(sat_commnicate_path)):
     # lat, lon = satcompute.get_sat_lat_lon(sat_list[i], 0)
     # print(lat, lon, sat_list[i].r)
 
-print("total delay of the commnication is", t, "seconds.")
+print("total delay of the commnication is", sat_commnicate_delay[len(sat_commnicate_delay)-1], "seconds.")
 
 
 end_time = time.time()
