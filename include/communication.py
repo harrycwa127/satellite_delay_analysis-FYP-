@@ -168,14 +168,14 @@ def sat_ground_commnicate(t, sat: Satellite_class.Satellite, ground_station: Gro
 
     transmit_delay = SimParameter.get_package_size() / SimParameter.get_data_rate()
 
-    distance = satcompute.sat_ground_distance(sat, ground_station)
+    distance = satcompute.sat_ground_distance(t, sat, ground_station)
 
     propagation_delay = distance / SimParameter.get_signal_speed()        # radio speed near speed of light, 299,792,458 m per second, value in signal_speed is m/s
 
     total_delay  = transmit_delay + propagation_delay + SimParameter.get_buffer_delay() + SimParameter.get_process_delay()
     final_t = t + total_delay
 
-    if visibility.is_gs_communicable(final_t, sat, ground_station, gs_off_nadir, SimParameter.get_start_greenwich()):
+    if visibility.is_gs_communicable(final_t, sat, ground_station):
         return final_t
     else:
         return -1
@@ -187,14 +187,14 @@ def sat_ground_commnicate(t, sat: Satellite_class.Satellite, ground_station: Gro
 
 # output:   1. sat_commnicate_path
 #           2. sat_commnicate_delay
-def path_decision(sat_list: list(Satellite_class.Satellite), gd: observation_class.Observation, gs: GroundStation_class.GroundStation) -> tuple(list, list(float)):
+def path_decision(sat_list: list, gd: observation_class.Observation, gs: GroundStation_class.GroundStation):
 
     t = 0
 
     imaging_sat = -1
     # search for all sat
     for s in range(len(sat_list)):
-        if visibility.is_observation_visible(0, sat_list[s], gd, SimParameter.get_off_nadir()):
+        if visibility.is_observation_visible(0, sat_list[s], gd):
             imaging_sat = s
             break
 
@@ -222,8 +222,8 @@ def path_decision(sat_list: list(Satellite_class.Satellite), gd: observation_cla
 
             for s in range(len(sat_list)):      # avoid the sat not able to communicate
                 if s not in ignore_sat and s not in sat_commnicate_path:
-                    if visibility.is_sat_communicable(sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
-                        distance = satcompute.sat_ground_distance(sat_list[s], gs)
+                    if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
+                        distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
                         if min_distance == -1:
                             min_distance = distance
                             min_sat = s
@@ -233,7 +233,7 @@ def path_decision(sat_list: list(Satellite_class.Satellite), gd: observation_cla
 
             # has sat in vibility
             if min_sat != -1:
-                temp = inter_sat_commnicate(sat_list[sat_commnicate_path[sat_num]], sat_list[min_sat])
+                temp = inter_sat_commnicate(t, sat_list[sat_commnicate_path[sat_num]], sat_list[min_sat])
                 if temp > 0:
                     # commnicate success
                     t = temp
@@ -244,8 +244,8 @@ def path_decision(sat_list: list(Satellite_class.Satellite), gd: observation_cla
                     # insert delay
                     sat_commnicate_delay.append(t)
 
-                    if visibility.is_gs_communicable(sat_list[sat_commnicate_path[sat_num]], gs) == True:
-                        temp = sat_ground_commnicate(sat_list[sat_commnicate_path[sat_num]], gs)
+                    if visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs) == True:
+                        temp = sat_ground_commnicate(t, sat_list[sat_commnicate_path[sat_num]], gs)
                         if temp > 0:
                             t = temp
                             end_path = True

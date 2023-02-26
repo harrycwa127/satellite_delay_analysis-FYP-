@@ -72,7 +72,7 @@ col_num = 1
 imaging_sat = -1
 # search for all sat
 for s in range(len(sat_list)):
-    if visibility.is_observation_visible(0, sat_list[s], gd, SimParameter.get_off_nadir()):
+    if visibility.is_observation_visible(0, sat_list[s], gd):
         imaging_sat = s
         break
 
@@ -185,5 +185,3 @@ print("total delay of the commnication is", sat_commnicate_delay[len(sat_commnic
 end_time = time.time()
 print('overall time:',  end_time-start_time)
 book.save('results/analysis_result.xls')
-
-
