@@ -37,19 +37,3 @@ class Satellite(object):
     def __str__(self):
         return "Omega: %s; M: %s" % (self.Omega_o, self.M_o)
 
-
-# # ---------virtual satellite
-# class VirSAT(object):
-#     sid = -1                       # satellite id
-#     vir_sid = -1                   # virtual satellite id (把一个卫星划分成了多个‘虚拟卫星’)
-#     lst_id = -1
-#     service_curve = []
-#     offset_list = []              # the offset list for the virtual satellite
-#     request_id = []               # the request id of request curve that the virtual satellite serve
-#     inter_len = 0                 # the intersect length for selected offset
-
-#     def __init__(self, sid, vir_sid, service_curve):
-#         self.sid = sid
-#         self.vir_sid = vir_sid
-#         self.service_curve = service_curve
-

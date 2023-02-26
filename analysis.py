@@ -83,90 +83,12 @@ if imaging_sat == -1:
 
 # if the satellite obervate the the obervation point and able to directly commincation to the gs
 gs = gs_list[0]         # target ground_station
-# search for all sat
-# for s in sat_list:
-#     gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
-#     if visibility.is_gs_communicable(0, s, gs, gs_off_nadir, start_greenwich):
-#         temp = communication.sat_ground_commnicate(0, package_size, data_rate, sat_list[imaging_sat], gs, buffer_delay, process_delay, gs_off_nadir, start_greenwich)
-#         if temp > 0:
-#             print("Satellite direcly get obervation point and ground station!")
-#             print("Commnication Delay is:",  temp)
-#             sys.exit(0)
 
-
-# no able to directly transfer data from obervation satellite to ground station
+# array to store the path result
 sat_commnicate_path = []
-sat_commnicate_path.append(imaging_sat)
-sat_num = 0         #index of the last element in sat_commnicate_path
-
-# write first sat to sheet
-phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[sat_num]], t = 0)
-sheet.write(col_num, 0, phi)
-sheet.write(col_num, 1, lam)
-sheet.write(col_num, 2, sat_list[sat_commnicate_path[sat_num]].r)
-sheet.write(col_num, 3, 0)
-
-col_num += 1
+sat_commnicate_delay = []
 
 sat_commnicate_path, sat_commnicate_delay = communication.path_decision(sat_list, gd, gs)
-# var for path decision
-# end_path = False
-# gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / sat_list[sat_commnicate_path[sat_num]].r)
-# while end_path == False:
-#     ignore_sat = []
-#     ignore = True
-#     while ignore == True:
-#         min_distance = -1        # store the min distance from next satellite to gs
-#         min_sat = -1            # store the min distance satellite object
-#         distance = 0
-
-#         for s in range(len(sat_list)):      # avoid the sat not able to communicate
-#             if s not in ignore_sat and s not in sat_commnicate_path:
-#                 if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
-#                     distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
-#                     if min_distance == -1:
-#                         min_distance = distance
-#                         min_sat = s
-#                     elif distance < min_distance:
-#                         min_distance = distance
-#                         min_sat = s
-
-#         # has sat in vibility
-#         if min_sat != -1:
-#             temp = communication.inter_sat_commnicate(t, sat_list[sat_commnicate_path[sat_num]], sat_list[min_sat])
-#             if temp > 0:
-#                 # commnicate success
-#                 t = temp
-#                 sat_commnicate_path.append(min_sat)
-#                 sat_num += 1
-#                 ignore = False
-#                 gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / sat_list[sat_commnicate_path[sat_num]].r)
-
-#                 # write new sat to sheet
-#                 phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[sat_num]], t = t)
-#                 sheet.write(col_num, 0, phi)
-#                 sheet.write(col_num, 1, lam)
-#                 sheet.write(col_num, 2, sat_list[sat_commnicate_path[sat_num]].r)
-#                 sheet.write(col_num, 3, t)
-#                 col_num += 1
-
-#                 if visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs) == True:
-#                     temp = communication.sat_ground_commnicate(t, sat_list[sat_commnicate_path[sat_num]], gs)
-#                     if temp > 0:
-#                         t = temp
-#                         end_path = True
-#                     else:
-#                         end_path = False
-
-#             else:
-#                 # commnication fail, loop again and ignore that sat
-#                 ignore = True
-#                 ignore_sat.append(min_sat)
-                
-#         # wait 1 sec and check visibility again
-#         else:
-#                 t += 1
-#                 print("No other Satellites in the visibility, wait 1 sec.")
 
 
 print("Satellite path:")
@@ -176,8 +98,6 @@ for i in range(len(sat_commnicate_path)):
     sheet.write(col_num, 1, lam)
     sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
     sheet.write(col_num, 3, sat_commnicate_delay[i])
-    # lat, lon = satcompute.get_sat_lat_lon(sat_list[i], 0)
-    # print(lat, lon, sat_list[i].r)
 
 print("total delay of the commnication is", sat_commnicate_delay[len(sat_commnicate_delay)-1], "seconds.")
 
