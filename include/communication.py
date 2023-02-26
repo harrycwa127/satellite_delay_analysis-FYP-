@@ -6,6 +6,7 @@ from include import observation_class
 from include.SimParameter_class import SimParameter
 import sys
 
+
 # asuum satellite using radio frequencies, because only very less satellite use laser
 # high carrier frequencies and narrow beamwidths
 # The signal delay approximately 20 ms.
@@ -94,9 +95,10 @@ def path_decision(sat_list: list, gd: observation_class.Observation, gs: GroundS
     # no able to directly transfer data from obervation satellite to ground station
     sat_commnicate_path = []
     sat_commnicate_path.append(imaging_sat)
-    sat_num = 0         #index of the last element in sat_commnicate_path
     sat_commnicate_delay = []
     sat_commnicate_delay.append(0)
+    sat_num = 0         #index of the last element in sat_commnicate_path and sat_commnicate_delay
+    last_min_distance = -1
 
     end_path = False
     while end_path == False:
@@ -104,8 +106,8 @@ def path_decision(sat_list: list, gd: observation_class.Observation, gs: GroundS
         ignore = True
         while ignore == True:
             min_distance = -1        # store the min distance from next satellite to gs
-            min_sat = -1            # store the min distance satellite object
-            distance = 0
+            min_sat = -1            # store the min distance satellite object index
+            distance = -1
 
             for s in range(len(sat_list)):      # avoid the sat not able to communicate
                 if s not in ignore_sat and s not in sat_commnicate_path:

@@ -91,13 +91,27 @@ sat_commnicate_delay = []
 sat_commnicate_path, sat_commnicate_delay = communication.path_decision(sat_list, gd, gs)
 
 
-print("Satellite path:")
 for i in range(len(sat_commnicate_path)):
-    phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[i]], t = sat_commnicate_delay[i])
-    sheet.write(col_num, 0, phi)
-    sheet.write(col_num, 1, lam)
-    sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
-    sheet.write(col_num, 3, sat_commnicate_delay[i])
+    if sat_commnicate_path[i] == -1:
+        sheet.write(col_num, 0, -1)
+        sheet.write(col_num, 1, -1)
+        sheet.write(col_num, 2, -1)
+        sheet.write(col_num, 3, sat_commnicate_delay[i])
+
+        col_num += 1
+
+    else:
+        phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[i]], t = sat_commnicate_delay[i])
+        phi = phi * (180/math.pi)
+        lam = lam * (180/math.pi)
+        
+        sheet.write(col_num, 0, phi)
+        sheet.write(col_num, 1, lam)
+        sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
+        sheet.write(col_num, 3, sat_commnicate_delay[i])
+
+        col_num += 1
+
 
 print("total delay of the commnication is", sat_commnicate_delay[len(sat_commnicate_delay)-1], "seconds.")
 

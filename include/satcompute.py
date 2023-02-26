@@ -50,6 +50,16 @@ def get_sat_lat_lon(sat: Satellite_class.Satellite, t):
 
     return phi, lam
 
+def lla_to_cartesian(lat, lon, alt):
+    b = 6356752.3142  # semi-minor axis of the Earth
+    e_sq = 1 - (b/Satellite_class.Re)**2
+    N = Satellite_class.Re / math.sqrt(1 - e_sq*math.sin(lat)**2)
+
+    x = (N + alt) * math.cos(lat) * math.cos(lon)
+    y = (N + alt) * math.cos(lat) * math.sin(lon)
+    z = (N * (1 - e_sq) + alt) * math.sin(lat)
+
+    return x, y, z
 
 # input     1. t (time passed from start_greenwich, in sec)
 #           2. sat_1 (first satellite)
@@ -89,8 +99,7 @@ def sat_ground_distance(t, sat: Satellite_class.Satellite, gs: GroundStation_cla
     to_x = Satellite_class.Re * math.cos(gs.lat_rad) * math.cos(gs.long_rad)
     to_y = Satellite_class.Re * math.cos(gs.lat_rad) * math.sin(gs.long_rad)
     to_z = Satellite_class.Re * math.sin(gs.lat_rad)
-    
-    return ((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2) **(1/2)
+    return math.sqrt((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2)
 
 
 # 根据给定的最大off_nadir角和地面点，求卫星可能观测到的纬度带
