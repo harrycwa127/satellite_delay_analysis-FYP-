@@ -3,7 +3,6 @@ import xlwt
 import time
 import math
 from include import Satellite_class
-from include import GroundStation_class
 from include import satcompute
 from include import visibility
 from include import read_data
