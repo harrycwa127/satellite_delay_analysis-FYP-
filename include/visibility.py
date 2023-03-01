@@ -16,7 +16,7 @@ import math
 def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: observation_class.Observation) -> bool:
     phi, lam = satcompute.get_sat_lat_lon(sat = satellite, t = t)
 
-    theta = lam - gd.long_rad
+    theta = lam - gd.lon_rad
     cos_psi = math.cos(gd.lat_rad) * math.cos(phi) * math.cos(theta) + math.sin(gd.lat_rad) * math.sin(phi)
     psi = math.acos(cos_psi)
     beta = math.atan(Satellite_class.Re * math.sin(psi) / (satellite.r - Satellite_class.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
@@ -37,7 +37,7 @@ def is_gs_communicable(t, satellite: Satellite_class.Satellite, gs: GroundStatio
     gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / satellite.r)
     phi, lam = satcompute.get_sat_lat_lon(sat = satellite, t = t)
     
-    theta = lam - gs.long_rad
+    theta = lam - gs.lon_rad
     cos_psi = math.cos(gs.lat_rad) * math.cos(phi) * math.cos(theta) + math.sin(gs.lat_rad) * math.sin(phi)
     psi = math.acos(cos_psi)
     beta = math.atan(Satellite_class.Re * math.sin(psi) / (satellite.r - Satellite_class.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]

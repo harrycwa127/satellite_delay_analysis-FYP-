@@ -54,7 +54,7 @@ col_num = 1
 # search
 for i in range(len(gd_list)):
     sheet.write(col_num, 0, math.degrees(gd_list[i].lat_rad))
-    sheet.write(col_num, 1, math.degrees(gd_list[i].long_rad))
+    sheet.write(col_num, 1, math.degrees(gd_list[i].lon_rad))
     imaging_sats = []
     for s in sat_list:
         if visibility.is_observation_visible(0, s, gd_list[i],):

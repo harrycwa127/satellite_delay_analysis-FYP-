@@ -25,8 +25,8 @@ e_o = 0
 omega_o = 0
 M_o = 0
 region_lat_rad = math.radians(45)      # 弧度
-region_long_rad = math.radians(100)     # 弧度
-gd = Observation(region_lat_rad, region_long_rad)
+region_lon_rad = math.radians(100)     # 弧度
+gd = Observation(region_lat_rad, region_lon_rad)
 circle_o_list = [12, 12.5, 13, 13.5, 14, 14.5, 15, 15.5, 16]
 off_nadir_list = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
 

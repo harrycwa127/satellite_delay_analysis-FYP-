@@ -41,8 +41,8 @@ def get_observation():
         region_lat = float(gd_lines[g][0])
         region_long = float(gd_lines[g][1])
         region_lat_rad = math.radians(region_lat)       # rad
-        region_long_rad = math.radians(region_long)     # rad
-        gd = observation_class.Observation(region_lat_rad, region_long_rad)
+        region_lon_rad = math.radians(region_long)     # rad
+        gd = observation_class.Observation(region_lat_rad, region_lon_rad)
         gd_list.append(gd)
 
     return gd_list
@@ -56,8 +56,8 @@ def get_observation2():
     region_lat = float(gd_lines[0][0])
     region_long = float(gd_lines[0][1])
     region_lat_rad = math.radians(region_lat)       # rad
-    region_long_rad = math.radians(region_long)     # rad
-    gd = observation_class.Observation(region_lat_rad, region_long_rad)
+    region_lon_rad = math.radians(region_long)     # rad
+    gd = observation_class.Observation(region_lat_rad, region_lon_rad)
 
     return gd
 
@@ -78,9 +78,9 @@ def get_gs():
         gs_ele = float(gs_lines[g][2])
         # gs_ele = 10
         gs_lat_rad = math.radians(gs_lat)  # rad
-        gs_long_rad = math.radians(gs_long)  # rad
+        gs_lon_rad = math.radians(gs_long)  # rad
         gs_ele_rad = math.radians(gs_ele)  # rad
-        gs = GroundStation_class.GroundStation(gs_lat_rad, gs_long_rad, gs_ele_rad)
+        gs = GroundStation_class.GroundStation(gs_lat_rad, gs_lon_rad, gs_ele_rad)
         gs_list.append(gs)
 
     return gs_list

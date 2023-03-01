@@ -37,8 +37,8 @@ for g in range(gd_accounts):
     region_lat = float(gd_lines[g][0])
     region_long = float(gd_lines[g][1])
     region_lat_rad = math.radians(region_lat)       # 弧度
-    region_long_rad = math.radians(region_long)     # 弧度
-    gd = Observation(region_lat_rad, region_long_rad)
+    region_lon_rad = math.radians(region_long)     # 弧度
+    gd = Observation(region_lat_rad, region_lon_rad)
     gd_list.append(gd)
 
 # ---------read ground stations
@@ -58,9 +58,9 @@ for g in range(gs_accounts):
     gs_ele = float(gs_lines[g][2])
     # gs_ele = 10
     gs_lat_rad = math.radians(gs_lat)  # 弧度
-    gs_long_rad = math.radians(gs_long)  # 弧度
+    gs_lon_rad = math.radians(gs_long)  # 弧度
     gs_ele_rad = math.radians(gs_ele)  # 弧度
-    gs = GroundStation(gs_lat_rad, gs_long_rad, gs_ele_rad)
+    gs = GroundStation(gs_lat_rad, gs_lon_rad, gs_ele_rad)
     gs_list.append(gs)
 
 # ----------main section
@@ -106,7 +106,7 @@ for orbit_id in range(m):
 # ------穷举搜索
 for i in range(gd_accounts):
     sheet.write(col_num, 0, math.degrees(gd_list[i].lat_rad))
-    sheet.write(col_num, 1, math.degrees(gd_list[i].long_rad))
+    sheet.write(col_num, 1, math.degrees(gd_list[i].lon_rad))
     valid = 0
     for offset_start in np.arange(0, 600, 0.1):
         result_lst = [0]*requestNum

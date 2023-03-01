@@ -59,7 +59,7 @@ for orbit_id in range(m):
 # satellite to ground station visible
 for gs in gs_list:
     sheet.write(col_num, 0, math.degrees(gs.lat_rad))
-    sheet.write(col_num, 1, math.degrees(gs.long_rad))
+    sheet.write(col_num, 1, math.degrees(gs.lon_rad))
     visited_sats = []
     # search for all sat
     for s in sat_list:

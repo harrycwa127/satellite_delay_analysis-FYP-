@@ -22,8 +22,8 @@ start_greenwich = (greenwich(start_time_julian)) % 360   # 转到0到360°
 
 off_nadir = math.radians(45)
 region_lat_rad = math.radians(48)      # 弧度
-region_long_rad = math.radians(9)     # 弧度
-gd = Observation(region_lat_rad, region_long_rad)
+region_lon_rad = math.radians(9)     # 弧度
+gd = Observation(region_lat_rad, region_lon_rad)
 
 # ----------main section
 i_o = math.radians(50)
