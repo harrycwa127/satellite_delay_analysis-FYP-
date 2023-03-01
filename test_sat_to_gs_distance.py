@@ -9,6 +9,7 @@ from include import visibility
 from include import read_data
 from include.SimParameter_class import SimParameter
 
+
 start_time = time.time()
 
 # ---------read start time and end time
@@ -20,11 +21,11 @@ gs_list = read_data.get_gs()
 
 
 # remove existed output file
-if os.path.exists("results/sat_to_gs_communicable_result.xls"):
-    os.remove("results/sat_to_gs_communicable_result.xls")
+if os.path.exists("results/sat_to_gs_distance_result.xls"):
+    os.remove("results/sat_to_gs_distance_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
 sheet = book.add_sheet('sat_ground_communicable_result', cell_overwrite_ok=True)
-col = ('Geocentric Latitude', 'Geocentric Longitude', 'Radius of Orbit', 'communicable')
+col = ('Latitude', 'Longitude', 'Height', 'distance')
 for i in range(0, 4):
     sheet.write(0, i, col[i])
 col_num = 1
@@ -37,6 +38,8 @@ omega_o = 0
 circle_o = 14
 m = 9                  # number of orbit
 n = 25                 # number of sat
+
+t = 0
 
 
 sat_list = []
@@ -65,19 +68,19 @@ for gs in gs_list:
         if visibility.is_gs_communicable(0, s, gs):
             visited_sats.append(s)
 
-    temp = ''
     if visited_sats:
         for s in visited_sats:
             phi, lam = satcompute.get_sat_lat_lon(sat = s, t = 0)
             phi = phi * (180/math.pi)
             lam = lam * (180/math.pi)
+            distance = satcompute.sat_ground_distance(t, s, gs)
             
-            if temp == '':
-                temp = "[%f, %f, %f]" % (phi, lam, s.r)
-            else:
-                temp += ", [%f, %f, %f]" % (phi, lam, s.r)
+            sheet.write(col_num, 0, phi)
+            sheet.write(col_num, 1, lam)
+            sheet.write(col_num, 2, s.r)
+            sheet.write(col_num, 3, distance)
 
-            sheet.write(col_num, 2, temp)
+
     else:
         sheet.write(col_num, 2, '-')
                 
@@ -86,4 +89,4 @@ for gs in gs_list:
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)
-book.save('results/sat_to_gs_communicable_result.xls')
+book.save('results/sat_to_gs_distance_result.xls')

@@ -1,6 +1,9 @@
+import numpy as np
 import math
 from include import Satellite_class
 from include import GroundStation_class
+from astropy.time import Time
+from pyproj import Geod, Proj
 from include.SimParameter_class import SimParameter
 
 # 根据轨道六要素求卫星当前位置赤经
@@ -31,6 +34,25 @@ def sat_alpha(r, Omega_o, u, i_o):
             s_alpha = 3 * math.pi / 2
     return s_alpha
 
+
+
+def eci_from_latlon(lat, lon, start_greenwich, time):
+    # Convert latitude and longitude to ECEF coordinates
+    geod = Geod(ellps='WGS84')
+    ecef_x, ecef_y, ecef_z = geod.to_geocentric(lon, lat, 0)
+
+    # Calculate Greenwich Mean Sidereal Time (GMST)
+    gmst = SimParameter.get_start_greenwich()
+
+    # Transformation matrix from ECEF to ECI
+    T = np.array([[math.cos(gmst), math.sin(gmst), 0],
+                  [-math.sin(gmst), math.cos(gmst), 0],
+                  [0, 0, 1]])
+
+    # Convert ECEF coordinates to ECI coordinates
+    eci_coords = T @ np.array([ecef_x, ecef_y, ecef_z])
+
+    return eci_coords
 
 # input     1. sat (Satellite Class Object)
 #           2. t (time passed from start_greenwich, in sec)

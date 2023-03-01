@@ -98,7 +98,6 @@ def path_decision(sat_list: list, gd: observation_class.Observation, gs: GroundS
     sat_commnicate_delay = []
     sat_commnicate_delay.append(0)
     sat_num = 0         #index of the last element in sat_commnicate_path and sat_commnicate_delay
-    last_min_distance = -1
 
     end_path = False
     while end_path == False:
