@@ -57,17 +57,6 @@ SimParameter.set_signal_speed(299792458)
 t = 0       # for store the current time passed from start time
 temp = 0    # for get the result of communication
 
-# remove orginal output file
-if os.path.exists("results/analysis_result.xls"):
-    os.remove("results/analysis_result.xls")
-book = xlwt.Workbook(encoding='utf-8', style_compression=0)
-sheet = book.add_sheet('analysis_result', cell_overwrite_ok=True)
-col = ('Satellite Latitude', 'Satellite Longitude', 'Satellite Altitude', 'Delay Time' )
-for i in range(0, 4):
-    sheet.write(0, i, col[i])
-col_num = 1
-
-
 # search satellite to observation
 imaging_sat = -1
 # search for all sat
@@ -83,6 +72,30 @@ if imaging_sat == -1:
 
 # if the satellite obervate the the obervation point and able to directly commincation to the gs
 gs = gs_list[0]         # target ground_station
+
+
+# remove orginal output file
+if os.path.exists("results/analysis_result.xls"):
+    os.remove("results/analysis_result.xls")
+book = xlwt.Workbook(encoding='utf-8', style_compression=0)
+sheet = book.add_sheet('analysis_result', cell_overwrite_ok=True)
+
+# write the data the obervation and ground station
+sheet.write(0, 1, "Latitude")
+sheet.write(0, 2, "Longitude")
+
+sheet.write(1, 0, "Observation Point")
+sheet.write(1, 1, math.degrees(gd.lat_rad))
+sheet.write(1, 2, math.degrees(gd.lon_rad))
+
+sheet.write(2, 0, "Ground Station")
+sheet.write(2, 1, math.degrees(gs.lat_rad))
+sheet.write(2, 2, math.degrees(gs.lon_rad))
+
+col = ('Satellite Latitude', 'Satellite Longitude', 'Satellite Altitude', 'Delay Time' )
+for i in range(0, 4):
+    sheet.write(4, i, col[i])
+col_num = 5
 
 # array to store the path result
 sat_commnicate_path = []

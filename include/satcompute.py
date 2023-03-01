@@ -78,44 +78,44 @@ def inter_sat_distance(t, sat_1: Satellite_class.Satellite, sat_2: Satellite_cla
     return ((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2) **(1/2)
 
 
-def eci_from_latlon(t, gs):
-    # Convert latitude and longitude to degrees
-    lat_deg = math.degrees(gs.lat_rad)
-    lon_deg = math.degrees(gs.lon_rad)
+# def eci_from_latlon(t, gs):
+#     # Convert latitude and longitude to degrees
+#     lat_deg = math.degrees(gs.lat_rad)
+#     lon_deg = math.degrees(gs.lon_rad)
 
-    if lon_deg > 180:
-        lon_deg -= 360
+#     if lon_deg > 180:
+#         lon_deg -= 360
         
-    # print(lat_deg, lon_deg, gs.lat_rad, gs.lon_rad)
+#     # print(lat_deg, lon_deg, gs.lat_rad, gs.lon_rad)
 
-    # Calculate the current GMST in radians
-    current_gmst_rad = SimParameter.get_start_greenwich() + (1.00273790935 * t) % (2 * np.pi)
+#     # Calculate the current GMST in radians
+#     current_gmst_rad = SimParameter.get_start_greenwich() + (1.00273790935 * t) % (2 * np.pi)
 
-    # Calculate the transformation matrix from ECEF to ECI coordinates
-    c = np.cos(current_gmst_rad)
-    s = np.sin(current_gmst_rad)
-    T = np.array([
-        [-s, c, 0],
-        [-c, -s, 0],
-        [0, 0, 1]
-    ])
+#     # Calculate the transformation matrix from ECEF to ECI coordinates
+#     c = np.cos(current_gmst_rad)
+#     s = np.sin(current_gmst_rad)
+#     T = np.array([
+#         [-s, c, 0],
+#         [-c, -s, 0],
+#         [0, 0, 1]
+#     ])
 
-    #  Define the WGS84 ellipsoid using a Proj string
-    ellps_proj_str = "+ellps=WGS84 +a=6378137 +rf=298.257223563"
+#     #  Define the WGS84 ellipsoid using a Proj string
+#     ellps_proj_str = "+ellps=WGS84 +a=6378137 +rf=298.257223563"
 
-    # Create a transformer object to convert lat/lon to ECEF coordinates
-    transformer = Transformer.from_crs(
-        CRS.from_proj4("+proj=longlat +ellps=WGS84"),
-        CRS.from_proj4("+proj=geocent " + ellps_proj_str)
-    )
+#     # Create a transformer object to convert lat/lon to ECEF coordinates
+#     transformer = Transformer.from_crs(
+#         CRS.from_proj4("+proj=longlat +ellps=WGS84"),
+#         CRS.from_proj4("+proj=geocent " + ellps_proj_str)
+#     )
 
-    # Convert the lat/lon coordinates to ECEF coordinates
-    ecef_x, ecef_y, ecef_z = transformer.transform(gs.lon_rad, gs.lat_rad, 0, radians=True)
+#     # Convert the lat/lon coordinates to ECEF coordinates
+#     ecef_x, ecef_y, ecef_z = transformer.transform(gs.lon_rad, gs.lat_rad, 0, radians=True)
 
-    # Apply the transformation matrix to convert ECEF to ECI coordinates
-    eci_coords = T @ np.array([ecef_x, ecef_y, ecef_z])
+#     # Apply the transformation matrix to convert ECEF to ECI coordinates
+#     eci_coords = T @ np.array([ecef_x, ecef_y, ecef_z])
 
-    return eci_coords[0], eci_coords[1], eci_coords[2]
+#     return eci_coords[0], eci_coords[1], eci_coords[2]
 
 
 
@@ -131,10 +131,14 @@ def sat_ground_distance(t, sat: Satellite_class.Satellite, gs: GroundStation_cla
     from_y = sat.r * math.cos(from_delta) * math.sin(from_alpha)
     from_z = sat.r * math.sin(from_delta)
 
-    to_x, to_y, to_z = eci_from_latlon(t, gs)
-    # to_x = Satellite_class.Re * math.cos(gs.lat_rad) * math.cos(gs.lon_rad)
-    # to_y = Satellite_class.Re * math.cos(gs.lat_rad) * math.sin(gs.lon_rad)
-    # to_z = Satellite_class.Re * math.sin(gs.lat_rad)
+    to_u = (math.radians(SimParameter.get_start_greenwich()) + gs.lon_rad) % (2 * math.pi)
+    to_alpha = (to_u + Satellite_class.omega_e * t) % (2 * math.pi)
+
+    # temp_x, temp_y, temp_z = eci_from_latlon(t, gs)
+    to_x = Satellite_class.Re * math.cos(gs.lat_rad) * math.cos(to_alpha)
+    to_y = Satellite_class.Re * math.cos(gs.lat_rad) * math.sin(to_alpha)
+    to_z = Satellite_class.Re * math.sin(gs.lat_rad)
+
     return math.sqrt((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2)
 
 

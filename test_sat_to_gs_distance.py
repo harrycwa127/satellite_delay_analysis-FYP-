@@ -65,7 +65,7 @@ for gs in gs_list:
     for s in sat_list:
         gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / s.r)
         
-        if visibility.is_gs_communicable(0, s, gs):
+        if visibility.is_gs_communicable(t, s, gs):
             visited_sats.append(s)
 
     if visited_sats:
