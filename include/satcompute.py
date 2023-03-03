@@ -1,6 +1,7 @@
 import math
 from include import Satellite_class
 from include import GroundStation_class
+from include import observation_class
 from include.SimParameter_class import SimParameter
 
 # 根据轨道六要素求卫星当前位置赤经
@@ -51,25 +52,36 @@ def get_sat_lat_lon(sat: Satellite_class.Satellite, t):
     return phi, lam
 
 
+def get_sat_eci_xyz(t, sat: Satellite_class.Satellite):
+    u = sat.omega_o + (sat.n_o * t + sat.M_o) % (2 * math.pi)
+    alpha = sat_alpha(sat.r, sat.Omega_o, u, sat.i_o) # right ascension
+    delta = math.asin(math.sin(u) * math.sin(sat.i_o))  # in time t
+
+    x = sat.r * math.cos(delta) * math.cos(alpha)
+    y = sat.r * math.cos(delta) * math.sin(alpha)
+    z = sat.r * math.sin(delta)
+
+    return (x, y, z)
+
+
+def get_ground_eci_xyz(t, ground: GroundStation_class.GroundStation | observation_class.Observation):
+    u = (math.radians(SimParameter.get_start_greenwich()) + ground.lon_rad) % (2 * math.pi)
+    alpha = (u + Satellite_class.omega_e * t) % (2 * math.pi)
+
+    x = Satellite_class.Re * math.cos(ground.lat_rad) * math.cos(alpha)
+    y = Satellite_class.Re * math.cos(ground.lat_rad) * math.sin(alpha)
+    z = Satellite_class.Re * math.sin(ground.lat_rad)
+
+    return (x, y, z)
+
+
 # input     1. t (time passed from start_greenwich, in sec)
 #           2. sat_1 (first satellite)
 #           3. sat_2 (first satellite)
 def inter_sat_distance(t, sat_1: Satellite_class.Satellite, sat_2: Satellite_class.Satellite):
-    from_u = sat_1.omega_o + (sat_1.n_o * t + sat_1.M_o) % (2 * math.pi)
-    from_alpha = sat_alpha(sat_1.r, sat_1.Omega_o, from_u, sat_1.i_o) # right ascension
-    from_delta = math.asin(math.sin(from_u) * math.sin(sat_1.i_o))  # in time t
+    from_x, from_y, from_z = get_sat_eci_xyz(t, sat_1)
 
-    from_x = sat_1.r * math.cos(from_delta) * math.cos(from_alpha)
-    from_y = sat_1.r * math.cos(from_delta) * math.sin(from_alpha)
-    from_z = sat_1.r * math.sin(from_delta)
-
-    to_u = sat_2.omega_o + (sat_2.n_o * t + sat_2.M_o) % (2 * math.pi)
-    to_alpha = sat_alpha(sat_2.r, sat_2.Omega_o, to_u, sat_2.i_o)   # right ascension in time t
-    to_delta = math.asin(math.sin(to_u) * math.sin(sat_2.i_o))  # declination in time t
-
-    to_x = sat_2.r * math.cos(to_delta) * math.cos(to_alpha)
-    to_y = sat_2.r * math.cos(to_delta) * math.sin(to_alpha)
-    to_z = sat_2.r * math.sin(to_delta)
+    to_x, to_y, to_z = get_sat_eci_xyz(t, sat_2)
     
     return ((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2) **(1/2)
 
@@ -78,21 +90,9 @@ def inter_sat_distance(t, sat_1: Satellite_class.Satellite, sat_2: Satellite_cla
 #           2. sat_1 (Satellite)
 #           3. gs (Ground Station)
 def sat_ground_distance(t, sat: Satellite_class.Satellite, gs: GroundStation_class.GroundStation):
-    from_u = sat.omega_o + (sat.n_o * t + sat.M_o) % (2 * math.pi)
-    from_alpha = sat_alpha(sat.r, sat.Omega_o, from_u, sat.i_o) # right ascension
-    from_delta = math.asin(math.sin(from_u) * math.sin(sat.i_o))  # in time t
+    from_x, from_y, from_z = get_sat_eci_xyz(t, sat)
 
-    from_x = sat.r * math.cos(from_delta) * math.cos(from_alpha)
-    from_y = sat.r * math.cos(from_delta) * math.sin(from_alpha)
-    from_z = sat.r * math.sin(from_delta)
-
-    to_u = (math.radians(SimParameter.get_start_greenwich()) + gs.lon_rad) % (2 * math.pi)
-    to_alpha = (to_u + Satellite_class.omega_e * t) % (2 * math.pi)
-
-    # temp_x, temp_y, temp_z = eci_from_latlon(t, gs)
-    to_x = Satellite_class.Re * math.cos(gs.lat_rad) * math.cos(to_alpha)
-    to_y = Satellite_class.Re * math.cos(gs.lat_rad) * math.sin(to_alpha)
-    to_z = Satellite_class.Re * math.sin(gs.lat_rad)
+    to_x, to_y, to_z = get_ground_eci_xyz(t, gs)
 
     return math.sqrt((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2)
 

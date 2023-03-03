@@ -1,84 +1,130 @@
 import pygame
+import math
+from pygame.locals import *
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-from OpenGL.GLUT import glutSolidSphere
-from OpenGL.GL import shaders
-import numpy as np
-from glm import *
+from PIL import Image
+import numpy
 
-# Initialize Pygame
-pygame.init()
+from include import Satellite_class
+from include import satcompute
 
-# Set the display size
-display = (800, 600)
-pygame.display.set_mode(display, pygame.DOUBLEBUF|pygame.OPENGL)
 
-# Set the OpenGL perspective
-glMatrixMode(GL_PROJECTION)
-gluPerspective(45, (display[0]/display[1]), 0.1, 50.0)
+def read_texture(filename):
+    """
+    Reads an image file and converts to a OpenGL-readable textID format
+    """
+    img = Image.open(filename)
+    img_data = numpy.array(list(img.getdata()), numpy.int8)
+    textID = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D, textID)
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
+    return textID
 
-# Set the initial camera position
-glMatrixMode(GL_MODELVIEW)
-glLoadIdentity()
-glTranslatef(0.0, 0.0, -5.0)
 
-# Set up lighting
-glEnable(GL_LIGHTING)
-glEnable(GL_LIGHT0)
-glLightfv(GL_LIGHT0, GL_POSITION, (0.0, 1.0, 1.0, 0.0))
-glLightfv(GL_LIGHT0, GL_AMBIENT, (0.5, 0.5, 0.5, 1.0))
+# convert ECI xyz to pygame xyz
+def cei_to_pygame_pos(x, y, z):
+    pass
 
-# Load the Earth texture
-textureSurface = pygame.image.load("earth_texture.jpg")
-textureData = pygame.image.tostring(textureSurface, "RGB", 1)
-width = textureSurface.get_width()
-height = textureSurface.get_height()
+# temp
+def draw_satellite(t, sat: Satellite_class.Satellite):
+    x, y, z = satcompute.get_sat_eci_xyz(t, sat)
 
-# Create the Earth sphere
-earthQuadric = gluNewQuadric()
-gluQuadricTexture(earthQuadric, GL_TRUE)
-gluQuadricNormals(earthQuadric, GL_SMOOTH)
-glEnable(GL_TEXTURE_2D)
-glTexImage2D(GL_TEXTURE_2D, 0, 3, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData)
-gluSphere(earthQuadric, 1.0, 32, 32)
+    # Draw a point at the specified XYZ coordinates
+    glPushMatrix()
+    glColor3f(1.0, 1.0, 0.0)
+    glTranslatef(x, y, z)
+    glutSolidSphere(10, 10, 10)
+    glPopMatrix()
 
-# Define the satellite position
-satellitePosition = (2.0, 0.0, 0.0)
 
-# Create the satellite marker
-satelliteMarker = glGenLists(1)
-glNewList(satelliteMarker, GL_COMPILE)
-glColor3f(1.0, 0.0, 0.0)
-glPushMatrix()
-glTranslatef(satellitePosition[0], satellitePosition[1], satellitePosition[2])
-glutSolidSphere(0.1, 10, 10)
-glPopMatrix()
-glEndList()
+def display(sat_list: list, sat_commnicate_path, sat_commnicate_delay):
+    pygame.init()
+    display = (800, 800)
+    pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
+    pygame.display.set_caption('Satellite Path')
+    pygame.key.set_repeat(1, 10)    # allows press and hold of buttons
+    gluPerspective(40, (display[0]/display[1]), 0.1, 50.0)
+    glTranslatef(0.0, 0.0, -5)    # sets initial zoom so we can see globe
+    lastPosX = 0
+    lastPosY = 0
+    texture = read_texture('earth_texture.jpg')
 
-# Main game loop
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            quit()
+    while True:
+        for event in pygame.event.get():    # user avtivities are called events
 
-    # Rotate the Earth
-    glRotatef(1, 0.0, 1.0, 0.0)
+            # Exit cleanly if user quits window
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
 
-    # Clear the screen
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+            # Rotation with arrow keys
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    glRotatef(1, 0, 1, 0)
+                if event.key == pygame.K_RIGHT:
+                    glRotatef(1, 0, -1, 0)
+                if event.key == pygame.K_UP:
+                    glRotatef(1, -1, 0, 0)
+                if event.key == pygame.K_DOWN:
+                    glRotatef(1, 1, 0, 0)
 
-    # Draw the Earth
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-    glTranslatef(0.0, 0.0, -5.0)
-    glRotatef(45, 1.0, 0.0, 0.0)
-    glRotatef(pygame.time.get_ticks() / 10, 0.0, 1.0, 0.0)
-    gluSphere(earthQuadric, 1.0, 32, 32)
+            # Zoom in and out with mouse wheel
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:  # wheel rolled up
+                    glScaled(1.05, 1.05, 1.05)
+                if event.button == 5:  # wheel rolled down
+                    glScaled(0.95, 0.95, 0.95)
 
-    # Draw the satellite marker
-    glCallList(satelliteMarker)
+            # Rotate with mouse click and drag
+            if event.type == pygame.MOUSEMOTION:
+                x, y = event.pos
+                dx = x - lastPosX
+                dy = y - lastPosY
+                mouseState = pygame.mouse.get_pressed()
+                if mouseState[0]:
 
-    # Update the screen
-    pygame.display.flip()
+                    modelView = (GLfloat * 16)()
+                    mvm = glGetFloatv(GL_MODELVIEW_MATRIX, modelView)
+
+                    # To combine x-axis and y-axis rotation
+                    temp = (GLfloat * 3)()
+                    temp[0] = modelView[0]*dy + modelView[1]*dx
+                    temp[1] = modelView[4]*dy + modelView[5]*dx
+                    temp[2] = modelView[8]*dy + modelView[9]*dx
+                    norm_xy = math.sqrt(temp[0]*temp[0] + temp[1]
+                                        * temp[1] + temp[2]*temp[2])
+                    glRotatef(math.sqrt(dx*dx+dy*dy),
+                              temp[0]/norm_xy, temp[1]/norm_xy, temp[2]/norm_xy)
+
+                lastPosX = x
+                lastPosY = y
+
+        # Creates Sphere and wraps texture
+        glEnable(GL_DEPTH_TEST)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+        qobj = gluNewQuadric()
+        gluQuadricTexture(qobj, GL_TRUE)
+        glEnable(GL_TEXTURE_2D)
+        glBindTexture(GL_TEXTURE_2D, texture)
+        gluSphere(qobj, 1, 50, 50)
+        gluDeleteQuadric(qobj)
+        glDisable(GL_TEXTURE_2D)
+
+        # Displays pygame window
+        pygame.display.flip()
+        pygame.time.wait(10)
+
+
+display()
