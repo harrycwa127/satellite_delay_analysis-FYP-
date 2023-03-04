@@ -18,6 +18,7 @@ class Display:
     _sat_commnicate_delay = []
     _gs: GroundStation_class.GroundStation
     _gd: Observation_class.Observation
+    _qobj = gluNewQuadric()
 
 
     # setter of point info
@@ -62,7 +63,6 @@ class Display:
             x, y, z = satcompute.get_sat_eci_xyz(0, s)
 
         # Draw a point at the specified XYZ coordinates
-            qobj = gluNewQuadric()
             # gluQuadricTexture(qobj, GL_TRUE)
 
             # gluSphere(qobj, 1, 50, 50)  # may set to sat_class.Re
@@ -70,10 +70,9 @@ class Display:
 
             glTranslatef(x, y, z) #Move to the place
             glColor4f(0.5, 0.2, 0.2, 1) #Put color
-            gluSphere(qobj, 1.0, 32, 16) #Draw sphere
+            gluSphere(cls._qobj, 1.0, 32, 16) #Draw sphere
 
             glPopMatrix()
-            gluDeleteQuadric(qobj)
 
 
     @classmethod
@@ -111,9 +110,9 @@ class Display:
                 # Zoom in and out with mouse wheel
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 4:  # wheel rolled up
-                        glScaled(1.05, 1.05, 1.05)
+                        glScaled(1.1, 1.1, 1.1)
                     if event.button == 5:  # wheel rolled down
-                        glScaled(0.95, 0.95, 0.95)
+                        glScaled(0.9, 0.9, 0.9)
 
                 # Rotate with mouse click and drag
                 if event.type == pygame.MOUSEMOTION:
@@ -143,12 +142,12 @@ class Display:
             glEnable(GL_DEPTH_TEST)
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-            qobj = gluNewQuadric()
-            gluQuadricTexture(qobj, GL_TRUE)
+            gluQuadricTexture(cls._qobj, GL_TRUE)
+            gluQuadricNormals(cls._qobj, GL_TRUE)
             glEnable(GL_TEXTURE_2D)
             glBindTexture(GL_TEXTURE_2D, texture)
-            gluSphere(qobj, 1, 50, 50)  # may set to sat_class.Re
-            gluDeleteQuadric(qobj)
+            gluSphere(cls._qobj, 1, 50, 50)  # may set to sat_class.Re
+            # gluDeleteQuadric(cls._qobj)
             glDisable(GL_TEXTURE_2D)
 
             # cls.__draw_sat()
