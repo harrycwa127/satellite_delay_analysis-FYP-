@@ -18,7 +18,9 @@ class Display:
     _sat_commnicate_delay = []
     _gs: GroundStation_class.GroundStation
     _gd: Observation_class.Observation
-    _qobj = gluNewQuadric()
+
+
+    _scale_rate = 1000000       # store the scale of coordinate changed from ECI
 
 
     # setter of point info
@@ -60,19 +62,23 @@ class Display:
     @classmethod
     def __draw_sat(cls):
         for s in cls._sat_list:
+            qobj = gluNewQuadric()
+            glPushMatrix()
+            glLoadIdentity()
+
             x, y, z = satcompute.get_sat_eci_xyz(0, s)
 
+            x = x / cls._scale_rate
+            y = y / cls._scale_rate
+            z = z / cls._scale_rate
+
         # Draw a point at the specified XYZ coordinates
-            # gluQuadricTexture(qobj, GL_TRUE)
-
-            # gluSphere(qobj, 1, 50, 50)  # may set to sat_class.Re
-            glPushMatrix()
-
             glTranslatef(x, y, z) #Move to the place
-            glColor4f(0.5, 0.2, 0.2, 1) #Put color
-            gluSphere(cls._qobj, 1.0, 32, 16) #Draw sphere
+            glColor3f(0.5, 0.2, 0.2) #Put color
+            gluSphere(qobj, 1, 1, 1) #Draw sphere
 
             glPopMatrix()
+            gluDeleteQuadric(qobj)
 
 
     @classmethod
@@ -82,11 +88,15 @@ class Display:
         pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
         pygame.display.set_caption('Satellite Path')
         pygame.key.set_repeat(1, 10)    # allows press and hold of buttons
-        gluPerspective(40, (display[0]/display[1]), 0.1, 50.0)
-        glTranslatef(0.0, 0.0, -5)    # sets initial zoom so we can see globe
+        glMatrixMode(GL_PROJECTION)
+        gluPerspective(45, (display[0]/display[1]), 0.1, 50.0)
+        glTranslatef(0.0, 0.0, -25 - Satellite_class.Re/cls._scale_rate)    # sets initial zoom so we can see globe
         lastPosX = 0
         lastPosY = 0
+        scaled_earth_radius = Satellite_class.Re/cls._scale_rate
         texture = cls.__read_texture('earth_texture.jpg')
+        glMatrixMode(GL_MODELVIEW)
+
 
         while True:
             for event in pygame.event.get():    # user avtivities are called events
@@ -138,19 +148,26 @@ class Display:
                     lastPosX = x
                     lastPosY = y
 
-            # Creates Sphere and wraps texture
+            # Creates Sphere and wraps texture of earth
             glEnable(GL_DEPTH_TEST)
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-            gluQuadricTexture(cls._qobj, GL_TRUE)
-            gluQuadricNormals(cls._qobj, GL_TRUE)
+            glPushMatrix()
+            glTranslatef(0, 0, 0) #Move to the place
+            qobj = gluNewQuadric()
+
+            gluQuadricTexture(qobj, GL_TRUE)
+            # gluQuadricNormals(qobj, GL_TRUE)
             glEnable(GL_TEXTURE_2D)
             glBindTexture(GL_TEXTURE_2D, texture)
-            gluSphere(cls._qobj, 1, 50, 50)  # may set to sat_class.Re
-            # gluDeleteQuadric(cls._qobj)
+            glColor3f(0.5, 0.2, 0.2) #Put color
+            gluSphere(qobj, scaled_earth_radius, 50, 50)  # may set to sat_class.Re
             glDisable(GL_TEXTURE_2D)
+            gluDeleteQuadric(qobj)
 
-            # cls.__draw_sat()
+            glPopMatrix()
+
+            cls.__draw_sat()
 
             # Displays pygame window
             pygame.display.flip()
