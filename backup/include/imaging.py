@@ -1,5 +1,5 @@
 from include import Satellite_class
-from include import observation_class
+from include import Observation_class
 from include import satcompute
 from include import visibility
 import math
@@ -12,7 +12,7 @@ import math
 #      4.地面点class
 #      5.off_nadir角
 # 输出：imaging curve
-def visible(time_interval, start_greenwich, satellite: Satellite_class.Satellite, gd: observation_class.Observation, off_nadir):
+def visible(time_interval, start_greenwich, satellite: Satellite_class.Satellite, gd: Observation_class.Observation, off_nadir):
     start_ground = (math.radians(start_greenwich) + gd.lon_rad) % (2 * math.pi)
     psi, phi_min, phi_max = satcompute.get_sat_phi_range(off_nadir, satellite.a_o, gd.lat_rad)
     alpha_min1, alpha_max1, alpha_min2, alpha_max2, t_min1, t_max1, t_min2, t_max2 = satcompute.get_sat_alpha_range\

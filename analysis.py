@@ -9,6 +9,7 @@ from include import visibility
 from include import read_data
 from include import satcompute
 from include.SimParameter_class import SimParameter
+from include.display_class import Display
 
 start_time = time.time()
 
@@ -132,3 +133,8 @@ print("total delay of the commnication is", sat_commnicate_delay[len(sat_commnic
 end_time = time.time()
 print('overall time:',  end_time-start_time)
 book.save('results/analysis_result.xls')
+
+# for s in sat_list:
+#     display_class.draw_satellite(0, s)
+Display.set_point_info(gd, sat_list, sat_commnicate_path, sat_commnicate_delay, gs)
+Display.display()

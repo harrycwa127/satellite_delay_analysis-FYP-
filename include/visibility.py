@@ -1,7 +1,7 @@
 from include import Satellite_class
 from include import GroundStation_class
 from include import satcompute
-from include import observation_class
+from include import Observation_class
 from include.SimParameter_class import SimParameter
 import math
 
@@ -13,7 +13,7 @@ import math
 #      4.off_nadir角
 #      5.开始时刻0经度所处的赤经
 # 输出：TRUE OR FALSE
-def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: observation_class.Observation) -> bool:
+def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: Observation_class.Observation) -> bool:
     phi, lam = satcompute.get_sat_lat_lon(sat = satellite, t = t)
 
     theta = lam - gd.lon_rad

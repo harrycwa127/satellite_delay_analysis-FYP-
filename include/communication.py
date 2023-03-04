@@ -2,7 +2,7 @@ from include import Satellite_class
 from include import satcompute
 from include import GroundStation_class
 from include import visibility
-from include import observation_class
+from include import Observation_class
 from include.SimParameter_class import SimParameter
 import sys
 
@@ -75,7 +75,7 @@ def sat_ground_commnicate(t, sat: Satellite_class.Satellite, ground_station: Gro
 
 # output:   1. sat_commnicate_path
 #           2. sat_commnicate_delay
-def path_decision(sat_list: list, gd: observation_class.Observation, gs: GroundStation_class.GroundStation):
+def path_decision(sat_list: list, gd: Observation_class.Observation, gs: GroundStation_class.GroundStation):
 
     t = 0
 

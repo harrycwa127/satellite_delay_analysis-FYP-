@@ -1,5 +1,5 @@
 from include import greenwich
-from include import observation_class
+from include import Observation_class
 from include import GroundStation_class
 
 import math
@@ -42,7 +42,7 @@ def get_observation():
         region_long = float(gd_lines[g][1])
         region_lat_rad = math.radians(region_lat)       # rad
         region_lon_rad = math.radians(region_long)     # rad
-        gd = observation_class.Observation(region_lat_rad, region_lon_rad)
+        gd = Observation_class.Observation(region_lat_rad, region_lon_rad)
         gd_list.append(gd)
 
     return gd_list
@@ -57,7 +57,7 @@ def get_observation2():
     region_long = float(gd_lines[0][1])
     region_lat_rad = math.radians(region_lat)       # rad
     region_lon_rad = math.radians(region_long)     # rad
-    gd = observation_class.Observation(region_lat_rad, region_lon_rad)
+    gd = Observation_class.Observation(region_lat_rad, region_lon_rad)
 
     return gd
 

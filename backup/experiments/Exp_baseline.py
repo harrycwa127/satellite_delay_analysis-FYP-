@@ -7,7 +7,7 @@ from backup.include.imaging import *
 from include.communication import *
 from include.greenwich import *
 from include.Satellite_class import *
-from include.observation_class import *
+from include.Observation_class import *
 from include.GroundStation_class import *
 
 start_time = time.time()
