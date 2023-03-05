@@ -5,15 +5,15 @@ import time
 from backup.include import imaging
 from include import communication
 from include import satcompute
-from include import gsexclude
+from backup.include import gsexclude
 from include import curve
-from include import service
+from backup.include import service
 from include import validation
 from include.greenwich import *
 from include.Satellite_class import *
 from backup.gdclass import *
 from include.GroundStation_class import *
-from include.requestclass import *
+from backup.include.requestclass import *
 
 
 start_time = time.time()

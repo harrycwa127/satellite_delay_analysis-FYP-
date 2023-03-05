@@ -1,5 +1,5 @@
 from include.Satellite_class import *
-from include.requestclass import *
+from backup.include.requestclass import *
 from backup.include.voteclass import *
 from include import curve
 from typing import List

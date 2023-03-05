@@ -195,7 +195,7 @@ class Display:
 
         lastPosX = 0
         lastPosY = 0
-        texture = cls.__read_texture('earth_texture.jpg')
+        texture = cls.__read_texture('include/earth_texture.jpg')
 
         while True:
             glLoadIdentity()
