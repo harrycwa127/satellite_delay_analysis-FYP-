@@ -15,7 +15,7 @@ start_time_julian, start_greenwich = read_data.get_start_julian_time()
 SimParameter.set_start_greenwich(start_greenwich)
 
 # ---------read ground stations
-gs_list = read_data.get_gs()
+gs_list = read_data.get_select_gs()
 
 
 # remove existed output file

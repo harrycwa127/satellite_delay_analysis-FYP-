@@ -21,8 +21,7 @@ SimParameter.set_start_greenwich(start_greenwich)
 gd = read_data.get_observation2()
 
 # ---------read ground stations
-gs_list = read_data.get_gs()
-
+gs = read_data.get_gs()
 
 # init satellite
 SimParameter.set_off_nadir(math.radians(45))
@@ -70,9 +69,6 @@ for s in range(len(sat_list)):
 if imaging_sat == -1:
     print("No Satellite able to visit the observation point!!")
     sys.exit(-1)
-
-# if the satellite obervate the the obervation point and able to directly commincation to the gs
-gs = gs_list[0]         # target ground_station
 
 
 # remove orginal output file

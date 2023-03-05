@@ -54,10 +54,28 @@ lastPosY = 0
 texture = read_texture('earth_texture.jpg')
 
 while True:
+    glLoadIdentity()
+
+    # init the view matrix
+    glPushMatrix()
+    glLoadIdentity()
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
+
+
+        # Rotation with arrow keys
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT:
+                glRotatef(10, 0, 10, 0)
+            if event.key == pygame.K_RIGHT:
+                glRotatef(10, 0, -10, 0)
+            if event.key == pygame.K_UP:
+                glRotatef(10, -10, 0, 0)
+            if event.key == pygame.K_DOWN:
+                glRotatef(10, 10, 0, 0)
 
         # Zoom in and out with mouse wheel
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -89,28 +107,7 @@ while True:
 
             lastPosX = x
             lastPosY = y
-
-    keypress = pygame.key.get_pressed()
-
-    # glEnable(GL_DEPTH_TEST)
-    # glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-    # init model view matrix
-    glLoadIdentity()
-
-    # init the view matrix
-    glPushMatrix()
-    glLoadIdentity()
-
-    # apply the movment 
-    if keypress[pygame.K_w]:
-        glTranslatef(0,0,0.1)
-    if keypress[pygame.K_s]:
-        glTranslatef(0,0,-0.1)
-    if keypress[pygame.K_d]:
-        glTranslatef(-0.1,0,0)
-    if keypress[pygame.K_a]:
-        glTranslatef(0.1,0,0)
-
+        
     # multiply the current matrix by the get the new view matrix and store the final vie matrix 
     glMultMatrixf(viewMatrix)
     viewMatrix = glGetFloatv(GL_MODELVIEW_MATRIX)
@@ -123,21 +120,30 @@ while True:
 
     glPushMatrix()
 
-    glTranslatef(-1.5, 0, 0) #Move to the place
+    glTranslatef(0, -scaled_earth_radius, 0) #Move to the place
     # glColor4f(0.5, 0.2, 0.2, 1) #Put color
     # gluSphere(sphere, scaled_earth_radius, 32, 16) #Draw sphere
 
     gluQuadricTexture(sphere, GL_TRUE)
-    # gluQuadricNormals(sphere, GL_TRUE)
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, texture)
     glColor3f(0.5, 0.2, 0.2) #Put color
     gluSphere(sphere, scaled_earth_radius, 50, 50)  # may set to sat_class.Re
     glDisable(GL_TEXTURE_2D)
-    gluDeleteQuadric(sphere)
-    sphere = gluNewQuadric()
+    # gluDeleteQuadric(sphere)
+    # sphere = gluNewQuadric()
 
     glPopMatrix()
+
+    glPushMatrix()
+
+    glTranslatef(0, -20, 0) #Move to the place
+    glColor3f(0.5, 0.2, 0.2) #Put color
+    gluSphere(sphere, scaled_earth_radius, 50, 50)  # may set to sat_class.Re
+
+    glPopMatrix()
+
+
 
     pygame.display.flip() #Update the screen
     pygame.time.wait(10)

@@ -21,6 +21,7 @@ class Display:
 
 
     _scale_rate = 1000000       # store the scale of coordinate changed from ECI
+    _qobj = gluNewQuadric()
 
 
     # setter of point info
@@ -57,72 +58,175 @@ class Display:
     def __cei_to_pygame_pos(cls, x, y, z):
         pass
 
+        # draw all the sat
+    @classmethod
+    def __draw_ground(cls):
+        # draw gd
+        x, y, z = satcompute.get_ground_eci_xyz(0, cls._gd)
+        x = x / cls._scale_rate
+        y = y / cls._scale_rate
+        z = z / cls._scale_rate
 
-    # temp
+        glPushMatrix()
+        glTranslatef(x, y, z)       # Move to the place
+        glColor3f(0.8, 0.0, 0.8)    # Put color
+        gluSphere(cls._qobj, 0.1, 20, 20)  # may set to sat_class.Re
+        glPopMatrix()
+
+        # draw gs
+        x, y, z = satcompute.get_ground_eci_xyz(0, cls._gs)
+        x = x / cls._scale_rate
+        y = y / cls._scale_rate
+        z = z / cls._scale_rate
+
+        glPushMatrix()
+        glTranslatef(x, y, z)       # Move to the place
+        glColor3f(1.0, 0.6, 0.2)    # Put color
+        gluSphere(cls._qobj, 0.1, 20, 20)  # may set to sat_class.Re
+        glPopMatrix()
+
+
+    # draw all the sat
     @classmethod
     def __draw_sat(cls):
-        for s in cls._sat_list:
-            qobj = gluNewQuadric()
-            glPushMatrix()
-            glLoadIdentity()
-
-            x, y, z = satcompute.get_sat_eci_xyz(0, s)
+        for s in range(len(cls._sat_list)):
+            x, y, z = satcompute.get_sat_eci_xyz(0, cls._sat_list[s])
 
             x = x / cls._scale_rate
             y = y / cls._scale_rate
             z = z / cls._scale_rate
 
-        # Draw a point at the specified XYZ coordinates
-            glTranslatef(x, y, z) #Move to the place
-            glColor3f(0.5, 0.2, 0.2) #Put color
-            gluSphere(qobj, 1, 1, 1) #Draw sphere
+            glPushMatrix()
+
+            glTranslatef(x, y, z) # Move to the place
+            # Put color
+            if s in cls._sat_commnicate_path:
+                glColor3f(0.8, 0.0, 0.0) 
+            else:
+                glColor3f(0.0, 0.8, 0.0)
+
+            gluSphere(cls._qobj, 0.1, 20, 20)  # may set to sat_class.Re
 
             glPopMatrix()
-            gluDeleteQuadric(qobj)
+
+    
+    @classmethod
+    def __draw_path(cls):
+        # draw line from obervation to first sat
+        glPushMatrix()
+        glLineWidth(3)
+
+        to_x, to_y, to_z = satcompute.get_ground_eci_xyz(0, cls._gd)
+        to_x /= cls._scale_rate
+        to_y /= cls._scale_rate
+        to_z /= cls._scale_rate
+
+        from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._sat_commnicate_path[0]])
+        from_x /= cls._scale_rate
+        from_y /= cls._scale_rate
+        from_z /= cls._scale_rate
+        
+        glBegin(GL_LINES)
+        glColor3f(0.5, 0.2, 0.2) #Put color
+        glVertex3f(to_x, to_y, to_z)
+        glVertex3f(from_x, from_y, from_z)
+        glEnd()
+        glPopMatrix()
+
+        #   draw lines between sate path
+        for p in range(len(cls._sat_commnicate_path)-1):
+            glPushMatrix()
+            to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._sat_commnicate_path[p]])
+            to_x /= cls._scale_rate
+            to_y /= cls._scale_rate
+            to_z /= cls._scale_rate
+
+            from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._sat_commnicate_path[p+1]])
+            from_x /= cls._scale_rate
+            from_y /= cls._scale_rate
+            from_z /= cls._scale_rate
+            
+            glBegin(GL_LINES)
+            glColor3f(0.5, 0.2, 0.2) #Put color
+            glVertex3f(to_x, to_y, to_z)
+            glVertex3f(from_x, from_y, from_z)
+            glEnd()
+            glPopMatrix()
+
+        # draw line from last sat to ground station
+        glPushMatrix()
+        to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._sat_commnicate_path[len(cls._sat_commnicate_path)-1]])
+        to_x /= cls._scale_rate
+        to_y /= cls._scale_rate
+        to_z /= cls._scale_rate
+
+        from_x, from_y, from_z = satcompute.get_ground_eci_xyz(0, cls._gs)
+        from_x /= cls._scale_rate
+        from_y /= cls._scale_rate
+        from_z /= cls._scale_rate
+        
+        glBegin(GL_LINES)
+        glColor3f(0.5, 0.2, 0.2) #Put color
+        glVertex3f(to_x, to_y, to_z)
+        glVertex3f(from_x, from_y, from_z)
+        glEnd()
+        glPopMatrix()
 
 
     @classmethod
     def display(cls):      # sat_list: list, sat_commnicate_path, sat_commnicate_delay
         pygame.init()
-        display = (800, 800)
-        pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
-        pygame.display.set_caption('Satellite Path')
+        display = (800, 600)
+        screen = pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
+        pygame.display.set_caption('Satellite Path Result')
         pygame.key.set_repeat(1, 10)    # allows press and hold of buttons
+        scaled_earth_radius = Satellite_class.Re/cls._scale_rate
+
+        glEnable(GL_DEPTH_TEST)
+
         glMatrixMode(GL_PROJECTION)
         gluPerspective(45, (display[0]/display[1]), 0.1, 50.0)
-        glTranslatef(0.0, 0.0, -25 - Satellite_class.Re/cls._scale_rate)    # sets initial zoom so we can see globe
+        glTranslatef(0.0, 0.0, -20 - scaled_earth_radius)    # sets initial zoom so we can see globe
+
+
+        glMatrixMode(GL_MODELVIEW)
+        viewMatrix = glGetFloatv(GL_MODELVIEW_MATRIX)
+        glLoadIdentity()
+
         lastPosX = 0
         lastPosY = 0
-        scaled_earth_radius = Satellite_class.Re/cls._scale_rate
         texture = cls.__read_texture('earth_texture.jpg')
-        glMatrixMode(GL_MODELVIEW)
-
 
         while True:
-            for event in pygame.event.get():    # user avtivities are called events
+            glLoadIdentity()
 
-                # Exit cleanly if user quits window
+            # init the view matrix
+            glPushMatrix()
+            glLoadIdentity()
+
+            for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     quit()
 
+
                 # Rotation with arrow keys
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
-                        glRotatef(1, 0, 1, 0)
+                        glRotatef(10, 0, 10, 0)
                     if event.key == pygame.K_RIGHT:
-                        glRotatef(1, 0, -1, 0)
+                        glRotatef(10, 0, -10, 0)
                     if event.key == pygame.K_UP:
-                        glRotatef(1, -1, 0, 0)
+                        glRotatef(10, -10, 0, 0)
                     if event.key == pygame.K_DOWN:
-                        glRotatef(1, 1, 0, 0)
+                        glRotatef(10, 10, 0, 0)
 
                 # Zoom in and out with mouse wheel
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 4:  # wheel rolled up
-                        glScaled(1.1, 1.1, 1.1)
+                        glScaled(1.05, 1.05, 1.05)
                     if event.button == 5:  # wheel rolled down
-                        glScaled(0.9, 0.9, 0.9)
+                        glScaled(0.95, 0.95, 0.95)
 
                 # Rotate with mouse click and drag
                 if event.type == pygame.MOUSEMOTION:
@@ -147,28 +251,38 @@ class Display:
 
                     lastPosX = x
                     lastPosY = y
+                
+            # multiply the current matrix by the get the new view matrix and store the final vie matrix 
+            glMultMatrixf(viewMatrix)
+            viewMatrix = glGetFloatv(GL_MODELVIEW_MATRIX)
 
-            # Creates Sphere and wraps texture of earth
-            glEnable(GL_DEPTH_TEST)
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+            # apply view matrix
+            glPopMatrix()
+            glMultMatrixf(viewMatrix)
+
+            glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT) #Clear the screen
 
             glPushMatrix()
-            glTranslatef(0, 0, 0) #Move to the place
-            qobj = gluNewQuadric()
 
-            gluQuadricTexture(qobj, GL_TRUE)
-            # gluQuadricNormals(qobj, GL_TRUE)
+            glTranslatef(0, 0, 0) #Move to the place, y may = -scaled_earth_radius
+            # glColor4f(0.5, 0.2, 0.2, 1) #Put color
+            # gluSphere(cls._qobj, scaled_earth_radius, 32, 16) #Draw cls._qobj
+
+            gluQuadricTexture(cls._qobj, GL_TRUE)
             glEnable(GL_TEXTURE_2D)
             glBindTexture(GL_TEXTURE_2D, texture)
             glColor3f(0.5, 0.2, 0.2) #Put color
-            gluSphere(qobj, scaled_earth_radius, 50, 50)  # may set to sat_class.Re
+            gluSphere(cls._qobj, scaled_earth_radius, 50, 50)  # may set to sat_class.Re
             glDisable(GL_TEXTURE_2D)
-            gluDeleteQuadric(qobj)
+
 
             glPopMatrix()
 
+            cls.__draw_ground()
+
             cls.__draw_sat()
 
-            # Displays pygame window
-            pygame.display.flip()
+            cls.__draw_path()
+
+            pygame.display.flip() #Update the screen
             pygame.time.wait(10)

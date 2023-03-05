@@ -61,7 +61,7 @@ def get_observation2():
 
     return gd
 
-def get_gs():
+def get_select_gs():
     gs_lines = []
     input_f2 = open('settings/SELECT_GROUND_STATION.txt', 'r')
     for line in input_f2.readlines():
@@ -84,3 +84,24 @@ def get_gs():
         gs_list.append(gs)
 
     return gs_list
+
+def get_gs():
+    gs_lines = []
+    input_f2 = open('settings/GROUND_STATION.txt', 'r')
+    for line in input_f2.readlines():
+        tmpl = line.strip()
+        gs_lines.append(tmpl.split(' '))
+    input_f2.close()
+
+    gs_lat = float(gs_lines[0][0])
+    gs_long = float(gs_lines[0][1])
+    if gs_long < 0:
+        gs_long = 360 + gs_long
+    gs_ele = float(gs_lines[0][2])
+    # gs_ele = 10
+    gs_lat_rad = math.radians(gs_lat)  # rad
+    gs_lon_rad = math.radians(gs_long)  # rad
+    gs_ele_rad = math.radians(gs_ele)  # rad
+    gs = GroundStation_class.GroundStation(gs_lat_rad, gs_lon_rad, gs_ele_rad)
+
+    return gs
