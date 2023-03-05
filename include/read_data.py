@@ -9,25 +9,11 @@ def get_start_julian_time():
     time_lines = []
     for line in time_f.readlines():
         time_lines.append(line.split())
-    start_time_julian = greenwich.julian2(int(time_lines[0][0]), int(time_lines[0][1]), int(time_lines[0][2]),
+    start_time_julian = greenwich.julian(int(time_lines[0][0]), int(time_lines[0][1]), int(time_lines[0][2]),
                                         int(time_lines[0][3]), int(time_lines[0][4]), int(time_lines[0][5]))
     start_greenwich = (greenwich.greenwich(start_time_julian)) % 360   # from 0 degree to 360 degree
 
     return (start_time_julian, start_greenwich)
-
-def get_start_end_time_interval():
-    time_f = open('settings/TIME_INTERVAL.txt', 'r')
-    time_lines = []
-    for line in time_f.readlines():
-        time_lines.append(line.split())
-    start_time_julian = greenwich.julian2(int(time_lines[0][0]), int(time_lines[0][1]), int(time_lines[0][2]),
-                                        int(time_lines[0][3]), int(time_lines[0][4]), int(time_lines[0][5]))
-    end_time_julian = greenwich.julian2(int(time_lines[1][0]), int(time_lines[1][1]), int(time_lines[1][2]),
-                                        int(time_lines[1][3]), int(time_lines[1][4]), int(time_lines[1][5]))
-    time_interval = (end_time_julian-start_time_julian)*86400  # in sec
-    start_greenwich = (greenwich.greenwich(start_time_julian)) % 360   # from 0 degree to 360 degree
-
-    return (start_time_julian, start_greenwich, end_time_julian, time_interval)
 
 def get_observation():
     gd_lines = []
