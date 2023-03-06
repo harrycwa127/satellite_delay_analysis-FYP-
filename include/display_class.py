@@ -34,6 +34,16 @@ class Display:
         cls._gd = gd
 
 
+    # draw the total delay withＴｅｘｔ
+    @classmethod
+    def __draw_delay(cls):
+        font = pygame.font.SysFont('arial', 18)
+        textSurface = font.render("Total Delay: " + str(cls._sat_commnicate_delay[-1]) + " sec", True, (255, 255, 66, 255), (0, 66, 0, 255))
+        textData = pygame.image.tostring(textSurface, "RGBA", True)
+        glWindowPos2d(5, 5)
+        glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
+
+
     @classmethod
     def __read_texture(cls, filename):
         img = Image.open(filename)
@@ -155,7 +165,7 @@ class Display:
 
         # draw line from last sat to ground station
         glPushMatrix()
-        to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._sat_commnicate_path[len(cls._sat_commnicate_path)-1]])
+        to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._sat_commnicate_path[-1]])
         to_x /= cls._scale_rate
         to_y /= cls._scale_rate
         to_z /= cls._scale_rate
@@ -283,6 +293,8 @@ class Display:
             cls.__draw_sat()
 
             cls.__draw_path()
+
+            cls.__draw_delay()
 
             pygame.display.flip() #Update the screen
             pygame.time.wait(10)
