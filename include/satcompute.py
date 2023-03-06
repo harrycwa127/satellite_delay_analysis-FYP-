@@ -3,6 +3,7 @@ from include import Satellite_class
 from include import GroundStation_class
 from include import Observation_class
 from include.SimParameter_class import SimParameter
+from typing  import Union
 
 # 根据轨道六要素求卫星当前位置赤经
 # 输入：1.卫星半径 2.升交点赤经 3.卫星轨道面上卫星当前位置与升交点赤经的角度(omega+f) 4.轨道倾角
@@ -64,7 +65,7 @@ def get_sat_eci_xyz(t, sat: Satellite_class.Satellite):
     return (x, y, z)
 
 
-def get_ground_eci_xyz(t, ground: GroundStation_class.GroundStation | Observation_class.Observation):
+def get_ground_eci_xyz(t, ground: Union[GroundStation_class.GroundStation, Observation_class.Observation]):
     u = (math.radians(SimParameter.get_start_greenwich()) + ground.lon_rad) % (2 * math.pi)
     alpha = (u + Satellite_class.omega_e * t) % (2 * math.pi)
 
