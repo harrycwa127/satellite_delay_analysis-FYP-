@@ -3,13 +3,12 @@ import xlwt
 import time
 import math
 import sys
+import numpy as np
 from include import Satellite_class
-from include import communication
 from include import visibility
 from include import read_data
 from include import satcompute
 from include.SimParameter_class import SimParameter
-from include.display_class import Display
 
 start_time = time.time()
 
@@ -107,59 +106,68 @@ gs_alpha_min1, gs_alpha_max1, gs_alpha_min2, gs_alpha_max2, gs_t_min1, gs_t_max1
 if gd_t_min1 < gs_t_min1:
     time_delay = gs_t_min1 - gd_t_min1
 elif gd_t_min1 < gs_t_max1:
-    time_delay = gs_t_max1 - gd_t_min1
+    for i in np.arange(gs_t_min1, gs_t_max1+0.01, 0.01):
+        if i > gd_t_min1:
+            time_delay = gs_t_max1 - gd_t_min1
+            break
 
 elif gd_t_min1 < gs_t_min2:
     time_delay = gs_t_min2 - gd_t_min1
-elif gd_t_min1 < gs_t_min2:
-    time_delay = gs_t_max2 - gd_t_min1
+elif gd_t_min1 < gs_t_max2:
+    for i in np.arange(gs_t_min1, gs_t_max2+0.01, 0.01):
+        if i > gd_t_min1:
+            time_delay = gs_t_max2 - gd_t_min1
+            break
 
 elif gd_t_min2 < gs_t_min1:
     time_delay = gs_t_min1 - gd_t_min2
 elif gd_t_min2 < gs_t_max1:
-    time_delay = gs_t_max1 - gd_t_min2
+    for i in np.arange(gs_t_min1, gs_t_max1+0.01, 0.01):
+        if i > gd_t_min2:
+            time_delay = gs_t_max1 - gd_t_min2
+            break
 
 elif gd_t_min2 < gs_t_min2:
     time_delay = gs_t_min2 - gd_t_min2
-elif gd_t_min2 < gs_t_min2:
-    time_delay = gs_t_max2 - gd_t_min2
+elif gd_t_min2 < gs_t_max2:
+    for i in np.arange(gs_t_min1, gs_t_max2+0.05, 0.05):
+        if i > gd_t_min2:
+            time_delay = gs_t_max2 - gd_t_min2
+            break
+
+else:
+    print("not able to send data to the ground station!")
+    sheet.write(col_num, 0, -1)
+    sheet.write(col_num, 1, -1)
+    sheet.write(col_num, 2, -1)
+    sheet.write(col_num, 3, "NA")
 
 
-# sat_commnicate_path, sat_commnicate_delay = communication.astar_path_decision(sat_list, gd, gs)
+# write result to excel
+phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[imaging_sat], t = 0)
+phi = phi * (180/math.pi)
+lam = lam * (180/math.pi)
 
+sheet.write(col_num, 0, phi)
+sheet.write(col_num, 1, lam)
+sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
+sheet.write(col_num, 3, sat_commnicate_delay[i])
 
-# for i in range(len(sat_commnicate_path)):
-#     if sat_commnicate_path[i] == -1:
-#         sheet.write(col_num, 0, -1)
-#         sheet.write(col_num, 1, -1)
-#         sheet.write(col_num, 2, -1)
-#         sheet.write(col_num, 3, sat_commnicate_delay[i])
+col_num += 1
 
-#         col_num += 1
+phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[imaging_sat], t = time_delay)
+phi = phi * (180/math.pi)
+lam = lam * (180/math.pi)
 
-#     else:
-#         phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[i]], t = sat_commnicate_delay[i])
-#         phi = phi * (180/math.pi)
-#         lam = lam * (180/math.pi)
-        
-#         sheet.write(col_num, 0, phi)
-#         sheet.write(col_num, 1, lam)
-#         sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
-#         sheet.write(col_num, 3, sat_commnicate_delay[i])
+sheet.write(col_num, 0, phi)
+sheet.write(col_num, 1, lam)
+sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
+sheet.write(col_num, 3, sat_commnicate_delay[i])
 
-#         col_num += 1
-
-
-
+col_num += 1
 
 print("total delay of the commnication is", time_delay, "seconds.")
-
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)
 book.save('results/orginal_delay_result.xls')
-
-# # for s in sat_list:
-# #     display_class.draw_satellite(0, s)
-# Display.set_point_info(gd, sat_list, sat_commnicate_path, sat_commnicate_delay, gs)
-# Display.display()

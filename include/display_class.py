@@ -37,7 +37,7 @@ class Display:
     # draw the total delay withＴｅｘｔ
     @classmethod
     def __draw_decription(cls):
-        font = pygame.font.SysFont('arial', 18)
+        font = pygame.font.SysFont(None, 24)
         textSurface = font.render("Total Delay: " + str(cls._sat_commnicate_delay[-1]) + " sec", True, (255, 255, 66, 255), (0, 66, 0, 255))
         textData = pygame.image.tostring(textSurface, "RGBA", True)
         glWindowPos2d(5, 5)
