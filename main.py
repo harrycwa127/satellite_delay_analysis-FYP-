@@ -79,39 +79,40 @@ col_num = 5
 sat_commnicate_path = []
 sat_commnicate_delay = []
 
-# sat_commnicate_path, sat_commnicate_delay = communication.astar_path_decision(sat_list, gd, gs)
-sat_commnicate_path, sat_commnicate_delay = communication.orbit_path_decision(sat_list, gd, gs, n)
+astar_sat_commnicate_path, astar_sat_commnicate_delay = communication.astar_path_decision(sat_list, gd, gs)
+orbit_sat_commnicate_path, orbit_sat_commnicate_delay = communication.orbit_path_decision(sat_list, gd, gs, n)
 
 
 
-for i in range(len(sat_commnicate_path)):
-    if sat_commnicate_path[i] == -1:
+for i in range(len(astar_sat_commnicate_path)):
+    if astar_sat_commnicate_path[i] == -1:
         sheet.write(col_num, 0, -1)
         sheet.write(col_num, 1, -1)
         sheet.write(col_num, 2, -1)
-        sheet.write(col_num, 3, sat_commnicate_delay[i])
+        sheet.write(col_num, 3, astar_sat_commnicate_delay[i])
 
         col_num += 1
 
     else:
-        phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[i]], t = sat_commnicate_delay[i])
+        phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[astar_sat_commnicate_path[i]], t = astar_sat_commnicate_delay[i])
         phi = phi * (180/math.pi)
         lam = lam * (180/math.pi)
         
         sheet.write(col_num, 0, phi)
         sheet.write(col_num, 1, lam)
-        sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
-        sheet.write(col_num, 3, sat_commnicate_delay[i])
+        sheet.write(col_num, 2, sat_list[astar_sat_commnicate_path[i]].r)
+        sheet.write(col_num, 3, astar_sat_commnicate_delay[i])
 
         col_num += 1
 
 
-print("total delay of the commnication is", sat_commnicate_delay[-1], "seconds.")
+print("total delay of the commnication is", astar_sat_commnicate_delay[-1], "seconds.")
 
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)
 book.save('results/analysis_result.xls')
 
-Display.set_point_info(gd, sat_list, sat_commnicate_path, sat_commnicate_delay, gs)
+Display.set_point_info(gd, sat_list, astar_sat_commnicate_path, astar_sat_commnicate_delay,\
+                        orbit_sat_commnicate_path, orbit_sat_commnicate_delay, gs)
 Display.display()
