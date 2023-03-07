@@ -30,7 +30,7 @@ e_o = 0
 omega_o = 0
 circle_o = 14
 m = 9
-n = 15
+n = 25
 
 sat_list = []
 first_Omega = 0  # first right ascension of ascending node (rad)
@@ -51,13 +51,13 @@ SimParameter.set_buffer_delay(0.05)        # (sec, e.g. 0.05, 50 ms)
 SimParameter.set_process_delay(0.01)        # (sec, e.g. 0.01, 10 ms)
 SimParameter.set_package_size(56623104)    # (Bytes) 54 Mb, 
 SimParameter.set_data_rate(530579456)       # (Bytes/s) 506 Mb/s
-SimParameter.set_signal_speed(299792458)
+SimParameter.set_signal_speed(299792458)    # speed of radio, near the speed of light
 
 # remove orginal output file
-if os.path.exists("results/analysis_result.xls"):
-    os.remove("results/analysis_result.xls")
+if os.path.exists("results/orginal_method_result.xls"):
+    os.remove("results/orginal_method_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
-sheet = book.add_sheet('astar_analysis_result', cell_overwrite_ok=True)
+sheet = book.add_sheet('orginal_method_result', cell_overwrite_ok=True)
 
 # write the data the obervation and ground station
 sheet.write(0, 1, "Latitude")

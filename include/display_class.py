@@ -62,12 +62,6 @@ class Display:
                     img.size[0], img.size[1], 0, GL_RGB, GL_UNSIGNED_BYTE, img_data)
         return textID
 
-
-    # convert ECI xyz to pygame xyz
-    @classmethod
-    def __cei_to_pygame_pos(cls, x, y, z):
-        pass
-
         # draw all the sat
     @classmethod
     def __draw_ground(cls):
