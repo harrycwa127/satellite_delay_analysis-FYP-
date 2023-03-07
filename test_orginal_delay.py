@@ -80,39 +80,86 @@ col_num = 5
 sat_commnicate_path = []
 sat_commnicate_delay = []
 
-sat_commnicate_path, sat_commnicate_delay = communication.astar_path_decision(sat_list, gd, gs)
+imaging_sat = -1
+# search for all sat
+for s in range(len(sat_list)):
+    if visibility.is_observation_visible(0, sat_list[s], gd):
+        imaging_sat = s
+        break
+
+# if no any satellite obervate the obervation point, exit
+if imaging_sat == -1:
+    print("No Satellite able to visit the observation point!!")
+    sys.exit(-1)
+
+time_delay = 0       # in sec
+
+# time window of gd
+psi, phi_min, phi_max = satcompute.get_sat_phi_range(sat_list[imaging_sat].a_o, gd.lat_rad)
+gd_alpha_min1, gd_alpha_max1, gd_alpha_min2, gd_alpha_max2, gd_t_min1, gd_t_max1, gd_t_min2, gd_t_max2 = satcompute.get_sat_alpha_range\
+    (phi_min, phi_max, sat_list[imaging_sat])
+
+# time window of gs
+psi, phi_min, phi_max = satcompute.get_sat_phi_range(sat_list[imaging_sat].a_o, gs.lat_rad)
+gs_alpha_min1, gs_alpha_max1, gs_alpha_min2, gs_alpha_max2, gs_t_min1, gs_t_max1, gs_t_min2, gs_t_max2 = satcompute.get_sat_alpha_range\
+    (phi_min, phi_max, sat_list[imaging_sat])
+
+if gd_t_min1 < gs_t_min1:
+    time_delay = gs_t_min1 - gd_t_min1
+elif gd_t_min1 < gs_t_max1:
+    time_delay = gs_t_max1 - gd_t_min1
+
+elif gd_t_min1 < gs_t_min2:
+    time_delay = gs_t_min2 - gd_t_min1
+elif gd_t_min1 < gs_t_min2:
+    time_delay = gs_t_max2 - gd_t_min1
+
+elif gd_t_min2 < gs_t_min1:
+    time_delay = gs_t_min1 - gd_t_min2
+elif gd_t_min2 < gs_t_max1:
+    time_delay = gs_t_max1 - gd_t_min2
+
+elif gd_t_min2 < gs_t_min2:
+    time_delay = gs_t_min2 - gd_t_min2
+elif gd_t_min2 < gs_t_min2:
+    time_delay = gs_t_max2 - gd_t_min2
 
 
-for i in range(len(sat_commnicate_path)):
-    if sat_commnicate_path[i] == -1:
-        sheet.write(col_num, 0, -1)
-        sheet.write(col_num, 1, -1)
-        sheet.write(col_num, 2, -1)
-        sheet.write(col_num, 3, sat_commnicate_delay[i])
+# sat_commnicate_path, sat_commnicate_delay = communication.astar_path_decision(sat_list, gd, gs)
 
-        col_num += 1
 
-    else:
-        phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[i]], t = sat_commnicate_delay[i])
-        phi = phi * (180/math.pi)
-        lam = lam * (180/math.pi)
+# for i in range(len(sat_commnicate_path)):
+#     if sat_commnicate_path[i] == -1:
+#         sheet.write(col_num, 0, -1)
+#         sheet.write(col_num, 1, -1)
+#         sheet.write(col_num, 2, -1)
+#         sheet.write(col_num, 3, sat_commnicate_delay[i])
+
+#         col_num += 1
+
+#     else:
+#         phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[sat_commnicate_path[i]], t = sat_commnicate_delay[i])
+#         phi = phi * (180/math.pi)
+#         lam = lam * (180/math.pi)
         
-        sheet.write(col_num, 0, phi)
-        sheet.write(col_num, 1, lam)
-        sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
-        sheet.write(col_num, 3, sat_commnicate_delay[i])
+#         sheet.write(col_num, 0, phi)
+#         sheet.write(col_num, 1, lam)
+#         sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
+#         sheet.write(col_num, 3, sat_commnicate_delay[i])
 
-        col_num += 1
+#         col_num += 1
 
 
-print("total delay of the commnication is", sat_commnicate_delay[len(sat_commnicate_delay)-1], "seconds.")
+
+
+print("total delay of the commnication is", time_delay, "seconds.")
 
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)
-book.save('results/analysis_result.xls')
+book.save('results/orginal_delay_result.xls')
 
-# for s in sat_list:
-#     display_class.draw_satellite(0, s)
-Display.set_point_info(gd, sat_list, sat_commnicate_path, sat_commnicate_delay, gs)
-Display.display()
+# # for s in sat_list:
+# #     display_class.draw_satellite(0, s)
+# Display.set_point_info(gd, sat_list, sat_commnicate_path, sat_commnicate_delay, gs)
+# Display.display()

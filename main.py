@@ -105,14 +105,12 @@ for i in range(len(sat_commnicate_path)):
         col_num += 1
 
 
-print("total delay of the commnication is", sat_commnicate_delay[len(sat_commnicate_delay)-1], "seconds.")
+print("total delay of the commnication is", sat_commnicate_delay[-1], "seconds.")
 
 
 end_time = time.time()
 print('overall time:',  end_time-start_time)
 book.save('results/analysis_result.xls')
 
-# for s in sat_list:
-#     display_class.draw_satellite(0, s)
 Display.set_point_info(gd, sat_list, sat_commnicate_path, sat_commnicate_delay, gs)
 Display.display()

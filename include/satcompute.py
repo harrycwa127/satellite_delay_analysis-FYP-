@@ -101,14 +101,14 @@ def sat_ground_distance(t, sat: Satellite_class.Satellite, gs: GroundStation_cla
 # 根据给定的最大off_nadir角和地面点，求卫星可能观测到的纬度带
 # 输入：1.最大off_nadir角 2.卫星半径 3.地面点纬度
 # 输出：1.卫星与地心的连线和地面点与地心的连线之间最大的可视夹角 2.纬度带最小值 3.纬度带最大值
-def get_sat_phi_range(off_nadir, r, gd_lat_rad):
-    temp = r * math.sin(off_nadir) / Satellite_class.Re
+def get_sat_phi_range(r, lat_rad):
+    temp = r * math.sin(SimParameter.get_off_nadir()) / Satellite_class.Re
     if temp <= 1:
-        psi = math.asin(temp) - off_nadir
+        psi = math.asin(temp) - SimParameter.get_off_nadir()
     else:
         psi = math.acos(Satellite_class.Re / r)
-    phi_min = max(gd_lat_rad - psi, -math.pi / 2)
-    phi_max = min(gd_lat_rad + psi, math.pi / 2)
+    phi_min = max(lat_rad - psi, -math.pi / 2)
+    phi_max = min(lat_rad + psi, math.pi / 2)
     return psi, phi_min, phi_max
 
 
