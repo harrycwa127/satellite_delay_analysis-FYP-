@@ -30,7 +30,7 @@ e_o = 0
 omega_o = 0
 circle_o = 14
 m = 9
-n = 15
+n = 25
 
 sat_list = []
 first_Omega = 0  # first right ascension of ascending node (rad)
@@ -44,7 +44,6 @@ for orbit_id in range(m):
         # set time to the start time
         s = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
         sat_list = sat_list + [s]
-
 
 # data commnication delay init
 SimParameter.set_buffer_delay(0.05)        # (sec, e.g. 0.05, 50 ms)
@@ -80,7 +79,9 @@ col_num = 5
 sat_commnicate_path = []
 sat_commnicate_delay = []
 
-sat_commnicate_path, sat_commnicate_delay = communication.astar_path_decision(sat_list, gd, gs)
+# sat_commnicate_path, sat_commnicate_delay = communication.astar_path_decision(sat_list, gd, gs)
+sat_commnicate_path, sat_commnicate_delay = communication.orbit_path_decision(sat_list, gd, gs, n)
+
 
 
 for i in range(len(sat_commnicate_path)):

@@ -5,6 +5,7 @@ from include import visibility
 from include import Observation_class
 from include.SimParameter_class import SimParameter
 import sys
+import math
 
 
 # asuum satellite using radio frequencies, because only very less satellite use laser
@@ -156,8 +157,9 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
     return (sat_commnicate_path, sat_commnicate_delay)
 
 
-    # orbit base algo
-def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: GroundStation_class.GroundStation):
+# orbit base algo
+# idea, find by lon or orbit.
+def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: GroundStation_class.GroundStation, sat_per_orbit: int):
     t = 0
 
     imaging_sat = -1
@@ -178,7 +180,27 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
     sat_commnicate_path.append(imaging_sat)
     sat_commnicate_delay = []
     sat_commnicate_delay.append(0)
+    max_orbit = len(sat_list)//sat_per_orbit # 0 to max
     sat_num = 0         #index of the last element in sat_commnicate_path and sat_commnicate_delay
+
+    orbit_num = sat_commnicate_path[sat_num] // sat_per_orbit
+    half_omega_change = math.radians(180/(max_orbit-1))/2
+
+    # check which orbit should go or stay
+    if gs.lon_rad < (sat_list[imaging_sat].Omega_o + half_omega_change) and\
+        gs.lon_rad > (sat_list[imaging_sat].Omega_o - half_omega_change):
+        orbit_direction = 0
+    elif gs.lon_rad - sat_list[imaging_sat + sat_per_orbit].Omega_o > 0:
+        orbit_direction = 1
+    else:
+        orbit_direction = -1
+
+    # update orbit_num
+    orbit_num += orbit_direction
+    if orbit_num < 0:
+        orbit_num += max_orbit
+    if orbit_num >= max_orbit:
+        orbit_num -= max_orbit
 
     end_path = False
     while end_path == False:
@@ -189,7 +211,10 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
             min_sat = -1            # store the min distance satellite object index
             distance = -1
 
-            for s in range(len(sat_list)):      # avoid the sat not able to communicate
+            orbit_sat_max = orbit_num+1
+            if orbit_sat_max >= max_orbit:
+                orbit_sat_max -= max_orbit
+            for s in range(orbit_num*sat_per_orbit, (orbit_num+1)*sat_per_orbit):      # avoid the sat not able to communicate
                 if s not in ignore_sat and s not in sat_commnicate_path:
                     if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
                         distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
@@ -208,6 +233,12 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                     t = temp
                     sat_commnicate_path.append(min_sat)
                     sat_num += 1
+                    orbit_num += orbit_direction
+                    if orbit_num < 0:
+                        orbit_num += max_orbit
+                    if orbit_num >= max_orbit:
+                        orbit_num -= max_orbit
+
                     ignore = False
 
                     # insert delay
@@ -231,6 +262,6 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                     t += 1
                     sat_commnicate_path.append(-1)  # mean waiting
                     sat_commnicate_delay.append(t)
-                    print("No other Satellites in the visibility, wait 1 sec.")
+                    # print("No other Satellites in the visibility, wait 1 sec.")
 
     return (sat_commnicate_path, sat_commnicate_delay)
