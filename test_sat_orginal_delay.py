@@ -51,31 +51,13 @@ SimParameter.set_buffer_delay(0.05)        # (sec, e.g. 0.05, 50 ms)
 SimParameter.set_process_delay(0.01)        # (sec, e.g. 0.01, 10 ms)
 SimParameter.set_package_size(56623104)    # (Bytes) 54 Mb, 
 SimParameter.set_data_rate(530579456)       # (Bytes/s) 506 Mb/s
-SimParameter.set_signal_speed(299792458)
-
-# time var
-t = 0       # for store the current time passed from start time
-temp = 0    # for get the result of communication
-
-# search satellite to observation
-imaging_sat = -1
-# search for all sat
-for s in range(len(sat_list)):
-    if visibility.is_observation_visible(0, sat_list[s], gd):
-        imaging_sat = s
-        break
-
-# if no any satellite obervate the obervation point, exit
-if imaging_sat == -1:
-    print("No Satellite able to visit the observation point!!")
-    sys.exit(-1)
-
+SimParameter.set_signal_speed(299792458)    # speed of radio, near the speed of light
 
 # remove orginal output file
-if os.path.exists("results/analysis_result.xls"):
-    os.remove("results/analysis_result.xls")
+if os.path.exists("results/orginal_method_result.xls"):
+    os.remove("results/orginal_method_result.xls")
 book = xlwt.Workbook(encoding='utf-8', style_compression=0)
-sheet = book.add_sheet('analysis_result', cell_overwrite_ok=True)
+sheet = book.add_sheet('orginal_method_result', cell_overwrite_ok=True)
 
 # write the data the obervation and ground station
 sheet.write(0, 1, "Latitude")
@@ -98,7 +80,7 @@ col_num = 5
 sat_commnicate_path = []
 sat_commnicate_delay = []
 
-sat_commnicate_path, sat_commnicate_delay = communication.path_decision(sat_list, gd, gs)
+sat_commnicate_path, sat_commnicate_delay = communication.astar_path_decision(sat_list, gd, gs)
 
 
 for i in range(len(sat_commnicate_path)):
