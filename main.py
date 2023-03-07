@@ -30,7 +30,7 @@ e_o = 0
 omega_o = 0
 circle_o = 14
 m = 9
-n = 25
+n = 15
 
 sat_list = []
 first_Omega = 0  # first right ascension of ascending node (rad)
@@ -53,9 +53,6 @@ SimParameter.set_package_size(56623104)    # (Bytes) 54 Mb,
 SimParameter.set_data_rate(530579456)       # (Bytes/s) 506 Mb/s
 SimParameter.set_signal_speed(299792458)
 
-# time var
-t = 0       # for store the current time passed from start time
-temp = 0    # for get the result of communication
 
 # search satellite to observation
 imaging_sat = -1
@@ -98,7 +95,7 @@ col_num = 5
 sat_commnicate_path = []
 sat_commnicate_delay = []
 
-sat_commnicate_path, sat_commnicate_delay = communication.path_decision(sat_list, gd, gs)
+sat_commnicate_path, sat_commnicate_delay = communication.as_path_decision(sat_list, gd, gs)
 
 
 for i in range(len(sat_commnicate_path)):

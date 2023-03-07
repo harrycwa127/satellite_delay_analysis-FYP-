@@ -68,6 +68,7 @@ def sat_ground_commnicate(t, sat: Satellite_class.Satellite, ground_station: Gro
     else:
         return -1
 
+# A*
 # input:    1. sat_list
 #           2. gd
 #           3. gs
@@ -75,7 +76,7 @@ def sat_ground_commnicate(t, sat: Satellite_class.Satellite, ground_station: Gro
 
 # output:   1. sat_commnicate_path
 #           2. sat_commnicate_delay
-def path_decision(sat_list: list, gd: Observation_class.Observation, gs: GroundStation_class.GroundStation):
+def as_path_decision(sat_list: list, gd: Observation_class.Observation, gs: GroundStation_class.GroundStation):
 
     t = 0
 
