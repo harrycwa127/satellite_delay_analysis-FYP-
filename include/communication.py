@@ -107,7 +107,7 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
         ignore = True
         while ignore == True:
             min_distance = -1        # store the min distance from next satellite to gs
-            min_sat = -1            # store the min distance satellite object index
+            min_distance_sat = -1            # store the min distance satellite object index
             distance = -1
 
             for s in range(len(sat_list)):      # avoid the sat not able to communicate
@@ -116,18 +116,18 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                         distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
                         if min_distance == -1:
                             min_distance = distance
-                            min_sat = s
+                            min_distance_sat = s
                         elif distance < min_distance:
                             min_distance = distance
-                            min_sat = s
+                            min_distance_sat = s
 
             # has sat in vibility
-            if min_sat != -1:
-                temp = inter_sat_commnicate(t, sat_list[sat_commnicate_path[sat_num]], sat_list[min_sat])
+            if min_distance_sat != -1:
+                temp = inter_sat_commnicate(t, sat_list[sat_commnicate_path[sat_num]], sat_list[min_distance_sat])
                 if temp > 0:
                     # commnicate success
                     t = temp
-                    sat_commnicate_path.append(min_sat)
+                    sat_commnicate_path.append(min_distance_sat)
                     sat_num += 1
                     ignore = False
 
@@ -145,7 +145,7 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                 else:
                     # commnication fail, loop again and ignore that sat
                     ignore = True
-                    ignore_sat.append(min_sat)
+                    ignore_sat.append(min_distance_sat)
                     
             # wait 1 sec and check visibility again
             else:
@@ -180,27 +180,11 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
     sat_commnicate_path.append(imaging_sat)
     sat_commnicate_delay = []
     sat_commnicate_delay.append(0)
-    max_orbit = len(sat_list)//sat_per_orbit # 0 to max
     sat_num = 0         #index of the last element in sat_commnicate_path and sat_commnicate_delay
+    max_orbit = len(sat_list)//sat_per_orbit 
+    max_sat = max_orbit * sat_per_orbit
 
     orbit_num = sat_commnicate_path[sat_num] // sat_per_orbit
-    half_omega_change = math.radians(180/(max_orbit-1))/2
-
-    # check which orbit should go or stay
-    if gs.lon_rad < (sat_list[imaging_sat].Omega_o + half_omega_change) and\
-        gs.lon_rad > (sat_list[imaging_sat].Omega_o - half_omega_change):
-        orbit_direction = 0
-    elif gs.lon_rad - sat_list[imaging_sat + sat_per_orbit].Omega_o > 0:
-        orbit_direction = 1
-    else:
-        orbit_direction = -1
-
-    # update orbit_num
-    orbit_num += orbit_direction
-    if orbit_num < 0:
-        orbit_num += max_orbit
-    if orbit_num >= max_orbit:
-        orbit_num -= max_orbit
 
     end_path = False
     while end_path == False:
@@ -208,36 +192,35 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
         ignore = True
         while ignore == True:
             min_distance = -1        # store the min distance from next satellite to gs
-            min_sat = -1            # store the min distance satellite object index
+            min_distance_sat = -1            # store the min distance satellite object index
             distance = -1
 
-            orbit_sat_max = orbit_num+1
-            if orbit_sat_max >= max_orbit:
-                orbit_sat_max -= max_orbit
-            for s in range(orbit_num*sat_per_orbit, (orbit_num+1)*sat_per_orbit):      # avoid the sat not able to communicate
+            for s in range((orbit_num - 1)*sat_per_orbit, (orbit_num + 2)*sat_per_orbit):      # avoid the sat not able to communicate
+                if s >= max_sat:
+                    s -= max_sat
+                elif s < 0:
+                    s += max_sat
+
                 if s not in ignore_sat and s not in sat_commnicate_path:
                     if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
                         distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
                         if min_distance == -1:
                             min_distance = distance
-                            min_sat = s
+                            min_distance_sat = s
                         elif distance < min_distance:
                             min_distance = distance
-                            min_sat = s
+                            min_distance_sat = s
 
             # has sat in vibility
-            if min_sat != -1:
-                temp = inter_sat_commnicate(t, sat_list[sat_commnicate_path[sat_num]], sat_list[min_sat])
+            if min_distance_sat != -1:
+                temp = inter_sat_commnicate(t, sat_list[sat_commnicate_path[sat_num]], sat_list[min_distance_sat])
                 if temp > 0:
                     # commnicate success
                     t = temp
-                    sat_commnicate_path.append(min_sat)
+                    sat_commnicate_path.append(min_distance_sat)
                     sat_num += 1
-                    orbit_num += orbit_direction
-                    if orbit_num < 0:
-                        orbit_num += max_orbit
-                    if orbit_num >= max_orbit:
-                        orbit_num -= max_orbit
+                    orbit_num = min_distance_sat // sat_per_orbit
+
 
                     ignore = False
 
@@ -255,7 +238,7 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                 else:
                     # commnication fail, loop again and ignore that sat
                     ignore = True
-                    ignore_sat.append(min_sat)
+                    ignore_sat.append(min_distance_sat)
                     
             # wait 1 sec and check visibility again
             else:
