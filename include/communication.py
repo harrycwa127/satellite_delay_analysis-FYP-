@@ -195,7 +195,24 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
             min_distance_sat = -1            # store the min distance satellite object index
             distance = -1
 
-            for s in range((orbit_num - 1)*sat_per_orbit, (orbit_num + 2)*sat_per_orbit):      # avoid the sat not able to communicate
+            # the algo ignore the current orbit
+            for s in range((orbit_num - 1)*sat_per_orbit, orbit_num*sat_per_orbit):      # avoid the sat not able to communicate
+                if s >= max_sat:
+                    s -= max_sat
+                elif s < 0:
+                    s += max_sat
+
+                if s not in ignore_sat and s not in sat_commnicate_path:
+                    if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
+                        distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
+                        if min_distance == -1:
+                            min_distance = distance
+                            min_distance_sat = s
+                        elif distance < min_distance:
+                            min_distance = distance
+                            min_distance_sat = s
+
+            for s in range((orbit_num + 1)*sat_per_orbit, (orbit_num + 2)*sat_per_orbit):      # avoid the sat not able to communicate
                 if s >= max_sat:
                     s -= max_sat
                 elif s < 0:
@@ -246,5 +263,6 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                     sat_commnicate_path.append(-1)  # mean waiting
                     sat_commnicate_delay.append(t)
                     # print("No other Satellites in the visibility, wait 1 sec.")
+    print(sat_commnicate_path)
 
     return (sat_commnicate_path, sat_commnicate_delay)
