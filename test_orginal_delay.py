@@ -150,8 +150,8 @@ lam = lam * (180/math.pi)
 
 sheet.write(col_num, 0, phi)
 sheet.write(col_num, 1, lam)
-sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
-sheet.write(col_num, 3, sat_commnicate_delay[i])
+sheet.write(col_num, 2, sat_list[imaging_sat].r)
+sheet.write(col_num, 3, 0)
 
 col_num += 1
 
@@ -161,8 +161,8 @@ lam = lam * (180/math.pi)
 
 sheet.write(col_num, 0, phi)
 sheet.write(col_num, 1, lam)
-sheet.write(col_num, 2, sat_list[sat_commnicate_path[i]].r)
-sheet.write(col_num, 3, sat_commnicate_delay[i])
+sheet.write(col_num, 2, sat_list[imaging_sat].r)
+sheet.write(col_num, 3, time_delay)
 
 col_num += 1
 
