@@ -261,7 +261,7 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                     t += 1
                     sat_commnicate_path.append(-1)  # mean waiting
                     sat_commnicate_delay.append(t)
-                    # print("No other Satellites in the visibility, wait 1 sec.")
+                    print("No other Satellites in the visibility, wait 1 sec.")
 
     return (sat_commnicate_path, sat_commnicate_delay)
 
@@ -282,4 +282,68 @@ def dijkstra_path_decision(sat_list: list, gd: Observation_class.Observation, gs
         print("No Satellite able to visit the observation point!!")
         sys.exit(-1)
 
-    
+
+    # no able to directly transfer data from obervation satellite to ground station
+    sat_commnicate_path = []
+    sat_commnicate_path.append(imaging_sat)
+    sat_commnicate_delay = []
+    sat_commnicate_delay.append(0)
+    sat_num = 0         #index of the last element in sat_commnicate_path and sat_commnicate_delay
+
+    end_path = False
+    while end_path == False:
+        ignore_sat = []
+        ignore = True
+        while ignore == True:
+            min_distance = 999999999999     # store the min distance from next satellite to gs
+            min_distance_sat = -1            # store the min distance satellite object index
+            distance = -1
+
+            for s in range(len(sat_list)):      # avoid the sat not able to communicate
+                if s not in ignore_sat and s not in sat_commnicate_path:
+                    if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
+                        # estimated
+                        distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
+
+                        # add the cost
+                        for i in range(sat_num):
+                            distance += satcompute.inter_sat_distance(t, sat_list[sat_commnicate_path[i]], sat_list[sat_commnicate_path[i+1]])
+                        
+                        if distance < min_distance:
+                            min_distance = distance
+                            min_distance_sat = s
+
+            # has sat in vibility
+            if min_distance_sat != -1:
+                temp = inter_sat_commnicate(t, sat_list[sat_commnicate_path[sat_num]], sat_list[min_distance_sat])
+                if temp > 0:
+                    # commnicate success
+                    t = temp
+                    sat_commnicate_path.append(min_distance_sat)
+                    sat_num += 1
+                    ignore = False
+
+                    # insert delay
+                    sat_commnicate_delay.append(t)
+
+                    if visibility.is_gs_communicable(t, sat_list[sat_commnicate_path[sat_num]], gs) == True:
+                        temp = sat_ground_commnicate(t, sat_list[sat_commnicate_path[sat_num]], gs)
+                        if temp > 0:
+                            t = temp
+                            end_path = True
+                        else:
+                            end_path = False
+
+                else:
+                    # commnication fail, loop again and ignore that sat
+                    ignore = True
+                    ignore_sat.append(min_distance_sat)
+                    
+            # wait 1 sec and check visibility again
+            else:
+                    t += 1
+                    sat_commnicate_path.append(-1)  # mean waiting
+                    sat_commnicate_delay.append(t)
+                    print("No other Satellites in the visibility, wait 1 sec.")
+
+    return (sat_commnicate_path, sat_commnicate_delay)
