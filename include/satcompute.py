@@ -1,9 +1,11 @@
 import math
+import numpy as np
 from include import Satellite_class
 from include import GroundStation_class
 from include import Observation_class
 from include.SimParameter_class import SimParameter
 from typing  import Union
+
 
 # 根据轨道六要素求卫星当前位置赤经
 # 输入：1.卫星半径 2.升交点赤经 3.卫星轨道面上卫星当前位置与升交点赤经的角度(omega+f) 4.轨道倾角
@@ -137,13 +139,58 @@ def get_sat_alpha_range(phi_min, phi_max, sat: Satellite_class.Satellite):
     u_max2 = math.pi - u_max1
     u_min2 = math.pi - u_min1
 
-    alpha_min1 = sat_alpha(sat.r, sat.Omega_o, u_min1, sat.i_o)
-    alpha_max1 = sat_alpha(sat.r, sat.Omega_o, u_max1, sat.i_o)
-    alpha_min2 = sat_alpha(sat.r, sat.Omega_o, u_min2, sat.i_o)
-    alpha_max2 = sat_alpha(sat.r, sat.Omega_o, u_max2, sat.i_o)
+    # alpha_min1 = sat_alpha(sat.r, sat.Omega_o, u_min1, sat.i_o)
+    # alpha_max1 = sat_alpha(sat.r, sat.Omega_o, u_max1, sat.i_o)
+    # alpha_min2 = sat_alpha(sat.r, sat.Omega_o, u_min2, sat.i_o)
+    # alpha_max2 = sat_alpha(sat.r, sat.Omega_o, u_max2, sat.i_o)
 
     t_min1 = (u_min1 - sat.omega_o - sat.M_o) / sat.n_o
     t_max1 = (u_max1 - sat.omega_o - sat.M_o) / sat.n_o
     t_min2 = (u_max2 - sat.omega_o - sat.M_o) / sat.n_o
     t_max2 = (u_min2 - sat.omega_o - sat.M_o) / sat.n_o
-    return alpha_min1, alpha_max1, alpha_min2, alpha_max2, t_min1, t_max1, t_min2, t_max2
+    return t_min1, t_max1, t_min2, t_max2
+
+def sat_original_delay(gd:Observation_class.Observation, sat: Satellite_class.Satellite, gs: GroundStation_class.GroundStation):
+    psi, phi_min, phi_max = get_sat_phi_range(sat.a_o, gd.lat_rad)
+    gd_t_min1, gd_t_max1, gd_t_min2, gd_t_max2 = get_sat_alpha_range(phi_min, phi_max, sat)
+
+    # time window of gs
+    psi, phi_min, phi_max = get_sat_phi_range(sat.a_o, gs.lat_rad)
+    gs_t_min1, gs_t_max1, gs_t_min2, gs_t_max2 = get_sat_alpha_range(phi_min, phi_max, sat)
+
+    if gd_t_min1 < gs_t_min1:
+        time_delay = gs_t_min1 - gd_t_min1
+    elif gd_t_min1 < gs_t_max1:
+        for i in np.arange(gs_t_min1, gs_t_max1+0.01, 0.01):
+            if i > gd_t_min1:
+                time_delay = gs_t_max1 - gd_t_min1
+                break
+
+    elif gd_t_min1 < gs_t_min2:
+        time_delay = gs_t_min2 - gd_t_min1
+    elif gd_t_min1 < gs_t_max2:
+        for i in np.arange(gs_t_min1, gs_t_max2+0.01, 0.01):
+            if i > gd_t_min1:
+                time_delay = gs_t_max2 - gd_t_min1
+                break
+
+    elif gd_t_min2 < gs_t_min1:
+        time_delay = gs_t_min1 - gd_t_min2
+    elif gd_t_min2 < gs_t_max1:
+        for i in np.arange(gs_t_min1, gs_t_max1+0.01, 0.01):
+            if i > gd_t_min2:
+                time_delay = gs_t_max1 - gd_t_min2
+                break
+
+    elif gd_t_min2 < gs_t_min2:
+        time_delay = gs_t_min2 - gd_t_min2
+    elif gd_t_min2 < gs_t_max2:
+        for i in np.arange(gs_t_min1, gs_t_max2+0.05, 0.05):
+            if i > gd_t_min2:
+                time_delay = gs_t_max2 - gd_t_min2
+                break
+
+    else:
+        return -1
+    
+    return time_delay

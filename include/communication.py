@@ -5,7 +5,6 @@ from include import visibility
 from include import Observation_class
 from include.SimParameter_class import SimParameter
 import sys
-import math
 
 
 # asuum satellite using radio frequencies, because only very less satellite use laser

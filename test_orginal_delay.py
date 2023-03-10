@@ -75,10 +75,6 @@ for i in range(0, 4):
     sheet.write(4, i, col[i])
 col_num = 5
 
-# array to store the path result
-sat_commnicate_path = []
-sat_commnicate_delay = []
-
 imaging_sat = -1
 # search for all sat
 for s in range(len(sat_list)):
@@ -94,54 +90,13 @@ if imaging_sat == -1:
 time_delay = 0       # in sec
 
 # time window of gd
-psi, phi_min, phi_max = satcompute.get_sat_phi_range(sat_list[imaging_sat].a_o, gd.lat_rad)
-gd_alpha_min1, gd_alpha_max1, gd_alpha_min2, gd_alpha_max2, gd_t_min1, gd_t_max1, gd_t_min2, gd_t_max2 = satcompute.get_sat_alpha_range\
-    (phi_min, phi_max, sat_list[imaging_sat])
-
-# time window of gs
-psi, phi_min, phi_max = satcompute.get_sat_phi_range(sat_list[imaging_sat].a_o, gs.lat_rad)
-gs_alpha_min1, gs_alpha_max1, gs_alpha_min2, gs_alpha_max2, gs_t_min1, gs_t_max1, gs_t_min2, gs_t_max2 = satcompute.get_sat_alpha_range\
-    (phi_min, phi_max, sat_list[imaging_sat])
-
-if gd_t_min1 < gs_t_min1:
-    time_delay = gs_t_min1 - gd_t_min1
-elif gd_t_min1 < gs_t_max1:
-    for i in np.arange(gs_t_min1, gs_t_max1+0.01, 0.01):
-        if i > gd_t_min1:
-            time_delay = gs_t_max1 - gd_t_min1
-            break
-
-elif gd_t_min1 < gs_t_min2:
-    time_delay = gs_t_min2 - gd_t_min1
-elif gd_t_min1 < gs_t_max2:
-    for i in np.arange(gs_t_min1, gs_t_max2+0.01, 0.01):
-        if i > gd_t_min1:
-            time_delay = gs_t_max2 - gd_t_min1
-            break
-
-elif gd_t_min2 < gs_t_min1:
-    time_delay = gs_t_min1 - gd_t_min2
-elif gd_t_min2 < gs_t_max1:
-    for i in np.arange(gs_t_min1, gs_t_max1+0.01, 0.01):
-        if i > gd_t_min2:
-            time_delay = gs_t_max1 - gd_t_min2
-            break
-
-elif gd_t_min2 < gs_t_min2:
-    time_delay = gs_t_min2 - gd_t_min2
-elif gd_t_min2 < gs_t_max2:
-    for i in np.arange(gs_t_min1, gs_t_max2+0.05, 0.05):
-        if i > gd_t_min2:
-            time_delay = gs_t_max2 - gd_t_min2
-            break
-
-else:
+time_delay = satcompute.sat_original_delay(gd, sat_list[imaging_sat], gs)
+if time_delay < 0:
     print("not able to send data to the ground station!")
     sheet.write(col_num, 0, -1)
     sheet.write(col_num, 1, -1)
     sheet.write(col_num, 2, -1)
     sheet.write(col_num, 3, "NA")
-
 
 # write result to excel
 phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[imaging_sat], t = 0)

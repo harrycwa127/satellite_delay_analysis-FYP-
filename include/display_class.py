@@ -21,6 +21,8 @@ class Display:
     _gs: GroundStation_class.GroundStation
     _gd: Observation_class.Observation
 
+    _oringal_time_delay = -1
+
 
     _scale_rate = 1000000       # store the scale of coordinate changed from ECI
     _qobj = gluNewQuadric()
@@ -38,20 +40,37 @@ class Display:
         cls._gs = gs
         cls._gd = gd
 
+        cls._oringal_time_delay = satcompute.sat_original_delay(cls._gd, cls._sat_list[cls._astar_sat_commnicate_path[0]], cls._gs)
+
 
     # draw the total delay withＴｅｘｔ
     @classmethod
     def __draw_decription(cls):
         font = pygame.font.SysFont('Comic Sans MS', 16)
-        astar_textSurface = font.render("A* Path with Red, Delay: " + str(cls._astar_sat_commnicate_delay[-1]) + " sec", True, (204, 0, 0), (0, 0, 0))
-        textData = pygame.image.tostring(astar_textSurface, "RGBA", True)
-        glWindowPos2d(5, 5)
-        glDrawPixels(astar_textSurface.get_width(), astar_textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
 
-        orbit_textSurface = font.render("Orbit Base Path with Red, Delay: " + str(cls._orbit_sat_commnicate_delay[-1]) + " sec", True, (0,191,255), (0, 0, 0))
-        textData = pygame.image.tostring(orbit_textSurface, "RGBA", True)
-        glWindowPos2d(5, 5 + astar_textSurface.get_height()+5)
-        glDrawPixels(orbit_textSurface.get_width(), orbit_textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
+        height = 5
+
+        # A*
+        textSurface = font.render("A* Path with Red, Delay: " + str(cls._astar_sat_commnicate_delay[-1]) + " sec", True, (204, 0, 0), (0, 0, 0))
+        textData = pygame.image.tostring(textSurface, "RGBA", True)
+        glWindowPos2d(5, height)
+        glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
+
+        height += 5 + textSurface.get_height()
+
+        # Orbit
+        textSurface = font.render("Orbit Base Path with Red, Delay: " + str(cls._orbit_sat_commnicate_delay[-1]) + " sec", True, (0,191,255), (0, 0, 0))
+        textData = pygame.image.tostring(textSurface, "RGBA", True)
+        glWindowPos2d(5, height)
+        glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
+
+        height += 5 + textSurface.get_height()
+
+        # Original
+        textSurface = font.render("The Original Satellite Delay: " + str(cls._oringal_time_delay) + " sec", True, (255, 255, 255), (0, 0, 0))
+        textData = pygame.image.tostring(textSurface, "RGBA", True)
+        glWindowPos2d(5, height)
+        glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
 
 
 
