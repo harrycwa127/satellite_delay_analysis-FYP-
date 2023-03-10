@@ -69,7 +69,7 @@ def sat_ground_commnicate(t, sat: Satellite_class.Satellite, ground_station: Gro
     else:
         return -1
 
-# A*
+# A*(distance as cost)
 # input:    1. sat_list
 #           2. gd
 #           3. gs
@@ -113,7 +113,13 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
             for s in range(len(sat_list)):      # avoid the sat not able to communicate
                 if s not in ignore_sat and s not in sat_commnicate_path:
                     if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
+                        # estimated
                         distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
+
+                        # add the cost
+                        for i in range(sat_num):
+                            distance += satcompute.inter_sat_distance(t, sat_list[sat_commnicate_path[i]], sat_list[sat_commnicate_path[i+1]])
+                        
                         if min_distance == -1:
                             min_distance = distance
                             min_distance_sat = s
@@ -263,6 +269,5 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                     sat_commnicate_path.append(-1)  # mean waiting
                     sat_commnicate_delay.append(t)
                     # print("No other Satellites in the visibility, wait 1 sec.")
-    print(sat_commnicate_path)
 
     return (sat_commnicate_path, sat_commnicate_delay)
