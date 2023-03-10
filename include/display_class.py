@@ -40,7 +40,7 @@ class Display:
         cls._gs = gs
         cls._gd = gd
 
-        cls._oringal_time_delay = satcompute.sat_original_delay(cls._gd, cls._sat_list[cls._astar_sat_commnicate_path[0]], cls._gs)
+        cls._oringal_time_delay = satcompute.sat_original_delay(gd, sat_list[astar_path[0]], gs)
 
 
     # draw the total delay withＴｅｘｔ
@@ -51,7 +51,7 @@ class Display:
         height = 5
 
         # A*
-        textSurface = font.render("A* Path with Red, Delay: " + str(cls._astar_sat_commnicate_delay[-1]) + " sec", True, (204, 0, 0), (0, 0, 0))
+        textSurface = font.render("A* Path with Red, Delay: " + str(cls._astar_sat_commnicate_delay[-1]) + " sec", True, (230, 0, 0), (0, 0, 0))
         textData = pygame.image.tostring(textSurface, "RGBA", True)
         glWindowPos2d(5, height)
         glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
@@ -135,7 +135,7 @@ class Display:
             glTranslatef(x, y, z) # Move to the place
             # Put color
             if s in cls._astar_sat_commnicate_path:
-                glColor3f(0.8, 0.0, 0.0) 
+                glColor3f(0.9, 0.0, 0.0) 
             elif s in cls._orbit_sat_commnicate_path:
                 glColor3f(0.0, 0.75, 1.0)
             else:
@@ -163,7 +163,7 @@ class Display:
         from_z /= cls._scale_rate
         
         glBegin(GL_LINES)
-        glColor3f(0.8, 0.0, 0.0) #Put color
+        glColor3f(0.9, 0.0, 0.0) #Put color
         glVertex3f(to_x, to_y, to_z)
         glVertex3f(from_x, from_y, from_z)
         glEnd()
@@ -198,7 +198,7 @@ class Display:
             from_z /= cls._scale_rate
             
             glBegin(GL_LINES)
-            glColor3f(0.8, 0.0, 0.0) #Put color
+            glColor3f(0.9, 0.0, 0.0) #Put color
             glVertex3f(to_x, to_y, to_z)
             glVertex3f(from_x, from_y, from_z)
             glEnd()
@@ -237,7 +237,7 @@ class Display:
         from_z /= cls._scale_rate
         
         glBegin(GL_LINES)
-        glColor3f(0.8, 0.0, 0.0) #Put color
+        glColor3f(0.9, 0.0, 0.0) #Put color
         glVertex3f(to_x, to_y, to_z)
         glVertex3f(from_x, from_y, from_z)
         glEnd()

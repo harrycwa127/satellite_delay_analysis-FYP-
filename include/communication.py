@@ -105,7 +105,7 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
         ignore_sat = []
         ignore = True
         while ignore == True:
-            min_distance = -1        # store the min distance from next satellite to gs
+            min_distance = 999999999999     # store the min distance from next satellite to gs
             min_distance_sat = -1            # store the min distance satellite object index
             distance = -1
 
@@ -119,10 +119,7 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                         for i in range(sat_num):
                             distance += satcompute.inter_sat_distance(t, sat_list[sat_commnicate_path[i]], sat_list[sat_commnicate_path[i+1]])
                         
-                        if min_distance == -1:
-                            min_distance = distance
-                            min_distance_sat = s
-                        elif distance < min_distance:
+                        if distance < min_distance:
                             min_distance = distance
                             min_distance_sat = s
 
@@ -196,7 +193,7 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
         ignore_sat = []
         ignore = True
         while ignore == True:
-            min_distance = -1        # store the min distance from next satellite to gs
+            min_distance = 999999999999      # store the min distance from next satellite to gs
             min_distance_sat = -1            # store the min distance satellite object index
             distance = -1
 
@@ -210,10 +207,7 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                 if s not in ignore_sat and s not in sat_commnicate_path:
                     if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
                         distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
-                        if min_distance == -1:
-                            min_distance = distance
-                            min_distance_sat = s
-                        elif distance < min_distance:
+                        if distance < min_distance:
                             min_distance = distance
                             min_distance_sat = s
 
@@ -270,3 +264,22 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                     # print("No other Satellites in the visibility, wait 1 sec.")
 
     return (sat_commnicate_path, sat_commnicate_delay)
+
+
+# Dijkstra
+def dijkstra_path_decision(sat_list: list, gd: Observation_class.Observation, gs: GroundStation_class.GroundStation):
+    t = 0
+
+    imaging_sat = -1
+    # search for all sat
+    for s in range(len(sat_list)):
+        if visibility.is_observation_visible(0, sat_list[s], gd):
+            imaging_sat = s
+            break
+
+    # if no any satellite obervate the obervation point, exit
+    if imaging_sat == -1:
+        print("No Satellite able to visit the observation point!!")
+        sys.exit(-1)
+
+    
