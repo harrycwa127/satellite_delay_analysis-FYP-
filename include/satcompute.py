@@ -3,6 +3,8 @@ import numpy as np
 from include import Satellite_class
 from include import GroundStation_class
 from include import Observation_class
+from include import communication
+from include import visibility
 from include.SimParameter_class import SimParameter
 from typing  import Union
 
@@ -99,86 +101,39 @@ def sat_ground_distance(t, sat: Satellite_class.Satellite, gs: GroundStation_cla
     return math.sqrt((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2)
 
 
-# get tge phi range of ground
-# input：1. r of sat 2.lat_rad of ground(ground station/obervation point)
-# output：1.phi_min 2.phi_max
-def get_sat_phi_range(r, lat_rad):
-    temp = r * math.sin(SimParameter.get_off_nadir()) / Satellite_class.Re
-    if temp <= 1:
-        psi = math.asin(temp) - SimParameter.get_off_nadir()
-    else:
-        psi = math.acos(Satellite_class.Re / r)
-    phi_min = max(lat_rad - psi, -math.pi / 2)
-    phi_max = min(lat_rad + psi, math.pi / 2)
-    return phi_min, phi_max
-
-
-# input：   1.phi_min 2.phi_max 3.sat
-# output:   1.time window1 start t_min1
-#           2.time window1 end t_max1
-#           3.time window2 start t_min2
-#           4.time window2 end t_max2
-def get_sat_alpha_range(phi_min, phi_max, sat: Satellite_class.Satellite):
-    sin_u_min1 = math.sin(phi_min) / math.sin(sat.i_o)
-    sin_u_max1 = math.sin(phi_max) / math.sin(sat.i_o)
-    if abs(sin_u_min1) <= 1:
-        u_min1 = math.asin(sin_u_min1)
-    else:
-        u_min1 = math.pi / 2
-    if abs(sin_u_max1) <= 1:
-        u_max1 = math.asin(sin_u_max1)
-    else:
-        u_max1 = math.pi / 2
-    u_max2 = math.pi - u_max1
-    u_min2 = math.pi - u_min1
-
-    t_min1 = (u_min1 - sat.omega_o - sat.M_o) / sat.n_o
-    t_max1 = (u_max1 - sat.omega_o - sat.M_o) / sat.n_o
-    t_min2 = (u_max2 - sat.omega_o - sat.M_o) / sat.n_o
-    t_max2 = (u_min2 - sat.omega_o - sat.M_o) / sat.n_o
-    return t_min1, t_max1, t_min2, t_max2
-
+# input:    1. gd   2.sat   3. gs
+# output:   time
 def sat_original_delay(gd:Observation_class.Observation, sat: Satellite_class.Satellite, gs: GroundStation_class.GroundStation):
-    phi_min, phi_max = get_sat_phi_range(sat.a_o, gd.lat_rad)
-    gd_t_min1, gd_t_max1, gd_t_min2, gd_t_max2 = get_sat_alpha_range(phi_min, phi_max, sat)
+    t = 0
+    if visibility.is_observation_visible(t, sat, gd) == False:
+        # find time can commnicate with, in sec
+        while visibility.is_observation_visible(t, sat, gd) == False:
+            t += 1
 
-    # time window of gs
-    phi_min, phi_max = get_sat_phi_range(sat.a_o, gs.lat_rad)
-    gs_t_min1, gs_t_max1, gs_t_min2, gs_t_max2 = get_sat_alpha_range(phi_min, phi_max, sat)
-
-    if gd_t_min1 < gs_t_min1:
-        time_delay = gs_t_min1 - gd_t_min1
-    elif gd_t_min1 < gs_t_max1:
-        for i in np.arange(gs_t_min1, gs_t_max1+0.01, 0.01):
-            if i > gd_t_min1:
-                time_delay = gs_t_max1 - gd_t_min1
-                break
-
-    elif gd_t_min1 < gs_t_min2:
-        time_delay = gs_t_min2 - gd_t_min1
-    elif gd_t_min1 < gs_t_max2:
-        for i in np.arange(gs_t_min1, gs_t_max2+0.01, 0.01):
-            if i > gd_t_min1:
-                time_delay = gs_t_max2 - gd_t_min1
-                break
-
-    elif gd_t_min2 < gs_t_min1:
-        time_delay = gs_t_min1 - gd_t_min2
-    elif gd_t_min2 < gs_t_max1:
-        for i in np.arange(gs_t_min1, gs_t_max1+0.01, 0.01):
-            if i > gd_t_min2:
-                time_delay = gs_t_max1 - gd_t_min2
-                break
-
-    elif gd_t_min2 < gs_t_min2:
-        time_delay = gs_t_min2 - gd_t_min2
-    elif gd_t_min2 < gs_t_max2:
-        for i in np.arange(gs_t_min1, gs_t_max2+0.05, 0.05):
-            if i > gd_t_min2:
-                time_delay = gs_t_max2 - gd_t_min2
-                break
-
-    else:
-        return -1
+        t -= 1
+        while visibility.is_observation_visible(t, sat, gd) == False:
+            t+=0.01
+        
     
-    return time_delay
+    # find time can commnicate with, in sec
+    while visibility.is_gs_communicable(t, sat, gs) == False:
+        t += 1
+
+    # rollback 1 sec and find time in 0.01
+    t -= 1
+    while visibility.is_gs_communicable(t, sat, gs) == False:
+        t+=0.01
+
+    communication_end = False
+    while communication_end == False:
+        temp = communication.sat_ground_commnicate(t, sat, gs)
+        if temp > 0:
+            t = temp
+            communication_end = True
+        else:
+            t -= 0.001
+            communication_end = False
+            print("Satellite Orginal Communication Fail!!")
+
+
+    return t
