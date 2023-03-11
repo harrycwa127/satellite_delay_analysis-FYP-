@@ -80,10 +80,6 @@ astar_sat_commnicate_path, astar_sat_commnicate_delay = communication.astar_path
 dijkstra_sat_commnicate_path, dijkstra_sat_commnicate_delay = communication.dijkstra_path_decision(sat_list, gd, gs)
 orbit_sat_commnicate_path, orbit_sat_commnicate_delay = communication.orbit_path_decision(sat_list, gd, gs, n)
 
-print(astar_sat_commnicate_path)
-print(dijkstra_sat_commnicate_path)
-print(orbit_sat_commnicate_path)
-
 for i in range(len(astar_sat_commnicate_path)):
     if astar_sat_commnicate_path[i] == -1:
         sheet.write(col_num, 0, -1)
