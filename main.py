@@ -2,10 +2,8 @@ import os
 import xlwt
 import time
 import math
-import sys
 from include import Satellite_class
 from include import communication
-from include import visibility
 from include import read_data
 from include import satcompute
 from include.SimParameter_class import SimParameter

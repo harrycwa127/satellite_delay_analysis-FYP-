@@ -3,7 +3,6 @@ import xlwt
 import time
 import math
 import sys
-import numpy as np
 from include import Satellite_class
 from include import visibility
 from include import read_data
