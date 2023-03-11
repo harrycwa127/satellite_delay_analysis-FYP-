@@ -125,6 +125,7 @@ def sat_original_delay(gd:Observation_class.Observation, sat: Satellite_class.Sa
         t+=0.01
 
     communication_end = False
+    total_t = t
     while communication_end == False:
         temp = communication.sat_ground_commnicate(t, sat, gs)
         if temp > 0:
@@ -133,7 +134,9 @@ def sat_original_delay(gd:Observation_class.Observation, sat: Satellite_class.Sa
         else:
             t -= 0.001
             communication_end = False
-            print("Satellite Orginal Communication Fail!!")
-
+            
+            if total_t - t > 1:
+                print("Satellite Orginal Communication Fail!!")
+                return -1
 
     return t
