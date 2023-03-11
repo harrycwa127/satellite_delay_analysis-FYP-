@@ -28,8 +28,7 @@ class Satellite(object):
         self.omega_o = omega_o
         self.circle_o = circle_o
         self.T_o = 86400/self.circle_o
-        self.n_o = 2 * math.pi / self.T_o  # 平均角速率 (rad/s)
-        # 设定的开始时刻时的平近点角，即卫星位置
+        self.n_o = 2 * math.pi / self.T_o
         self.M_o = (M_o + self.n_o * (start_time_julian - current_julian) * 86400) % (2 * math.pi)
         self.a_o = (miu * self.T_o * self.T_o / 4 / math.pi / math.pi) ** (1 / 3)
         self.r = self.a_o

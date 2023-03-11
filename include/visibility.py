@@ -7,12 +7,10 @@ import math
 
 
 # Determine whether the satellite can image the obervation point
-# 输入：1.当前时刻t（相对于开始时刻的时间）
-#      2.卫星class
-#      3.地面点class
-#      4.off_nadir角
-#      5.开始时刻0经度所处的赤经
-# 输出：TRUE OR FALSE
+# input：1.t
+#       2.sat
+#       3.obervation point
+# output：TRUE OR FALSE
 def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: Observation_class.Observation) -> bool:
     phi, lam = satcompute.get_sat_lat_lon(sat = satellite, t = t)
 
@@ -26,13 +24,11 @@ def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: Observat
         return False
 
 
-# 判断当前时刻卫星是否能和地面站通信
-# 输入：1.当前时刻t（相对于开始时刻的时间）
-#      2.卫星class
-#      3.地面站class
-#      4.由地面站通信的最小仰角得到的最大的off_nadir角
-#      4.开始时刻0经度所处的赤经
-# 输出：TRUE OR FALSE
+# Determine whether the satellite can communicate with ground station
+# input：1.t
+#      2.sat
+#      3.gs
+# output：TRUE OR FALSE
 def is_gs_communicable(t, satellite: Satellite_class.Satellite, gs: GroundStation_class.GroundStation) -> bool:
     gs_off_nadir = math.asin(Satellite_class.Re * math.cos(gs.ele_rad) / satellite.r)
     phi, lam = satcompute.get_sat_lat_lon(sat = satellite, t = t)
@@ -47,8 +43,12 @@ def is_gs_communicable(t, satellite: Satellite_class.Satellite, gs: GroundStatio
     else:
         return False
 
+# Determine whether the satellite can communicate with another sat
+# input：1.t
+#      2.sat1
+#      3.sat2
+# output：TRUE OR FALSE
 def is_sat_communicable(t, from_satellite: Satellite_class.Satellite, to_satellite: Satellite_class.Satellite) -> bool:
-
     r3 = satcompute.inter_sat_distance(t, from_satellite, to_satellite)
 
     beta = math.acos((r3**2 + from_satellite.r**2 - to_satellite.r**2) / (2 * r3 * from_satellite.r))

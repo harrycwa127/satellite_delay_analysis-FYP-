@@ -1,8 +1,8 @@
 # the ground station
 class GroundStation(object):
-    lat_rad = 0      # latitude (rad)
-    lon_rad = 0     # longitude (rad)
-    ele_rad = 0      # elevation
+    lat_rad = 0         # latitude (rad)
+    lon_rad = 0         # longitude (rad)
+    ele_rad = 0         # elevation
 
     def __init__(self, lat_rad, lon_rad, ele_rad):
         self.lat_rad = lat_rad

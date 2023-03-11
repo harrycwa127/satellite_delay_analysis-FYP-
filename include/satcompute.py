@@ -7,9 +7,8 @@ from include.SimParameter_class import SimParameter
 from typing  import Union
 
 
-# 根据轨道六要素求卫星当前位置赤经
-# 输入：1.卫星半径 2.升交点赤经 3.卫星轨道面上卫星当前位置与升交点赤经的角度(omega+f) 4.轨道倾角
-# 输出：卫星当前位置赤经
+# input：1.sat radius 2.right ascension of ascending node 3.(omega+f) 4.inclination of sat
+# output：current sat Right ascension
 def sat_alpha(r, Omega_o, u, i_o):
     x = r * (math.cos(Omega_o) * math.cos(u) - math.sin(Omega_o) * math.sin(u) * math.cos(i_o))
     y = r * (math.sin(Omega_o) * math.cos(u) + math.cos(Omega_o) * math.sin(u) * math.cos(i_o))
@@ -39,14 +38,14 @@ def sat_alpha(r, Omega_o, u, i_o):
 # input     1. sat (Satellite Class Object)
 #           2. t (time passed from start_greenwich, in sec)
 def get_sat_lat_lon(sat: Satellite_class.Satellite, t):
-    M = (sat.n_o * t + sat.M_o) % (2 * math.pi)  # t时刻平近点角(rad)
+    M = (sat.n_o * t + sat.M_o) % (2 * math.pi)  # mean anomaly in time t
     f = M  # if circular orbit
     r = sat.a_o  # if circular orbit
     u = sat.omega_o + f
     alpha = sat_alpha(r, sat.Omega_o, u, sat.i_o)
-    delta = math.asin(math.sin(u) * math.sin(sat.i_o))  # t时刻卫星赤纬
-    phi = delta  # t时刻卫星地心纬度, lat
-    lam = alpha - (math.radians(SimParameter.get_start_greenwich()) + Satellite_class.omega_e * t) % (2 * math.pi)  # t时刻卫星地心经度, lon
+    delta = math.asin(math.sin(u) * math.sin(sat.i_o))
+    phi = delta  # lat in time t
+    lam = alpha - (math.radians(SimParameter.get_start_greenwich()) + Satellite_class.omega_e * t) % (2 * math.pi)  # lon in time t
     if lam > math.pi:
         lam = lam - 2 * math.pi
     if lam < -math.pi:
@@ -100,9 +99,9 @@ def sat_ground_distance(t, sat: Satellite_class.Satellite, gs: GroundStation_cla
     return math.sqrt((from_x - to_x)**2 + (from_y - to_y)**2 + (from_z - to_z)**2)
 
 
-# 根据给定的最大off_nadir角和地面点，求卫星可能观测到的纬度带
-# 输入：1.最大off_nadir角 2.卫星半径 3.地面点纬度
-# 输出：1.卫星与地心的连线和地面点与地心的连线之间最大的可视夹角 2.纬度带最小值 3.纬度带最大值
+# get tge phi range of ground
+# input：1. r of sat 2.lat_rad of ground(ground station/obervation point)
+# output：1.phi_min 2.phi_max
 def get_sat_phi_range(r, lat_rad):
     temp = r * math.sin(SimParameter.get_off_nadir()) / Satellite_class.Re
     if temp <= 1:
@@ -111,20 +110,14 @@ def get_sat_phi_range(r, lat_rad):
         psi = math.acos(Satellite_class.Re / r)
     phi_min = max(lat_rad - psi, -math.pi / 2)
     phi_max = min(lat_rad + psi, math.pi / 2)
-    return psi, phi_min, phi_max
+    return phi_min, phi_max
 
 
-# 求卫星到达可能观测到的纬度带的赤经范围，以及到达时刻
-# 输入：1.纬度带最小值 2.纬度带最大值 3.卫星class
-# 输出：由于卫星轨道与纬度带有两个交叉范围，因此会求出两个赤经范围(特殊情况就是两个赤经范围刚好连上)
-#      1.第一个赤经范围：卫星纬度到达纬度带最小值时的赤经 alpha_min1
-#      2.第一个赤经范围：卫星纬度到达纬度带最大值时的赤经 alpha_max1
-#      3.第二个赤经范围：卫星纬度到达纬度带最小值时的赤经 alpha_min2
-#      4.第二个赤经范围：卫星纬度到达纬度带最大值时的赤经 alpha_max2
-#      5.卫星到达alpha_min1对应的时刻 t_min1 (相对于simulate开始时刻；t_min1+kT   k为整数，T为卫星周期)
-#      6.卫星到达alpha_max1对应的时刻 t_max1
-#      7.卫星到达alpha_min2对应的时刻 t_min2
-#      8.卫星到达alpha_max2对应的时刻 t_max2
+# input：   1.phi_min 2.phi_max 3.sat
+# output:   1.time window1 start t_min1
+#           2.time window1 end t_max1
+#           3.time window2 start t_min2
+#           4.time window2 end t_max2
 def get_sat_alpha_range(phi_min, phi_max, sat: Satellite_class.Satellite):
     sin_u_min1 = math.sin(phi_min) / math.sin(sat.i_o)
     sin_u_max1 = math.sin(phi_max) / math.sin(sat.i_o)
@@ -139,11 +132,6 @@ def get_sat_alpha_range(phi_min, phi_max, sat: Satellite_class.Satellite):
     u_max2 = math.pi - u_max1
     u_min2 = math.pi - u_min1
 
-    # alpha_min1 = sat_alpha(sat.r, sat.Omega_o, u_min1, sat.i_o)
-    # alpha_max1 = sat_alpha(sat.r, sat.Omega_o, u_max1, sat.i_o)
-    # alpha_min2 = sat_alpha(sat.r, sat.Omega_o, u_min2, sat.i_o)
-    # alpha_max2 = sat_alpha(sat.r, sat.Omega_o, u_max2, sat.i_o)
-
     t_min1 = (u_min1 - sat.omega_o - sat.M_o) / sat.n_o
     t_max1 = (u_max1 - sat.omega_o - sat.M_o) / sat.n_o
     t_min2 = (u_max2 - sat.omega_o - sat.M_o) / sat.n_o
@@ -151,11 +139,11 @@ def get_sat_alpha_range(phi_min, phi_max, sat: Satellite_class.Satellite):
     return t_min1, t_max1, t_min2, t_max2
 
 def sat_original_delay(gd:Observation_class.Observation, sat: Satellite_class.Satellite, gs: GroundStation_class.GroundStation):
-    psi, phi_min, phi_max = get_sat_phi_range(sat.a_o, gd.lat_rad)
+    phi_min, phi_max = get_sat_phi_range(sat.a_o, gd.lat_rad)
     gd_t_min1, gd_t_max1, gd_t_min2, gd_t_max2 = get_sat_alpha_range(phi_min, phi_max, sat)
 
     # time window of gs
-    psi, phi_min, phi_max = get_sat_phi_range(sat.a_o, gs.lat_rad)
+    phi_min, phi_max = get_sat_phi_range(sat.a_o, gs.lat_rad)
     gs_t_min1, gs_t_max1, gs_t_min2, gs_t_max2 = get_sat_alpha_range(phi_min, phi_max, sat)
 
     if gd_t_min1 < gs_t_min1:
