@@ -336,13 +336,13 @@ class Display:
                 # Rotation with arrow keys
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
-                        glRotatef(10, 0, 10, 0)
+                        glRotatef(5, 0, 5, 0)
                     if event.key == pygame.K_RIGHT:
-                        glRotatef(10, 0, -10, 0)
+                        glRotatef(5, 0, -5, 0)
                     if event.key == pygame.K_UP:
-                        glRotatef(10, -10, 0, 0)
+                        glRotatef(5, -5, 0, 0)
                     if event.key == pygame.K_DOWN:
-                        glRotatef(10, 10, 0, 0)
+                        glRotatef(5, 5, 0, 0)
 
                 # Zoom in and out with mouse wheel
                 if event.type == pygame.MOUSEBUTTONDOWN:
