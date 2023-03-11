@@ -102,6 +102,12 @@ phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[imaging_sat], t = 0)
 phi = phi * (180/math.pi)
 lam = lam * (180/math.pi)
 
+if phi < 0:
+    phi += 360
+
+if lam < 0:
+    lam += 360
+
 sheet.write(col_num, 0, phi)
 sheet.write(col_num, 1, lam)
 sheet.write(col_num, 2, sat_list[imaging_sat].r)
@@ -112,6 +118,12 @@ col_num += 1
 phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[imaging_sat], t = time_delay)
 phi = phi * (180/math.pi)
 lam = lam * (180/math.pi)
+
+if phi < 0:
+    phi += 360
+
+if lam < 0:
+    lam += 360
 
 sheet.write(col_num, 0, phi)
 sheet.write(col_num, 1, lam)

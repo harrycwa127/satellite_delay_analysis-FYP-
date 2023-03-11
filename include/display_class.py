@@ -388,8 +388,6 @@ class Display:
             glPushMatrix()
 
             glTranslatef(0, 0, 0) #Move to the place, y may = -scaled_earth_radius
-            # glColor4f(0.5, 0.2, 0.2, 1) #Put color
-            # gluSphere(cls._qobj, scaled_earth_radius, 32, 16) #Draw cls._qobj
 
             gluQuadricTexture(cls._qobj, GL_TRUE)
             glEnable(GL_TEXTURE_2D)
@@ -411,3 +409,4 @@ class Display:
 
             pygame.display.flip() #Update the screen
             pygame.time.wait(10)
+            

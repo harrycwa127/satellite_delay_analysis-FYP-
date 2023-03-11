@@ -97,6 +97,12 @@ for i in range(len(astar_sat_commnicate_path)):
         phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[astar_sat_commnicate_path[i]], t = astar_sat_commnicate_delay[i])
         phi = phi * (180/math.pi)
         lam = lam * (180/math.pi)
+
+        if phi < 0:
+            phi += 360
+
+        if lam < 0:
+            lam += 360
         
         sheet.write(col_num, 0, phi)
         sheet.write(col_num, 1, lam)
@@ -145,6 +151,12 @@ for i in range(len(dijkstra_sat_commnicate_path)):
         phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[dijkstra_sat_commnicate_path[i]], t = dijkstra_sat_commnicate_delay[i])
         phi = phi * (180/math.pi)
         lam = lam * (180/math.pi)
+
+        if phi < 0:
+            phi += 360
+
+        if lam < 0:
+            lam += 360
         
         sheet.write(col_num, 0, phi)
         sheet.write(col_num, 1, lam)
@@ -192,6 +204,12 @@ for i in range(len(orbit_sat_commnicate_path)):
         phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[orbit_sat_commnicate_path[i]], t = orbit_sat_commnicate_delay[i])
         phi = phi * (180/math.pi)
         lam = lam * (180/math.pi)
+
+        if phi < 0:
+            phi += 360
+
+        if lam < 0:
+            lam += 360
         
         sheet.write(col_num, 0, phi)
         sheet.write(col_num, 1, lam)
