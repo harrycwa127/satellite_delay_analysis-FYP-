@@ -18,6 +18,8 @@ class Display:
     _astar_sat_commnicate_delay = []
     _orbit_sat_commnicate_path = []
     _orbit_sat_commnicate_delay = []
+    _dijkstra_sat_commnicate_path = []
+    _dijkstra_sat_commnicate_delay = []
     _gs: GroundStation_class.GroundStation
     _gd: Observation_class.Observation
 
@@ -31,12 +33,14 @@ class Display:
     # setter of point info
     @classmethod
     def set_point_info(cls, gd, sat_list, astar_path, astar_delay,\
-                       orbit_path, orbit_delay, gs):
+                       orbit_path, orbit_delay, dijkstra_path, dijkstra_delay, gs):
         cls._sat_list = sat_list
         cls._astar_sat_commnicate_path = astar_path
         cls._astar_sat_commnicate_delay = astar_delay
         cls._orbit_sat_commnicate_path = orbit_path
         cls._orbit_sat_commnicate_delay = orbit_delay
+        cls._dijkstra_sat_commnicate_path = dijkstra_path
+        cls._dijkstra_sat_commnicate_delay = dijkstra_delay
         cls._gs = gs
         cls._gd = gd
 
@@ -48,7 +52,23 @@ class Display:
     def __draw_decription(cls):
         font = pygame.font.SysFont('Comic Sans MS', 16)
 
-        height = 5
+        height = 3
+
+        # Orbit
+        textSurface = font.render("Orbit Base Path with Blue, Delay: " + str(cls._orbit_sat_commnicate_delay[-1]) + " sec", True, (0,191,255), (0, 0, 0))
+        textData = pygame.image.tostring(textSurface, "RGBA", True)
+        glWindowPos2d(3, height)
+        glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
+        
+        height += 3 + textSurface.get_height()
+
+        # Dijkstra
+        textSurface = font.render("Dijkstra Path with Orange, Delay: " + str(cls._dijkstra_sat_commnicate_delay[-1]) + " sec", True, (255, 172, 28), (0, 0, 0))
+        textData = pygame.image.tostring(textSurface, "RGBA", True)
+        glWindowPos2d(3, height)
+        glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
+
+        height += 3 + textSurface.get_height()
 
         # A*
         textSurface = font.render("A* Path with Red, Delay: " + str(cls._astar_sat_commnicate_delay[-1]) + " sec", True, (230, 0, 0), (0, 0, 0))
@@ -56,20 +76,12 @@ class Display:
         glWindowPos2d(5, height)
         glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
 
-        height += 5 + textSurface.get_height()
-
-        # Orbit
-        textSurface = font.render("Orbit Base Path with Red, Delay: " + str(cls._orbit_sat_commnicate_delay[-1]) + " sec", True, (0,191,255), (0, 0, 0))
-        textData = pygame.image.tostring(textSurface, "RGBA", True)
-        glWindowPos2d(5, height)
-        glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
-
-        height += 5 + textSurface.get_height()
+        height += 3 + textSurface.get_height()
 
         # Original
         textSurface = font.render("The Original Satellite Delay: " + str(cls._oringal_time_delay) + " sec", True, (255, 255, 255), (0, 0, 0))
         textData = pygame.image.tostring(textSurface, "RGBA", True)
-        glWindowPos2d(5, height)
+        glWindowPos2d(3, height)
         glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
 
 
@@ -115,7 +127,7 @@ class Display:
 
         glPushMatrix()
         glTranslatef(x, y, z)       # Move to the place
-        glColor3f(1.0, 0.6, 0.2)    # Put color
+        glColor3f(1.0, 0.6, 0.1)    # Put color
         gluSphere(cls._qobj, 0.1, 20, 20)  # may set to sat_class.Re
         glPopMatrix()
 
@@ -133,11 +145,13 @@ class Display:
             glPushMatrix()
 
             glTranslatef(x, y, z) # Move to the place
-            # Put color
+            # Put color'
             if s in cls._astar_sat_commnicate_path:
                 glColor3f(0.9, 0.0, 0.0) 
             elif s in cls._orbit_sat_commnicate_path:
                 glColor3f(0.0, 0.75, 1.0)
+            elif s in cls._dijkstra_sat_commnicate_path:
+                glColor3f(1.0, 0.6, 0.1) 
             else:
                 glColor3f(0.0, 0.8, 0.0)
 
@@ -157,42 +171,27 @@ class Display:
         to_y /= cls._scale_rate
         to_z /= cls._scale_rate
 
-        from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._astar_sat_commnicate_path[0]])
+        from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._dijkstra_sat_commnicate_path[0]])
         from_x /= cls._scale_rate
         from_y /= cls._scale_rate
         from_z /= cls._scale_rate
         
         glBegin(GL_LINES)
-        glColor3f(0.9, 0.0, 0.0) #Put color
+        glColor3f(1.0, 0.6, 0.1) #Put color
         glVertex3f(to_x, to_y, to_z)
         glVertex3f(from_x, from_y, from_z)
         glEnd()
         glPopMatrix()
 
-        # all algo should using same first sat
-        # if cls._orbit_sat_commnicate_path[0] != cls._astar_sat_commnicate_path[0]:
-        #     from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._orbit_sat_commnicate_path[0]])
-        #     from_x /= cls._scale_rate
-        #     from_y /= cls._scale_rate
-        #     from_z /= cls._scale_rate
-            
-        #     glPushMatrix()
-        #     glBegin(GL_LINES)
-        #     glColor3f(0.0, 0.75, 1.0) #Put color
-        #     glVertex3f(to_x, to_y, to_z)
-        #     glVertex3f(from_x, from_y, from_z)
-        #     glEnd()
-        #     glPopMatrix()
-
         #   draw lines between sat path
-        for p in range(len(cls._astar_sat_commnicate_path)-1):
+        for s in range(len(cls._astar_sat_commnicate_path)-2):
             glPushMatrix()
-            to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._astar_sat_commnicate_path[p]])
+            to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._astar_sat_commnicate_path[s]])
             to_x /= cls._scale_rate
             to_y /= cls._scale_rate
             to_z /= cls._scale_rate
 
-            from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._astar_sat_commnicate_path[p+1]])
+            from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._astar_sat_commnicate_path[s+1]])
             from_x /= cls._scale_rate
             from_y /= cls._scale_rate
             from_z /= cls._scale_rate
@@ -204,15 +203,34 @@ class Display:
             glEnd()
             glPopMatrix()
 
-        # draw orbit path
-        for p in range(len(cls._orbit_sat_commnicate_path)-1):
+        for s in range(len(cls._dijkstra_sat_commnicate_path)-2):
             glPushMatrix()
-            to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._orbit_sat_commnicate_path[p]])
+            to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._dijkstra_sat_commnicate_path[s]])
             to_x /= cls._scale_rate
             to_y /= cls._scale_rate
             to_z /= cls._scale_rate
 
-            from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._orbit_sat_commnicate_path[p+1]])
+            from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._dijkstra_sat_commnicate_path[s+1]])
+            from_x /= cls._scale_rate
+            from_y /= cls._scale_rate
+            from_z /= cls._scale_rate
+            
+            glBegin(GL_LINES)
+            glColor3f(1.0, 0.6, 0.1) #Put color
+            glVertex3f(to_x, to_y, to_z)
+            glVertex3f(from_x, from_y, from_z)
+            glEnd()
+            glPopMatrix()
+
+        # draw orbit path
+        for s in range(len(cls._orbit_sat_commnicate_path)-2):
+            glPushMatrix()
+            to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._orbit_sat_commnicate_path[s]])
+            to_x /= cls._scale_rate
+            to_y /= cls._scale_rate
+            to_z /= cls._scale_rate
+
+            from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._orbit_sat_commnicate_path[s+1]])
             from_x /= cls._scale_rate
             from_y /= cls._scale_rate
             from_z /= cls._scale_rate
@@ -226,7 +244,7 @@ class Display:
 
         # draw line from last sat to ground station
         glPushMatrix()
-        to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._astar_sat_commnicate_path[-1]])
+        to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._astar_sat_commnicate_path[-2]])
         to_x /= cls._scale_rate
         to_y /= cls._scale_rate
         to_z /= cls._scale_rate
@@ -243,9 +261,29 @@ class Display:
         glEnd()
         glPopMatrix()
 
-        if cls._orbit_sat_commnicate_path[-1] != cls._astar_sat_commnicate_path[-1]:
+        if cls._dijkstra_sat_commnicate_path[-2] != cls._astar_sat_commnicate_path[-2]:
             glPushMatrix()
-            to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._orbit_sat_commnicate_path[-1]])
+            to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._dijkstra_sat_commnicate_path[-2]])
+            to_x /= cls._scale_rate
+            to_y /= cls._scale_rate
+            to_z /= cls._scale_rate
+
+            from_x, from_y, from_z = satcompute.get_ground_eci_xyz(0, cls._gs)
+            from_x /= cls._scale_rate
+            from_y /= cls._scale_rate
+            from_z /= cls._scale_rate
+            
+            glBegin(GL_LINES)
+            glColor3f(1.0, 0.6, 0.1) #Put color
+            glVertex3f(to_x, to_y, to_z)
+            glVertex3f(from_x, from_y, from_z)
+            glEnd()
+            glPopMatrix()
+
+
+        if cls._orbit_sat_commnicate_path[-2] != cls._astar_sat_commnicate_path[-2]:
+            glPushMatrix()
+            to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._orbit_sat_commnicate_path[-2]])
             to_x /= cls._scale_rate
             to_y /= cls._scale_rate
             to_z /= cls._scale_rate
@@ -261,7 +299,7 @@ class Display:
     @classmethod
     def display(cls):      # sat_list: list, sat_commnicate_path, sat_commnicate_delay
         pygame.init()
-        display = (800, 600)
+        display = (1060, 800)
         screen = pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
         pygame.display.set_caption('Satellite Path Result')
         pygame.key.set_repeat(1, 10)    # allows press and hold of buttons

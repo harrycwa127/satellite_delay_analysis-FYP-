@@ -141,6 +141,9 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                         if temp > 0:
                             t = temp
                             end_path = True
+
+                            sat_commnicate_path.append("gs")
+                            sat_commnicate_delay.append(t)
                         else:
                             end_path = False
 
@@ -151,6 +154,7 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                     
             # wait 1 sec and check visibility again
             else:
+                    end_path = False
                     t += 1
                     sat_commnicate_path.append(-1)  # mean waiting
                     sat_commnicate_delay.append(t)
@@ -248,6 +252,9 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                         if temp > 0:
                             t = temp
                             end_path = True
+
+                            sat_commnicate_path.append("gs")
+                            sat_commnicate_delay.append(t)
                         else:
                             end_path = False
 
@@ -258,6 +265,7 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                     
             # wait 1 sec and check visibility again
             else:
+                    end_path = False
                     t += 1
                     sat_commnicate_path.append(-1)  # mean waiting
                     sat_commnicate_delay.append(t)
@@ -269,7 +277,6 @@ def orbit_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
 # Dijkstra
 def dijkstra_path_decision(sat_list: list, gd: Observation_class.Observation, gs: GroundStation_class.GroundStation):
     t = 0
-    dis = [len(sat_list)]
 
     imaging_sat = -1
     # search for all sat
@@ -283,37 +290,84 @@ def dijkstra_path_decision(sat_list: list, gd: Observation_class.Observation, gs
         print("No Satellite able to visit the observation point!!")
         sys.exit(-1)
 
-    su = [0] * len(sat_list)
-    su[imaging_sat] = 1
-    dis = [999999999999] * len(sat_list)
+    end_path = False
+    sat_commnicate_path = []
+    sat_commnicate_path.append(imaging_sat)
+    sat_commnicate_delay = []
+    sat_commnicate_delay.append(0)
+    sat_num = 0
 
-    for s in range(len(sat_list)):
-        if s != imaging_sat:
-            if visibility.is_sat_communicable(t, sat_list[imaging_sat], sat_list[s]):
-                dis[s] = satcompute.inter_sat_distance(t, sat_list[s], sat_list[imaging_sat])
+    while end_path == False:
+
+        su = [0] * len(sat_list)
+        su[sat_commnicate_path[0]] = 1
+        dis = [999999999999] * len(sat_list)
+        path = [[]]* len(sat_list)
+
+        for s in range(len(sat_list)):
+            if s != sat_commnicate_path[sat_num]:
+                if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
+                    dis[s] = satcompute.inter_sat_distance(t, sat_list[s], sat_list[sat_commnicate_path[sat_num]])
+                    path[s] = [sat_commnicate_path[sat_num], s]
 
 
-    # store the min distance from next satellite to gs
-    min_distance_sat = -1            # store the min distance satellite object index
+        for _ in range(len(sat_list)):      # avoid the sat not able to communicate
+            min_distance = 999999999999
+            min_distance_sat = -1            # store the min distance satellite object index
+            
+            for j in range(len(sat_list)): 
+                if su[j] == 0 and dis[j] < min_distance:
+                    min_distance = dis[j]
+                    min_distance_sat = j
 
-    for _ in range(len(sat_list)):      # avoid the sat not able to communicate
-        min_distance = 999999999999
-        
-        for j in range(len(sat_list)): 
-            if su[j] == 0 and dis[j] < min_distance:
-                min_distance = dis[j]
-                min_distance_sat = j
+            if min_distance_sat != -1:
+                su[min_distance_sat] = 1
 
-        su[min_distance_sat] = 1
+                for k in range(len(sat_list)):
+                    if k != min_distance_sat:
+                        if visibility.is_sat_communicable(t, sat_list[min_distance_sat], sat_list[k]):
+                            if dis[k] > dis[min_distance_sat] + satcompute.inter_sat_distance(t, sat_list[min_distance_sat], sat_list[k]):
+                                dis[k] = dis[min_distance_sat] + satcompute.inter_sat_distance(t, sat_list[min_distance_sat], sat_list[k])
+                                path[k] = path[min_distance_sat] + [k]
 
-        for k in range(len(sat_list)):
-            if k != min_distance_sat:
-                if visibility.is_sat_communicable(t, sat_list[min_distance_sat], sat_list[k]):
-                    if dis[k] > dis[min_distance_sat] + satcompute.inter_sat_distance(t, sat_list[min_distance_sat], sat_list[k]):
-                        dis[k] = dis[min_distance_sat] + satcompute.inter_sat_distance(t, sat_list[min_distance_sat], sat_list[k])
+        end = -1
+        for i in range(len(sat_list)):
+            if visibility.is_gs_communicable(t, sat_list[i], gs):
+                end = i
+                break
 
-    # return (sat_commnicate_path, sat_commnicate_delay)
-    for i in range(len(sat_list)):
-        if visibility.is_gs_communicable(t, sat_list[i], gs):
-            print(dis[i])
-            break
+        if len(path[end]) > 0:
+            for s in range(len(path[end])-1):
+                if visibility.is_sat_communicable(t, sat_list[path[end][s]], sat_list[path[end][s+1]]):
+                    temp = inter_sat_commnicate(t, sat_list[path[end][s]], sat_list[path[end][s+1]])
+                    if temp > 0:
+                        t = temp
+                        sat_commnicate_path.append(path[end][s+1])
+                        sat_num += 1
+
+                        sat_commnicate_delay.append(t)
+                        end_path = True
+
+                    else:
+                        # communicate fail, continuous looping, s as the start point
+                        end_path = False
+                        break
+                
+            if visibility.is_gs_communicable(t, sat_list[path[end][-1]], gs) == True:
+                temp = sat_ground_commnicate(t, sat_list[path[end][-1]], gs)
+                if temp > 0:
+                    t = temp
+                    end_path = True
+
+                    sat_commnicate_path.append("gs")
+                    sat_commnicate_delay.append(t)
+                else:
+                    end_path = False
+        else:
+            end_path = False
+            t += 1
+            sat_commnicate_path.append(-1)  # mean waiting
+            sat_commnicate_delay.append(t)
+            print("No other Satellites in the visibility, wait 1 sec.")
+
+    return (sat_commnicate_path, sat_commnicate_delay)

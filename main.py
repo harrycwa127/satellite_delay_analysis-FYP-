@@ -77,10 +77,12 @@ col_num = 5
 
 # array to store the path result
 astar_sat_commnicate_path, astar_sat_commnicate_delay = communication.astar_path_decision(sat_list, gd, gs)
+dijkstra_sat_commnicate_path, dijkstra_sat_commnicate_delay = communication.dijkstra_path_decision(sat_list, gd, gs)
 orbit_sat_commnicate_path, orbit_sat_commnicate_delay = communication.orbit_path_decision(sat_list, gd, gs, n)
-communication.dijkstra_path_decision(sat_list, gd, gs)
 
-
+print(astar_sat_commnicate_path)
+print(dijkstra_sat_commnicate_path)
+print(orbit_sat_commnicate_path)
 
 for i in range(len(astar_sat_commnicate_path)):
     if astar_sat_commnicate_path[i] == -1:
@@ -90,6 +92,12 @@ for i in range(len(astar_sat_commnicate_path)):
         sheet.write(col_num, 3, astar_sat_commnicate_delay[i])
 
         col_num += 1
+
+    elif astar_sat_commnicate_path[i] == "gs":
+        sheet.write(col_num, 0, "Ground Station")
+        sheet.write(col_num, 1, "Ground Station")
+        sheet.write(col_num, 2, 0)
+        sheet.write(col_num, 3, astar_sat_commnicate_delay[i])
 
     else:
         phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[astar_sat_commnicate_path[i]], t = astar_sat_commnicate_delay[i])
@@ -133,6 +141,12 @@ for i in range(len(orbit_sat_commnicate_path)):
 
         col_num += 1
 
+    elif orbit_sat_commnicate_path[i] == "gs":
+        sheet.write(col_num, 0, "Ground Station")
+        sheet.write(col_num, 1, "Ground Station")
+        sheet.write(col_num, 2, 0)
+        sheet.write(col_num, 3, orbit_sat_commnicate_delay[i])
+
     else:
         phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[orbit_sat_commnicate_path[i]], t = orbit_sat_commnicate_delay[i])
         phi = phi * (180/math.pi)
@@ -148,10 +162,59 @@ for i in range(len(orbit_sat_commnicate_path)):
 print("Total delay of the Orbit-Base Path is", orbit_sat_commnicate_delay[-1], "seconds.")
 
 
+sheet = book.add_sheet('dijkstra_analysis_result', cell_overwrite_ok=True)
+# write the data the obervation and ground station
+sheet.write(0, 1, "Latitude")
+sheet.write(0, 2, "Longitude")
+
+sheet.write(1, 0, "Observation Point")
+sheet.write(1, 1, math.degrees(gd.lat_rad))
+sheet.write(1, 2, math.degrees(gd.lon_rad))
+
+sheet.write(2, 0, "Ground Station")
+sheet.write(2, 1, math.degrees(gs.lat_rad))
+sheet.write(2, 2, math.degrees(gs.lon_rad))
+
+col = ('Satellite Latitude', 'Satellite Longitude', 'Satellite Altitude', 'Delay Time')
+for i in range(0, 4):
+    sheet.write(4, i, col[i])
+col_num = 5
+
+for i in range(len(dijkstra_sat_commnicate_path)):
+    if dijkstra_sat_commnicate_path[i] == -1:
+        sheet.write(col_num, 0, -1)
+        sheet.write(col_num, 1, -1)
+        sheet.write(col_num, 2, -1)
+        sheet.write(col_num, 3, dijkstra_sat_commnicate_delay[i])
+
+        col_num += 1
+
+    elif dijkstra_sat_commnicate_path[i] == "gs":
+        sheet.write(col_num, 0, "Ground Station")
+        sheet.write(col_num, 1, "Ground Station")
+        sheet.write(col_num, 2, 0)
+        sheet.write(col_num, 3, dijkstra_sat_commnicate_delay[i])
+
+    else:
+        phi, lam = satcompute.get_sat_lat_lon(sat = sat_list[dijkstra_sat_commnicate_path[i]], t = dijkstra_sat_commnicate_delay[i])
+        phi = phi * (180/math.pi)
+        lam = lam * (180/math.pi)
+        
+        sheet.write(col_num, 0, phi)
+        sheet.write(col_num, 1, lam)
+        sheet.write(col_num, 2, sat_list[dijkstra_sat_commnicate_path[i]].r)
+        sheet.write(col_num, 3, dijkstra_sat_commnicate_delay[i])
+
+        col_num += 1
+
+print("Total delay of the Orbit-Base Path is", dijkstra_sat_commnicate_delay[-1], "seconds.")
+
+
 end_time = time.time()
 print('overall time:',  end_time-start_time)
 book.save('results/analysis_result.xls')
 
 Display.set_point_info(gd, sat_list, astar_sat_commnicate_path, astar_sat_commnicate_delay,\
-                        orbit_sat_commnicate_path, orbit_sat_commnicate_delay, gs)
+                        orbit_sat_commnicate_path, orbit_sat_commnicate_delay,\
+                        dijkstra_sat_commnicate_path, dijkstra_sat_commnicate_delay, gs)
 Display.display()
