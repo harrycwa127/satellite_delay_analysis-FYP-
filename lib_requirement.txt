@@ -1,6 +1,0 @@
-numpy       1.23.3
-py          3.8+
-xlwt        1.3.0
-datetime    4.3
-pygame      2.01
-pyopengl    3.1.6
