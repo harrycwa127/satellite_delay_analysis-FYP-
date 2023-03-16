@@ -29,7 +29,6 @@ col_num = 1
 # init satellites
 off_nadir = math.radians(45)
 i_o = math.radians(97)
-e_o = 0
 omega_o = 0
 circle_o = 14
 n = 200       # number of sat
@@ -42,12 +41,12 @@ even_M = 360 / n
 for sat_id in range(n):
     M_o = math.radians(first_M + sat_id * even_M)
     # set current time to start time
-    s = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+    s = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, omega_o, M_o, circle_o, start_time_julian)
     
     sat_list = sat_list + [s]
 
 # 看能否通信
-target_sat = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, first_M, 10, start_time_julian)
+target_sat = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, omega_o, first_M, 10, start_time_julian)
 phi, lam = satcompute.get_sat_lat_lon(sat = target_sat, t = 0)
 for s in sat_list:
     # find out the lat lon

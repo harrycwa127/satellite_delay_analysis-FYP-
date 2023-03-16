@@ -11,7 +11,6 @@ class Satellite(object):
     current_julian = 0   # current julian time (day)
     i_o = 0              # inclination (rad)
     Omega_o = 0          # right ascension of ascending node (rad)
-    e_o = 0              # eccentricity
     omega_o = 0          # argument of perigee (rad)
     M_o = 0              # mean anomaly (rad)
     circle_o = 0         # mean motion (revolutions per day)
@@ -20,11 +19,10 @@ class Satellite(object):
     n_o = 0              # mean anomaly velocity (rad/s)
     r = 0                # radius of satellite at current time (m), inlcude the earth radius
 
-    def __init__(self, current_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian):
+    def __init__(self, current_julian, i_o, Omega_o, omega_o, M_o, circle_o, start_time_julian):
         self.current_julian = current_julian
         self.i_o = i_o
         self.Omega_o = Omega_o
-        self.e_o = e_o
         self.omega_o = omega_o
         self.circle_o = circle_o
         self.T_o = 86400/self.circle_o

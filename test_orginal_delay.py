@@ -24,7 +24,6 @@ gs = read_data.get_gs()
 # init satellite
 SimParameter.set_off_nadir(math.radians(45))
 i_o = math.radians(97)
-e_o = 0
 omega_o = 0
 circle_o = 14
 m = 9
@@ -40,7 +39,7 @@ for orbit_id in range(m):
     for sat_id in range(n):
         M_o = math.radians(first_M + sat_id * even_M)
         # set time to the start time
-        s = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+        s = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, omega_o, M_o, circle_o, start_time_julian)
         sat_list = sat_list + [s]
 
 

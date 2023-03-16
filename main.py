@@ -21,34 +21,35 @@ gd = read_data.get_observation2()
 # ---------read ground stations
 gs = read_data.get_gs()
 
+# init parameter for simulator
 # init satellite
 SimParameter.set_off_nadir(math.radians(45))
-i_o = math.radians(97)
-e_o = 0
-omega_o = 0
-circle_o = 14
-m = 9
-n = 25
+inclination = math.radians(97)
+argument_of_perigee = 0
+motion = 14   # mean motion (revolutions per day)
+orbit_size = 9  # define numbers of orbit
+sat_size = 25   # define numbers of satellite in each orbit
+
+# data commnication delay init
+SimParameter.set_buffer_delay(0.05)         # (sec, e.g. 0.05, 50 ms)
+SimParameter.set_process_delay(0.01)        # (sec, e.g. 0.01, 10 ms)
+SimParameter.set_package_size(56623104)     # (Bytes) 54 Mb, 
+SimParameter.set_data_rate(530579456)       # (Bytes/s) 506 Mb/s
+SimParameter.set_signal_speed(299792458)
 
 sat_list = []
 first_Omega = 0  # first right ascension of ascending node (rad)
-even_Omega = 180 / (m-1)
-for orbit_id in range(m):
+even_Omega = 180 / (orbit_size-1)
+for orbit_id in range(orbit_size):
     Omega_o = math.radians(first_Omega + orbit_id * even_Omega)
     first_M = 0  # first satellite posistion in the orbit
-    even_M = 360 / n
-    for sat_id in range(n):
+    even_M = 360 / sat_size
+    for sat_id in range(sat_size):
         M_o = math.radians(first_M + sat_id * even_M)
         # set time to the start time
-        s = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, e_o, omega_o, M_o, circle_o, start_time_julian)
+        s = Satellite_class.Satellite(start_time_julian, inclination, Omega_o, argument_of_perigee, M_o, motion, start_time_julian)
         sat_list = sat_list + [s]
 
-# data commnication delay init
-SimParameter.set_buffer_delay(0.05)        # (sec, e.g. 0.05, 50 ms)
-SimParameter.set_process_delay(0.01)        # (sec, e.g. 0.01, 10 ms)
-SimParameter.set_package_size(56623104)    # (Bytes) 54 Mb, 
-SimParameter.set_data_rate(530579456)       # (Bytes/s) 506 Mb/s
-SimParameter.set_signal_speed(299792458)
 
 # remove orginal output file
 if os.path.exists("results/analysis_result.xls"):
