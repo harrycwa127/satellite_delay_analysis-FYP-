@@ -50,38 +50,38 @@ class Display:
     # draw the total delay withＴｅｘｔ
     @classmethod
     def __draw_decription(cls):
-        font = pygame.font.SysFont('Comic Sans MS', 16)
+        font = pygame.font.SysFont('Comic Sans MS', 14)
 
-        height = 3
+        height = 2
 
         # Orbit
         textSurface = font.render("Orbit Base Path with Blue, Delay: " + str(cls._orbit_sat_commnicate_delay[-1]) + " sec", True, (0,191,255), (0, 0, 0))
         textData = pygame.image.tostring(textSurface, "RGBA", True)
-        glWindowPos2d(3, height)
+        glWindowPos2d(2, height)
         glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
         
-        height += 3 + textSurface.get_height()
+        height += 2 + textSurface.get_height()
 
         # Dijkstra
         textSurface = font.render("Dijkstra Path with Orange, Delay: " + str(cls._dijkstra_sat_commnicate_delay[-1]) + " sec", True, (255, 172, 28), (0, 0, 0))
         textData = pygame.image.tostring(textSurface, "RGBA", True)
-        glWindowPos2d(3, height)
+        glWindowPos2d(2, height)
         glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
 
-        height += 3 + textSurface.get_height()
+        height += 2 + textSurface.get_height()
 
         # A*
-        textSurface = font.render("A* Path with Red, Delay: " + str(cls._astar_sat_commnicate_delay[-1]) + " sec", True, (230, 0, 0), (0, 0, 0))
+        textSurface = font.render("A* Path with Red, Delay: " + str(cls._astar_sat_commnicate_delay[-1]) + " sec", True, (255, 0, 0), (0, 0, 0))
         textData = pygame.image.tostring(textSurface, "RGBA", True)
-        glWindowPos2d(5, height)
+        glWindowPos2d(2,height)
         glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
 
-        height += 3 + textSurface.get_height()
+        height += 2 + textSurface.get_height()
 
         # Original
         textSurface = font.render("The Original Satellite Delay: " + str(cls._oringal_time_delay) + " sec", True, (255, 255, 255), (0, 0, 0))
         textData = pygame.image.tostring(textSurface, "RGBA", True)
-        glWindowPos2d(3, height)
+        glWindowPos2d(2, height)
         glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
 
 
@@ -147,7 +147,7 @@ class Display:
             glTranslatef(x, y, z) # Move to the place
             # Put color'
             if s in cls._astar_sat_commnicate_path:
-                glColor3f(0.9, 0.0, 0.0) 
+                glColor3f(1.0, 0.0, 0.0) 
             elif s in cls._orbit_sat_commnicate_path:
                 glColor3f(0.0, 0.75, 1.0)
             elif s in cls._dijkstra_sat_commnicate_path:
@@ -197,7 +197,7 @@ class Display:
             from_z /= cls._scale_rate
             
             glBegin(GL_LINES)
-            glColor3f(0.9, 0.0, 0.0) #Put color
+            glColor3f(1.0, 0.0, 0.0) #Put color
             glVertex3f(to_x, to_y, to_z)
             glVertex3f(from_x, from_y, from_z)
             glEnd()
@@ -255,7 +255,7 @@ class Display:
         from_z /= cls._scale_rate
         
         glBegin(GL_LINES)
-        glColor3f(0.9, 0.0, 0.0) #Put color
+        glColor3f(1.0, 0.0, 0.0) #Put color
         glVertex3f(to_x, to_y, to_z)
         glVertex3f(from_x, from_y, from_z)
         glEnd()
@@ -299,7 +299,7 @@ class Display:
     @classmethod
     def display(cls):      # sat_list: list, sat_commnicate_path, sat_commnicate_delay
         pygame.init()
-        display = (1060, 800)
+        display = (800, 600)
         screen = pygame.display.set_mode(display, DOUBLEBUF | OPENGL)
         pygame.display.set_caption('Satellite Path Result')
         pygame.key.set_repeat(1, 10)    # allows press and hold of buttons
