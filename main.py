@@ -77,7 +77,7 @@ col_num = 5
 # array to store the path result
 astar_sat_commnicate_path, astar_sat_commnicate_delay = communication.astar_path_decision(sat_list, gd, gs)
 dijkstra_sat_commnicate_path, dijkstra_sat_commnicate_delay = communication.dijkstra_path_decision(sat_list, gd, gs)
-orbit_sat_commnicate_path, orbit_sat_commnicate_delay = communication.orbit_path_decision(sat_list, gd, gs, n)
+orbit_sat_commnicate_path, orbit_sat_commnicate_delay = communication.orbit_path_decision(sat_list, gd, gs, sat_size)
 
 for i in range(len(astar_sat_commnicate_path)):
     if astar_sat_commnicate_path[i] == -1:
