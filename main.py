@@ -7,7 +7,8 @@ from include import communication
 from include import read_data
 from include import satcompute
 from include.SimParameter_class import SimParameter
-from include.display_class import Display
+from include.Display_class import Display
+from include.Setting_class import Setting
 
 start_time = time.time()
 
@@ -21,33 +22,35 @@ gd = read_data.get_observation2()
 # ---------read ground stations
 gs = read_data.get_gs()
 
+# call Setting UI
+Setting.display()
+
 # init parameter for simulator
-# init satellite
-SimParameter.set_off_nadir(math.radians(45))
-inclination = math.radians(97)
-argument_of_perigee = 0
-motion = 14   # mean motion (revolutions per day)
-orbit_size = 9  # define numbers of orbit
-sat_size = 25   # define numbers of satellite in each orbit
+# SimParameter.set_off_nadir(math.radians(45))
+# inclination = math.radians(97)
+# argument_of_perigee = 0
+# motion = 14   # mean motion (revolutions per day)
+# orbit_size = 9  # define numbers of orbit
+# sat_size = 25   # define numbers of satellite in each orbit
 
 # data commnication delay init
-SimParameter.set_buffer_delay(0.05)         # (sec, e.g. 0.05, 50 ms)
-SimParameter.set_process_delay(0.01)        # (sec, e.g. 0.01, 10 ms)
-SimParameter.set_package_size(56623104)     # (Bytes) 54 Mb, 
-SimParameter.set_data_rate(530579456)       # (Bytes/s) 506 Mb/s
-SimParameter.set_signal_speed(299792458)
+# SimParameter.set_buffer_delay(0.05)         # (sec, e.g. 0.05, 50 ms)
+# SimParameter.set_process_delay(0.01)        # (sec, e.g. 0.01, 10 ms)
+# SimParameter.set_package_size(56623104)     # (Bytes) 54 Mb, 
+# SimParameter.set_data_rate(530579456)       # (Bytes/s) 506 Mb/s
+# SimParameter.set_signal_speed(299792458)    # (m/s)
 
 sat_list = []
 first_Omega = 0  # first right ascension of ascending node (rad)
-even_Omega = 180 / (orbit_size-1)
-for orbit_id in range(orbit_size):
+even_Omega = 180 / (Setting.orbit_size-1)
+for orbit_id in range(Setting.orbit_size):
     Omega_o = math.radians(first_Omega + orbit_id * even_Omega)
     first_M = 0  # first satellite posistion in the orbit
-    even_M = 360 / sat_size
-    for sat_id in range(sat_size):
+    even_M = 360 / Setting.sat_size
+    for sat_id in range(Setting.sat_size):
         M_o = math.radians(first_M + sat_id * even_M)
         # set time to the start time
-        s = Satellite_class.Satellite(start_time_julian, inclination, Omega_o, argument_of_perigee, M_o, motion, start_time_julian)
+        s = Satellite_class.Satellite(start_time_julian, Setting.inclination, Omega_o, Setting.argument_of_perigee, M_o, Setting.motion, start_time_julian)
         sat_list = sat_list + [s]
 
 
@@ -77,7 +80,7 @@ col_num = 5
 # array to store the path result
 astar_sat_commnicate_path, astar_sat_commnicate_delay = communication.astar_path_decision(sat_list, gd, gs)
 dijkstra_sat_commnicate_path, dijkstra_sat_commnicate_delay = communication.dijkstra_path_decision(sat_list, gd, gs)
-orbit_sat_commnicate_path, orbit_sat_commnicate_delay = communication.orbit_path_decision(sat_list, gd, gs, sat_size)
+orbit_sat_commnicate_path, orbit_sat_commnicate_delay = communication.orbit_path_decision(sat_list, gd, gs, Setting.sat_size)
 
 for i in range(len(astar_sat_commnicate_path)):
     if astar_sat_commnicate_path[i] == -1:
