@@ -26,14 +26,19 @@ gs = read_data.get_gs()
 Setting.display()
 
 # init parameter for simulator
-# SimParameter.set_off_nadir(math.radians(45))
-# inclination = math.radians(97)
-# argument_of_perigee = 0
-# motion = 14   # mean motion (revolutions per day)
-# orbit_size = 9  # define numbers of orbit
-# sat_size = 25   # define numbers of satellite in each orbit
+if Setting.inclination == -1:
+    Setting.inclination = math.radians(97)
+if Setting.argument_of_perigee == -1:
+    Setting.argument_of_perigee = 0
+if Setting.motion == -1:
+    Setting.motion = 14   # mean motion (revolutions per day)
+if Setting.orbit_size == -1:
+    Setting.orbit_size = 9  # define numbers of orbit
+if Setting.sat_size == -1:
+    Setting.sat_size = 25   # define numbers of satellite in each orbit
 
 # data commnication delay init
+# SimParameter.set_off_nadir(math.radians(45))
 # SimParameter.set_buffer_delay(0.05)         # (sec, e.g. 0.05, 50 ms)
 # SimParameter.set_process_delay(0.01)        # (sec, e.g. 0.01, 10 ms)
 # SimParameter.set_package_size(56623104)     # (Bytes) 54 Mb, 
