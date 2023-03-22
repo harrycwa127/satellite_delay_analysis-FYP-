@@ -12,8 +12,7 @@ from include.Setting_class import Setting
 start_time = time.time()
 
 # ---------read start time and end time
-start_time_julian, start_greenwich = read_data.get_start_julian_time()
-Setting.start_greenwich = start_greenwich
+
 
 
 # remove orginal output file
@@ -41,12 +40,12 @@ even_M = 360 / n
 for sat_id in range(n):
     M_o = math.radians(first_M + sat_id * even_M)
     # set current time to start time
-    s = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, omega_o, M_o, circle_o, start_time_julian)
+    s = Satellite_class.Satellite(Setting.start_time_julian, i_o, Omega_o, omega_o, M_o, circle_o, Setting.start_time_julian)
     
     sat_list = sat_list + [s]
 
 # 看能否通信
-target_sat = Satellite_class.Satellite(start_time_julian, i_o, Omega_o, omega_o, first_M, 10, start_time_julian)
+target_sat = Satellite_class.Satellite(Setting.start_time_julian, i_o, Omega_o, omega_o, first_M, 10, Setting.start_time_julian)
 phi, lam = satcompute.get_sat_lat_lon(sat = target_sat, t = 0)
 for s in sat_list:
     # find out the lat lon

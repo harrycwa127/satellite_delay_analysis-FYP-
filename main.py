@@ -11,10 +11,6 @@ from include.Setting_class import Setting
 
 start_time = time.time()
 
-# ---------read start time
-start_time_julian, start_greenwich = read_data.get_start_julian_time()
-Setting.start_greenwich = start_greenwich
-
 # obervation lat lon
 gd = read_data.get_observation2()
 
@@ -49,7 +45,7 @@ for orbit_id in range(Setting.orbit_size):
     for sat_id in range(Setting.sat_size):
         M_o = math.radians(first_M + sat_id * even_M)
         # set time to the start time
-        s = Satellite_class.Satellite(start_time_julian, Setting.inclination, Omega_o, Setting.argument_of_perigee, M_o, Setting.motion, start_time_julian)
+        s = Satellite_class.Satellite(Setting.start_time_julian, Setting.inclination, Omega_o, Setting.argument_of_perigee, M_o, Setting.motion, Setting.start_time_julian)
         sat_list = sat_list + [s]
 
 
