@@ -6,7 +6,6 @@ from include import Satellite_class
 from include import communication
 from include import read_data
 from include import satcompute
-from include.SimParameter_class import SimParameter
 from include.Display_class import Display
 from include.Setting_class import Setting
 
@@ -14,7 +13,7 @@ start_time = time.time()
 
 # ---------read start time
 start_time_julian, start_greenwich = read_data.get_start_julian_time()
-SimParameter.set_start_greenwich(start_greenwich)
+Setting.start_greenwich = start_greenwich
 
 # obervation lat lon
 gd = read_data.get_observation2()
@@ -26,24 +25,19 @@ gs = read_data.get_gs()
 Setting.display()
 
 # init parameter for simulator
-if Setting.inclination == -1:
-    Setting.inclination = math.radians(97)
-if Setting.argument_of_perigee == -1:
-    Setting.argument_of_perigee = 0
-if Setting.motion == -1:
-    Setting.motion = 14   # mean motion (revolutions per day)
-if Setting.orbit_size == -1:
-    Setting.orbit_size = 9  # define numbers of orbit
-if Setting.sat_size == -1:
-    Setting.sat_size = 25   # define numbers of satellite in each orbit
+# Setting.inclination = math.radians(97)
+# Setting.argument_of_perigee = 0
+# Setting.motion = 14   # mean motion (revolutions per day)
+# Setting.orbit_size = 9  # define numbers of orbit
+# Setting.sat_size = 25   # define numbers of satellite in each orbit
 
 # data commnication delay init
-# SimParameter.set_off_nadir(math.radians(45))
-# SimParameter.set_buffer_delay(0.05)         # (sec, e.g. 0.05, 50 ms)
-# SimParameter.set_process_delay(0.01)        # (sec, e.g. 0.01, 10 ms)
-# SimParameter.set_package_size(56623104)     # (Bytes) 54 Mb, 
-# SimParameter.set_data_rate(530579456)       # (Bytes/s) 506 Mb/s
-# SimParameter.set_signal_speed(299792458)    # (m/s)
+# Setting.off_nadir = math.radians(45)
+# Setting.buffer_delay = 0.05         # (sec, e.g. 0.05, 50 ms)
+# Setting.process_delay = 0.01        # (sec, e.g. 0.01, 10 ms)
+# Setting.package_size = 56623104     # (Bytes) 54 Mb, 
+# Setting.data_rate = 530579456       # (Bytes/s) 506 Mb/s
+# Setting.signal_speed = 299792458    # (m/s)
 
 sat_list = []
 first_Omega = 0  # first right ascension of ascending node (rad)

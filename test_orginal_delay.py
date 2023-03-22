@@ -7,13 +7,13 @@ from include import Satellite_class
 from include import visibility
 from include import read_data
 from include import satcompute
-from include.SimParameter_class import SimParameter
+from include.Setting_class import Setting
 
 start_time = time.time()
 
 # ---------read start time
 start_time_julian, start_greenwich = read_data.get_start_julian_time()
-SimParameter.set_start_greenwich(start_greenwich)
+Setting.start_greenwich = start_greenwich
 
 # obervation lat lon
 gd = read_data.get_observation2()
@@ -22,7 +22,7 @@ gd = read_data.get_observation2()
 gs = read_data.get_gs()
 
 # init satellite
-SimParameter.set_off_nadir(math.radians(45))
+Setting.off_nadir = math.radians(45)
 i_o = math.radians(97)
 omega_o = 0
 circle_o = 14
@@ -44,11 +44,11 @@ for orbit_id in range(m):
 
 
 # data commnication delay init
-SimParameter.set_buffer_delay(0.05)        # (sec, e.g. 0.05, 50 ms)
-SimParameter.set_process_delay(0.01)        # (sec, e.g. 0.01, 10 ms)
-SimParameter.set_package_size(56623104)    # (Bytes) 54 Mb, 
-SimParameter.set_data_rate(530579456)       # (Bytes/s) 506 Mb/s
-SimParameter.set_signal_speed(299792458)    # speed of radio, near the speed of light
+Setting.buffer_delay = 0.05        # (sec, e.g. 0.05, 50 ms)
+Setting.process_delay = 0.01        # (sec, e.g. 0.01, 10 ms)
+Setting.package_size = 56623104    # (Bytes) 54 Mb, 
+Setting.data_rate = 530579456       # (Bytes/s) 506 Mb/s
+Setting.signal_speed = 299792458    # speed of radio, near the speed of light
 
 # remove orginal output file
 if os.path.exists("results/orginal_method_result.xls"):

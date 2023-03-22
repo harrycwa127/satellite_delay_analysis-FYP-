@@ -5,8 +5,8 @@ from include import GroundStation_class
 from include import Observation_class
 from include import communication
 from include import visibility
-from include.SimParameter_class import SimParameter
 from typing  import Union
+from include.Setting_class import Setting
 
 
 # input：1.sat radius 2.right ascension of ascending node 3.(omega+f) 4.inclination of sat
@@ -47,7 +47,7 @@ def get_sat_lat_lon(sat: Satellite_class.Satellite, t):
     alpha = sat_alpha(r, sat.Omega_o, u, sat.i_o)
     delta = math.asin(math.sin(u) * math.sin(sat.i_o))
     phi = delta  # lat in time t
-    lam = alpha - (math.radians(SimParameter.get_start_greenwich()) + Satellite_class.omega_e * t) % (2 * math.pi)  # lon in time t
+    lam = alpha - (math.radians(Setting.start_greenwich) + Satellite_class.omega_e * t) % (2 * math.pi)  # lon in time t
     if lam > math.pi:
         lam = lam - 2 * math.pi
     if lam < -math.pi:
@@ -69,7 +69,7 @@ def get_sat_eci_xyz(t, sat: Satellite_class.Satellite):
 
 
 def get_ground_eci_xyz(t, ground: Union[GroundStation_class.GroundStation, Observation_class.Observation]):
-    u = (math.radians(SimParameter.get_start_greenwich()) + ground.lon_rad) % (2 * math.pi)
+    u = (math.radians(Setting.start_greenwich) + ground.lon_rad) % (2 * math.pi)
     alpha = (u + Satellite_class.omega_e * t) % (2 * math.pi)
 
     x = Satellite_class.Re * math.cos(ground.lat_rad) * math.cos(alpha)

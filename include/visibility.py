@@ -2,7 +2,7 @@ from include import Satellite_class
 from include import GroundStation_class
 from include import satcompute
 from include import Observation_class
-from include.SimParameter_class import SimParameter
+from include.Setting_class import Setting
 import math
 
 
@@ -18,7 +18,7 @@ def is_observation_visible(t, satellite: Satellite_class.Satellite, gd: Observat
     cos_psi = math.cos(gd.lat_rad) * math.cos(phi) * math.cos(theta) + math.sin(gd.lat_rad) * math.sin(phi)
     psi = math.acos(cos_psi)
     beta = math.atan(Satellite_class.Re * math.sin(psi) / (satellite.r - Satellite_class.Re * math.cos(psi)))  # off nadir angle, 注意atan得到的是[-pi/2,pi/2]
-    if cos_psi > Satellite_class.Re / satellite.r and beta <= SimParameter.get_off_nadir():
+    if cos_psi > Satellite_class.Re / satellite.r and beta <= Setting.off_nadir:
         return True
     else:
         return False

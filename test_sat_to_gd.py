@@ -6,21 +6,21 @@ from include import Satellite_class
 from include import satcompute
 from include import visibility
 from include import read_data
-from include.SimParameter_class import SimParameter
+from include.Setting_class import Setting
 
 
 start_time = time.time()
 
 # ---------read start time
 start_time_julian, start_greenwich = read_data.get_start_julian_time()
-SimParameter.set_start_greenwich(start_greenwich)
+Setting.start_greenwich = start_greenwich
 
 
 # obervation lat lon
 gd_list = read_data.get_observation()
 
 # init satellite
-SimParameter.set_off_nadir(math.radians(45))
+Setting.off_nadir = math.radians(45)
 i_o = math.radians(97)
 omega_o = 0
 circle_o = 14

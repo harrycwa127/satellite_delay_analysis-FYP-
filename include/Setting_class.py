@@ -1,13 +1,24 @@
 import tkinter as tk
 import math
-from include.SimParameter_class import SimParameter
+from include import read_data
 
 class Setting:
-    inclination = -1
-    argument_of_perigee = -1
-    motion = -1
-    orbit_size = -1
-    sat_size = -1
+    # sat parameter
+    inclination: float = math.radians(97)
+    argument_of_perigee: float = 0
+    motion: float = 14
+    orbit_size: float = 9
+    sat_size: float = 25
+
+    off_nadir: float = math.radians(45)
+    package_size: float = 56623104
+    data_rate: float = 530579456
+    signal_speed: float = 299792458
+    buffer_delay: float = 0.01
+    process_delay: float = 0.05
+    start_time_julian, start_greenwich = read_data.get_start_julian_time()
+
+    
 
     @classmethod
     def display(cls):
@@ -100,12 +111,12 @@ class Setting:
     @classmethod
     def submit(cls):
         # Retrieve the parameter values from the input fields
-        SimParameter.set_off_nadir(math.radians(int(cls.off_nadir_input.get())))
-        SimParameter.set_package_size(int(cls.package_size_input.get()))
-        SimParameter.set_data_rate(int(cls.data_rate_input.get()))
-        SimParameter.set_signal_speed(int(cls.signal_speed_input.get()))
-        SimParameter.set_process_delay(float(cls.process_delay_input.get()))
-        SimParameter.set_buffer_delay(float(cls.buffer_delay_input.get()))
+        cls.off_nadir = math.radians(int(cls.off_nadir_input.get()))
+        cls.package_size = int(cls.package_size_input.get())
+        cls.data_rate = int(cls.data_rate_input.get())
+        cls.signal_speed = int(cls.signal_speed_input.get())
+        cls.process_delay = float(cls.process_delay_input.get())
+        cls.buffer_delay = float(cls.buffer_delay_input.get())
         
         cls.inclination = math.radians(int(cls.inclination_input.get()))
         cls.argument_of_perigee = math.radians(int(cls.argument_of_perigee_input.get()))
@@ -113,5 +124,3 @@ class Setting:
         cls.orbit_size = int(cls.orbit_size_input.get())
         cls.sat_size = int(cls.sat_size_input.get())
         cls.window.destroy()
-
-# input_ui = SettingUI()

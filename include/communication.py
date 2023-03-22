@@ -3,7 +3,7 @@ from include import satcompute
 from include import GroundStation_class
 from include import visibility
 from include import Observation_class
-from include.SimParameter_class import SimParameter
+from include.Setting_class import Setting
 import sys
 
 
@@ -25,13 +25,13 @@ import sys
 # reference https://www.researchgate.net/publication/1961144_Analysis_and_Simulation_of_Delay_and_Buffer_Requirements_of_satellite-ATM_Networks_for_TCPIP_Traffic
 
 def inter_sat_commnicate(t, from_sat: Satellite_class.Satellite, to_sat: Satellite_class.Satellite) -> float:
-    transmit_delay = SimParameter.get_package_size() / SimParameter.get_data_rate()
+    transmit_delay = Setting.package_size / Setting.data_rate
 
     inter_sat_distance = satcompute.inter_sat_distance(t, from_sat, to_sat)
 
-    propagation_delay = inter_sat_distance / SimParameter.get_signal_speed()   # radio speed near speed of light, 299,792,458 m per second, value in signal_speed is m/s
+    propagation_delay = inter_sat_distance / Setting.signal_speed   # radio speed near speed of light, 299,792,458 m per second, value in signal_speed is m/s
 
-    total_delay = transmit_delay + propagation_delay + SimParameter.get_buffer_delay() + SimParameter.get_process_delay()
+    total_delay = transmit_delay + propagation_delay + Setting.buffer_delay + Setting.process_delay
     final_t = t + total_delay
 
     if visibility.is_sat_communicable(final_t, from_sat, to_sat):
@@ -54,13 +54,13 @@ def inter_sat_commnicate(t, from_sat: Satellite_class.Satellite, to_sat: Satelli
 
 def sat_ground_commnicate(t, sat: Satellite_class.Satellite, ground_station: GroundStation_class.GroundStation) -> float:
 
-    transmit_delay = SimParameter.get_package_size() / SimParameter.get_data_rate()
+    transmit_delay = Setting.package_size / Setting.data_rate
 
     distance = satcompute.sat_ground_distance(t, sat, ground_station)
 
-    propagation_delay = distance / SimParameter.get_signal_speed()        # radio speed near speed of light, 299,792,458 m per second, value in signal_speed is m/s
+    propagation_delay = distance / Setting.signal_speed        # radio speed near speed of light, 299,792,458 m per second, value in signal_speed is m/s
 
-    total_delay  = transmit_delay + propagation_delay + SimParameter.get_buffer_delay() + SimParameter.get_process_delay()
+    total_delay  = transmit_delay + propagation_delay + Setting.buffer_delay + Setting.process_delay
     final_t = t + total_delay
 
     if visibility.is_gs_communicable(final_t, sat, ground_station):
