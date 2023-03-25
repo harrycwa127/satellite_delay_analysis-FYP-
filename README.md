@@ -29,11 +29,13 @@ py main.py
 ```
 
 For install the python liburay run the following command in the project directory.
+
 ```
 pip install -r "requirements.txt"
 ```
 
 ### Execute
+
 At the project directory, run the main.py file to start the Simulator, comment as below.
 
 ```
@@ -42,6 +44,8 @@ python main.py
 
 After starting the Simulator, a window with default value is created to set up the parameter.
 ![Setting Window](readme_img/settingUI.png)
+
+
 After setting the parameter, click submit to start Simulator
 
 if want to disable the Setting Window, please open the main.py and follow the step below.
@@ -60,4 +64,4 @@ if want to disable the Setting Window, please open the main.py and follow the st
 After the Simulator is started, the result window will be popup as below.
 ![Setting Window](readme_img/path.png)
 
-The detail data will be stored as analysis result.xls in the results folder.
+The detailed data will be stored as analysis result.xls in the results folder.
