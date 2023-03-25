@@ -17,7 +17,7 @@ def get_start_julian_time():
 
 def get_observation():
     gd_lines = []
-    obs_f = open('settings/OBSERVATION.txt', 'r')
+    obs_f = open('settings/test_OBSERVATION.txt', 'r')
     for line in obs_f.readlines():
         gd_lines.append(line.split(' '))
     obs_f.close()
@@ -35,7 +35,7 @@ def get_observation():
 
 def get_observation2():
     gd_lines = []
-    obs_f = open('settings/OBSERVATION2.txt', 'r')
+    obs_f = open('settings/main_OBSERVATION.txt', 'r')
     for line in obs_f.readlines():
         gd_lines.append(line.split(' '))
     obs_f.close()
@@ -49,7 +49,7 @@ def get_observation2():
 
 def get_select_gs():
     gs_lines = []
-    input_f2 = open('settings/SELECT_GROUND_STATION.txt', 'r')
+    input_f2 = open('settings/test_GROUND_STATION.txt', 'r')
     for line in input_f2.readlines():
         tmpl = line.strip()
         gs_lines.append(tmpl.split(' '))
@@ -73,7 +73,7 @@ def get_select_gs():
 
 def get_gs():
     gs_lines = []
-    input_f2 = open('settings/GROUND_STATION.txt', 'r')
+    input_f2 = open('settings/main_GROUND_STATION.txt', 'r')
     for line in input_f2.readlines():
         tmpl = line.strip()
         gs_lines.append(tmpl.split(' '))
