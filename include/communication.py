@@ -99,6 +99,7 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
     sat_commnicate_delay = []
     sat_commnicate_delay.append(0)
     sat_num = 0         #index of the last element in sat_commnicate_path and sat_commnicate_delay
+    cost = 0
 
     end_path = False
     while end_path == False:
@@ -116,8 +117,7 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                         distance = satcompute.sat_ground_distance(t, sat_list[s], gs)
 
                         # add the cost
-                        for i in range(sat_num):
-                            distance += satcompute.inter_sat_distance(t, sat_list[sat_commnicate_path[i]], sat_list[sat_commnicate_path[i+1]])
+                        distance += cost
                         
                         if distance < min_distance:
                             min_distance = distance
@@ -132,6 +132,7 @@ def astar_path_decision(sat_list: list, gd: Observation_class.Observation, gs: G
                     sat_commnicate_path.append(min_distance_sat)
                     sat_num += 1
                     ignore = False
+                    cost += min_distance
 
                     # insert delay
                     sat_commnicate_delay.append(t)
