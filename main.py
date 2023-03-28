@@ -18,21 +18,21 @@ gd = read_data.get_observation2()
 gs = read_data.get_gs()
 
 # call Setting UI
-# Setting.display()
+Setting.display()
 
 # init parameter for simulator
-Setting.inclination = math.radians(97)
-Setting.argument_of_perigee = 0
-Setting.motion = 14   # mean motion (revolutions per day)
-Setting.orbit_size = 9  # define numbers of orbit
-Setting.sat_size = 25   # define numbers of satellite in each orbit
+# Setting.inclination = math.radians(97)
+# Setting.argument_of_perigee = 0
+# Setting.motion = 14   # mean motion (revolutions per day)
+# Setting.orbit_size = 9  # define numbers of orbit
+# Setting.sat_size = 25   # define numbers of satellite in each orbit
 
-Setting.off_nadir = math.radians(45)
-Setting.buffer_delay = 0.05         # (sec, e.g. 0.05, 50 ms)
-Setting.process_delay = 0.01        # (sec, e.g. 0.01, 10 ms)
-Setting.package_size = 56623104     # (Bytes) 54 Mb, 
-Setting.data_rate = 530579456       # (Bytes/s) 506 Mb/s
-Setting.signal_speed = 299792458    # (m/s)
+# Setting.off_nadir = math.radians(45)
+# Setting.buffer_delay = 0.05         # (sec, e.g. 0.05, 50 ms)
+# Setting.process_delay = 0.01        # (sec, e.g. 0.01, 10 ms)
+# Setting.package_size = 56623104     # (Bytes) 54 Mb, 
+# Setting.data_rate = 530579456       # (Bytes/s) 506 Mb/s
+# Setting.signal_speed = 299792458    # (m/s)
 
 sat_list = []
 first_Omega = 0  # first right ascension of ascending node (rad)
