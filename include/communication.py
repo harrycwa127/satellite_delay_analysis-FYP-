@@ -305,13 +305,19 @@ def dijkstra_path_decision(sat_list: list, gd: Observation_class.Observation, gs
         dis = [999999999999] * len(sat_list)
         path = [[]]* len(sat_list)
 
+        end = -1
+        for i in range(len(sat_list)):
+            if visibility.is_gs_communicable(t, sat_list[i], gs):
+                end = i
+                break
+
         for s in range(len(sat_list)):
             if s != sat_commnicate_path[sat_num]:
                 if visibility.is_sat_communicable(t, sat_list[sat_commnicate_path[sat_num]], sat_list[s]):
                     dis[s] = satcompute.inter_sat_distance(t, sat_list[s], sat_list[sat_commnicate_path[sat_num]])
                     path[s] = [sat_commnicate_path[sat_num], s]
 
-
+        find_path = False
         for _ in range(len(sat_list)):      # avoid the sat not able to communicate
             min_distance = 999999999999
             min_distance_sat = -1            # store the min distance satellite object index
@@ -331,10 +337,11 @@ def dijkstra_path_decision(sat_list: list, gd: Observation_class.Observation, gs
                                 dis[k] = dis[min_distance_sat] + satcompute.inter_sat_distance(t, sat_list[min_distance_sat], sat_list[k])
                                 path[k] = path[min_distance_sat] + [k]
 
-        end = -1
-        for i in range(len(sat_list)):
-            if visibility.is_gs_communicable(t, sat_list[i], gs):
-                end = i
+                            if k == end:
+                                find_path = True
+                                break
+            
+            if find_path == True:
                 break
 
         if len(path[end]) > 0:
