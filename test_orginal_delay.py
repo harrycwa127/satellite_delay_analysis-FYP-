@@ -30,7 +30,7 @@ n = 25
 
 sat_list = []
 first_Omega = 0  # first right ascension of ascending node (rad)
-even_Omega = 180 / (m-1)
+even_Omega = 180 / m
 for orbit_id in range(m):
     Omega_o = math.radians(first_Omega + orbit_id * even_Omega)
     first_M = 0  # first satellite posistion in the orbit

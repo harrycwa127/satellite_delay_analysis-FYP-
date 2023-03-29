@@ -11,6 +11,7 @@ from include import Satellite_class
 from include import GroundStation_class
 from include import Observation_class
 from include import satcompute
+from include.Setting_class import Setting
 
 class Display:
     _sat_list = []
@@ -63,7 +64,7 @@ class Display:
         height += 2 + textSurface.get_height()
 
         # Dijkstra
-        textSurface = font.render("Dijkstra Path with Orange, Delay: " + str(cls._dijkstra_sat_commnicate_delay[-1]) + " sec", True, (255, 172, 28), (0, 0, 0))
+        textSurface = font.render("Dijkstra Path with Orange, Delay: " + str(cls._dijkstra_sat_commnicate_delay[-1]) + " sec", True, (255, 51, 255), (0, 0, 0))
         textData = pygame.image.tostring(textSurface, "RGBA", True)
         glWindowPos2d(2, height)
         glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
@@ -127,7 +128,7 @@ class Display:
 
         glPushMatrix()
         glTranslatef(x, y, z)       # Move to the place
-        glColor3f(1.0, 0.6, 0.1)    # Put color
+        glColor3f(1.0, 0.2, 1.0)    # Put color
         gluSphere(cls._qobj, 0.1, 20, 20)  # may set to sat_class.Re
         glPopMatrix()
 
@@ -151,12 +152,58 @@ class Display:
             elif s in cls._orbit_sat_commnicate_path:
                 glColor3f(0.0, 0.75, 1.0)
             elif s in cls._dijkstra_sat_commnicate_path:
-                glColor3f(1.0, 0.6, 0.1) 
+                glColor3f(1.0, 0.2, 1.0) 
             else:
                 glColor3f(0.0, 0.8, 0.0)
 
             gluSphere(cls._qobj, 0.1, 20, 20)  # may set to sat_class.Re
 
+            glPopMatrix()
+
+
+    @classmethod
+    def __draw_orbit(cls):
+        glLineWidth(0.5)
+        orbit_num = len(cls._sat_list)//Setting.sat_size
+        for orbit_id in range(orbit_num):
+            for sat_id in range(Setting.sat_size-1):
+                s = orbit_id * Setting.sat_size + sat_id
+                glPushMatrix()
+
+                to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[s])
+                to_x /= cls._scale_rate
+                to_y /= cls._scale_rate
+                to_z /= cls._scale_rate
+
+                from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[s+1])
+                from_x /= cls._scale_rate
+                from_y /= cls._scale_rate
+                from_z /= cls._scale_rate
+                
+                glBegin(GL_LINES)
+                glColor3f(0.0, 0.8, 0.0) #Put color
+                glVertex3f(to_x, to_y, to_z)
+                glVertex3f(from_x, from_y, from_z)
+                glEnd()
+                glPopMatrix()
+
+            glPushMatrix()
+
+            to_x, to_y, to_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[s+1])
+            to_x /= cls._scale_rate
+            to_y /= cls._scale_rate
+            to_z /= cls._scale_rate
+
+            from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[orbit_id * Setting.sat_size])
+            from_x /= cls._scale_rate
+            from_y /= cls._scale_rate
+            from_z /= cls._scale_rate
+            
+            glBegin(GL_LINES)
+            glColor3f(0.0, 0.8, 0.0) #Put color
+            glVertex3f(to_x, to_y, to_z)
+            glVertex3f(from_x, from_y, from_z)
+            glEnd()
             glPopMatrix()
 
     
@@ -177,7 +224,7 @@ class Display:
         from_z /= cls._scale_rate
         
         glBegin(GL_LINES)
-        glColor3f(1.0, 0.6, 0.1) #Put color
+        glColor3f(1.0, 0.2, 1.0) #Put color
         glVertex3f(to_x, to_y, to_z)
         glVertex3f(from_x, from_y, from_z)
         glEnd()
@@ -216,7 +263,7 @@ class Display:
             from_z /= cls._scale_rate
             
             glBegin(GL_LINES)
-            glColor3f(1.0, 0.6, 0.1) #Put color
+            glColor3f(1.0, 0.2, 1.0) #Put color
             glVertex3f(to_x, to_y, to_z)
             glVertex3f(from_x, from_y, from_z)
             glEnd()
@@ -274,7 +321,7 @@ class Display:
             from_z /= cls._scale_rate
             
             glBegin(GL_LINES)
-            glColor3f(1.0, 0.6, 0.1) #Put color
+            glColor3f(1.0, 0.2, 1.0) #Put color
             glVertex3f(to_x, to_y, to_z)
             glVertex3f(from_x, from_y, from_z)
             glEnd()
@@ -402,6 +449,8 @@ class Display:
             cls.__draw_ground()
 
             cls.__draw_sat()
+
+            cls.__draw_orbit()
 
             cls.__draw_path()
 
