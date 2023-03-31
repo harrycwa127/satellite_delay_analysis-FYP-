@@ -116,7 +116,7 @@ class Display:
 
         glPushMatrix()
         glTranslatef(x, y, z)       # Move to the place
-        glColor3f(0.8, 0.0, 0.8)    # Put color
+        glColor3f(0.8, 0.4, 0.0)    # Put color
         gluSphere(cls._qobj, 0.1, 20, 20)  # may set to sat_class.Re
         glPopMatrix()
 
@@ -128,7 +128,7 @@ class Display:
 
         glPushMatrix()
         glTranslatef(x, y, z)       # Move to the place
-        glColor3f(1.0, 0.2, 1.0)    # Put color
+        glColor3f(0.6, 0.2, 1.0)    # Put color
         gluSphere(cls._qobj, 0.1, 20, 20)  # may set to sat_class.Re
         glPopMatrix()
 
@@ -156,7 +156,7 @@ class Display:
             else:
                 glColor3f(0.0, 0.8, 0.0)
 
-            gluSphere(cls._qobj, 0.1, 20, 20)  # may set to sat_class.Re
+            gluSphere(cls._qobj, 0.1, 20, 20)
 
             glPopMatrix()
 
@@ -218,7 +218,7 @@ class Display:
         to_y /= cls._scale_rate
         to_z /= cls._scale_rate
 
-        from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._dijkstra_sat_commnicate_path[0]])
+        from_x, from_y, from_z = satcompute.get_sat_eci_xyz(0, cls._sat_list[cls._astar_sat_commnicate_path[0]])
         from_x /= cls._scale_rate
         from_y /= cls._scale_rate
         from_z /= cls._scale_rate
