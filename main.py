@@ -76,6 +76,8 @@ astar_sat_commnicate_path, astar_sat_commnicate_delay = communication.astar_path
 dijkstra_sat_commnicate_path, dijkstra_sat_commnicate_delay = communication.dijkstra_path_decision(sat_list, gd, gs)
 orbit_sat_commnicate_path, orbit_sat_commnicate_delay = communication.orbit_path_decision(sat_list, gd, gs, Setting.sat_size)
 
+print("Total delay of the Orginal Satellite Method is", satcompute.sat_original_delay(gd, sat_list[astar_sat_commnicate_path[0]], gs), "seconds.")
+
 for i in range(len(astar_sat_commnicate_path)):
     if astar_sat_commnicate_path[i] == -1:
         sheet.write(col_num, 0, -1)
@@ -108,7 +110,7 @@ for i in range(len(astar_sat_commnicate_path)):
         sheet.write(col_num, 3, astar_sat_commnicate_delay[i])
 
         col_num += 1
-
+        
 print("Total delay of the A* Path is", astar_sat_commnicate_delay[-1], "seconds.")
 
 
@@ -217,6 +219,8 @@ for i in range(len(orbit_sat_commnicate_path)):
         col_num += 1
 
 print("Total delay of the Orbit-Base Path is", orbit_sat_commnicate_delay[-1], "seconds.")
+
+
 
 
 end_time = time.time()
