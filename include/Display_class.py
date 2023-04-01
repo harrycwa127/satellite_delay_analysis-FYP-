@@ -80,7 +80,7 @@ class Display:
         height += 2 + textSurface.get_height()
 
         # Original
-        textSurface = font.render("The Original Satellite Delay: " + str(cls._oringal_time_delay) + " sec", True, (255, 255, 255), (0, 0, 0))
+        textSurface = font.render("The Traditional Method Delay: " + str(cls._oringal_time_delay) + " sec", True, (255, 255, 255), (0, 0, 0))
         textData = pygame.image.tostring(textSurface, "RGBA", True)
         glWindowPos2d(2, height)
         glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
