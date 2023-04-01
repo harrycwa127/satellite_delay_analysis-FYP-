@@ -110,19 +110,20 @@ def sat_original_delay(gd:Observation_class.Observation, sat: Satellite_class.Sa
         while visibility.is_observation_visible(t, sat, gd) == False:
             t += 1
 
-        t -= 1
-        while visibility.is_observation_visible(t, sat, gd) == False:
-            t+=0.01
-        
+        while visibility.is_observation_visible(t, sat, gd) == True and t >= 0:
+            t-= 0.01
+
+        t += 0.01
     
     # find time can commnicate with, in sec
     while visibility.is_gs_communicable(t, sat, gs) == False:
         t += 1
 
     # rollback 1 sec and find time in 0.01
-    t -= 1
-    while visibility.is_gs_communicable(t, sat, gs) == False:
-        t+=0.01
+    while visibility.is_gs_communicable(t, sat, gs) == True and t >= 0:
+        t-=0.01
+
+    t += 0.01
 
     communication_end = False
     total_t = t
@@ -133,8 +134,7 @@ def sat_original_delay(gd:Observation_class.Observation, sat: Satellite_class.Sa
             communication_end = True
         else:
             t -= 0.001
-            communication_end = False
-            
+
             if total_t - t > 1:
                 print("Satellite Orginal Communication Fail!!")
                 return -1
