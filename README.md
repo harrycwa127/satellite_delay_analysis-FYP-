@@ -15,7 +15,7 @@ To Set up the parameter of the Simulator. A settings folder contains the setting
 | Setting file name       | description                                                                      | format                                               |
 | ----------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | main_GROUND_STATION.txt | use for simulator, contain only one ground station as the point data transfer to | Latitude(degree) Longitude(degree) elevation(degree) |
-| main_OBSERVATION.text   | use for simulator, contain only one observation point as the poin to observe    | Latitude(degree) Longitude(degree)                   |
+| main_OBSERVATION.txt    | use for simulator, contain only one observation point as the point to observe   | Latitude(degree) Longitude(degree)                   |
 | test_GROUND_STATION.txt | use for testing. contain a ground station list                                   | Latitude(degree) Longitude(degree) elevation(degree) |
 | test_OBSERVATION.txt    | use for testing, contain a observation points list as the poin to observe        | Latitude(degree) Longitude(degree)                   |
 | TIME_INTERVAL.txt       | use for simulator and testing, define the datetime of simulator                 | yyyy MM dd hh mm ss                                  |
@@ -44,7 +44,6 @@ python main.py
 
 After starting the Simulator, a window with default value is created to set up the parameter.
 ![Setting Window](readme_img/settingUI.png)
-
 
 After setting the parameter, click submit to start Simulator
 

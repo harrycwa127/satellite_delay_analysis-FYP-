@@ -18,7 +18,7 @@ start_time = time.time()
 gd = read_data.get_observation2()
 
 # ---------read ground stations
-gs = read_data.get_gs()
+gs = read_data.get_select_gs()
 
 # init satellite
 Setting.off_nadir = math.radians(45)
@@ -38,7 +38,7 @@ for orbit_id in range(m):
     for sat_id in range(n):
         M_o = math.radians(first_M + sat_id * even_M)
         # set time to the start time
-        s = Satellite_class.Satellite(Setting.start_time_julian, i_o, Omega_o, omega_o, M_o, circle_o, Setting.start_time_julian)
+        s = Satellite_class.Satellite(Omega_o, M_o, Setting.start_time_julian)
         sat_list = sat_list + [s]
 
 

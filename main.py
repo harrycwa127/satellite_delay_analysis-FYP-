@@ -23,7 +23,7 @@ gs = read_data.get_gs()
 # init parameter for simulator
 Setting.inclination = math.radians(97)
 Setting.argument_of_perigee = 0
-Setting.motion = 13   # mean motion (revolutions per day)
+Setting.motion = 13   # mean motion (revolutions per day, <15)
 Setting.orbit_size = 9  # define numbers of orbit
 Setting.sat_size = 25   # define numbers of satellite in each orbit
 
@@ -44,7 +44,7 @@ for orbit_id in range(Setting.orbit_size):
     for sat_id in range(Setting.sat_size):
         M_o = math.radians(first_M + sat_id * even_M)
         # set time to the start time
-        s = Satellite_class.Satellite(Setting.start_time_julian, Setting.inclination, Omega_o, Setting.argument_of_perigee, M_o, Setting.motion, Setting.start_time_julian)
+        s = Satellite_class.Satellite(Omega_o, M_o, Setting.start_time_julian)
         sat_list = sat_list + [s]
 
 

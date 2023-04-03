@@ -1,4 +1,5 @@
 import math
+from include.Setting_class import Setting
 
 # ---------constant value(orbit is circle)
 miu = 3.9860047e14            # earth gravity (m^3/s^2)
@@ -19,15 +20,15 @@ class Satellite(object):
     n_o = 0              # mean anomaly velocity (rad/s)
     r = 0                # radius of satellite at current time (m), inlcude the earth radius
 
-    def __init__(self, current_julian, i_o, Omega_o, omega_o, M_o, circle_o, start_time_julian):
-        self.current_julian = current_julian
-        self.i_o = i_o
+    def __init__(self, Omega_o, M_o, start_time_julian):
+        self.current_julian = Setting.start_time_julian
+        self.i_o = Setting.inclination
         self.Omega_o = Omega_o
-        self.omega_o = omega_o
-        self.circle_o = circle_o
+        self.omega_o = Setting.argument_of_perigee
+        self.circle_o = Setting.motion
         self.T_o = 86400/self.circle_o
         self.n_o = 2 * math.pi / self.T_o
-        self.M_o = (M_o + self.n_o * (start_time_julian - current_julian) * 86400) % (2 * math.pi)
+        self.M_o = (M_o + self.n_o * (start_time_julian - self.current_julian) * 86400) % (2 * math.pi)
         self.a_o = (miu * self.T_o * self.T_o / 4 / math.pi / math.pi) ** (1 / 3)
         self.r = self.a_o
 

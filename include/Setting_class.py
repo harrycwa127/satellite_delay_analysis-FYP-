@@ -44,7 +44,7 @@ class Setting:
         cls.argument_of_perigee_input.insert(0, "0")
         cls.argument_of_perigee_input.grid(row=2, column=1)
 
-        cls.motion_label = tk.Label(cls.window, text="Satellite Motion (Revolutions/Day): ", anchor=tk.E, font=font, width=32, pady=3)
+        cls.motion_label = tk.Label(cls.window, text="Satellite Motion (Revolutions/Day, <15): ", anchor=tk.E, font=font, width=32, pady=3)
         cls.motion_label.grid(row=3, column=0)
         cls.motion_input = tk.Entry(cls.window, font=font, width=32)
         cls.motion_input.insert(0, "14")
