@@ -26,6 +26,12 @@ def get_observation():
     for g in range(gd_accounts):
         region_lat = float(gd_lines[g][0])
         region_long = float(gd_lines[g][1])
+        
+        if region_long < 0:
+            region_long = 360 + region_long
+        if region_lat < 0:
+            region_lat = 360 + region_lat
+
         region_lat_rad = math.radians(region_lat)       # rad
         region_lon_rad = math.radians(region_long)     # rad
         gd = Observation_class.Observation(region_lat_rad, region_lon_rad)
@@ -41,6 +47,12 @@ def get_observation2():
     obs_f.close()
     region_lat = float(gd_lines[0][0])
     region_long = float(gd_lines[0][1])
+
+    if region_long < 0:
+        region_long = 360 + region_long
+    if region_lat < 0:
+        region_lat = 360 + region_lat
+
     region_lat_rad = math.radians(region_lat)       # rad
     region_lon_rad = math.radians(region_long)     # rad
     gd = Observation_class.Observation(region_lat_rad, region_lon_rad)
@@ -61,8 +73,9 @@ def get_select_gs():
         gs_long = float(gs_lines[g][1])
         if gs_long < 0:
             gs_long = 360 + gs_long
-        gs_ele = float(gs_lines[g][2])
-        # gs_ele = 10
+        if gs_lat < 0:
+            gs_lat = 360 + gs_lat
+        gs_ele = 10
         gs_lat_rad = math.radians(gs_lat)  # rad
         gs_lon_rad = math.radians(gs_long)  # rad
         gs_ele_rad = math.radians(gs_ele)  # rad
@@ -83,6 +96,8 @@ def get_gs():
     gs_long = float(gs_lines[0][1])
     if gs_long < 0:
         gs_long = 360 + gs_long
+    if gs_lat < 0:
+        gs_lat = 360 + gs_lat
     gs_ele = float(gs_lines[0][2])
     # gs_ele = 10
     gs_lat_rad = math.radians(gs_lat)  # rad

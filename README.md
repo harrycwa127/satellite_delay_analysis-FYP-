@@ -12,13 +12,13 @@ The overall objective is to analyze if the data download deadline can be met giv
 
 To Set up the parameter of the Simulator. A settings folder contains the setting file as below.
 
-| Setting file name       | description                                                                      | format                                               |
-| ----------------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| main_GROUND_STATION.txt | use for simulator, contain only one ground station as the point data transfer to | Latitude(degree) Longitude(degree) elevation(degree) |
-| main_OBSERVATION.txt    | use for simulator, contain only one observation point as the point to observe   | Latitude(degree) Longitude(degree)                   |
-| test_GROUND_STATION.txt | use for testing. contain a ground station list                                   | Latitude(degree) Longitude(degree) elevation(degree) |
-| test_OBSERVATION.txt    | use for testing, contain a observation points list as the poin to observe        | Latitude(degree) Longitude(degree)                   |
-| TIME_INTERVAL.txt       | use for simulator and testing, define the datetime of simulator                 | yyyy MM dd hh mm ss                                  |
+| Setting file name       | description                                                                      | format                             |
+| ----------------------- | -------------------------------------------------------------------------------- | ---------------------------------- |
+| main_GROUND_STATION.txt | use for simulator, contain only one ground station as the point data transfer to | Latitude(degree) Longitude(degree) |
+| main_OBSERVATION.txt    | use for simulator, contain only one observation point as the point to observe   | Latitude(degree) Longitude(degree) |
+| test_GROUND_STATION.txt | use for testing. contain a ground station list                                   | Latitude(degree) Longitude(degree) |
+| test_OBSERVATION.txt    | use for testing, contain a observation points list as the poin to observe        | Latitude(degree) Longitude(degree) |
+| TIME_INTERVAL.txt       | use for simulator and testing, define the datetime of simulator                 | yyyy MM dd hh mm ss                |
 
 ### Environment
 
