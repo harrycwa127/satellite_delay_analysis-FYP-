@@ -23,7 +23,7 @@ gs = read_data.get_gs()
 # init parameter for simulator
 Setting.inclination = math.radians(97)
 Setting.argument_of_perigee = 0
-Setting.motion = 13   # mean motion (revolutions per day, <15)
+Setting.motion = 14   # mean motion (revolutions per day, <15)
 Setting.orbit_size = 9  # define numbers of orbit
 Setting.sat_size = 25   # define numbers of satellite in each orbit
 
