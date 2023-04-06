@@ -98,8 +98,7 @@ def get_gs():
         gs_long = 360 + gs_long
     if gs_lat < 0:
         gs_lat = 360 + gs_lat
-    gs_ele = float(gs_lines[0][2])
-    # gs_ele = 10
+    gs_ele = 10
     gs_lat_rad = math.radians(gs_lat)  # rad
     gs_lon_rad = math.radians(gs_long)  # rad
     gs_ele_rad = math.radians(gs_ele)  # rad
