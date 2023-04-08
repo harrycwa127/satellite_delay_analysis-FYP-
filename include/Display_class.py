@@ -64,7 +64,7 @@ class Display:
         height += 2 + textSurface.get_height()
 
         # Dijkstra
-        textSurface = font.render("Dijkstra Path with Orange, Delay: " + str(cls._dijkstra_sat_commnicate_delay[-1]) + " sec", True, (255, 51, 255), (0, 0, 0))
+        textSurface = font.render("Dijkstra Path with Purple, Delay: " + str(cls._dijkstra_sat_commnicate_delay[-1]) + " sec", True, (255, 51, 255), (0, 0, 0))
         textData = pygame.image.tostring(textSurface, "RGBA", True)
         glWindowPos2d(2, height)
         glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
