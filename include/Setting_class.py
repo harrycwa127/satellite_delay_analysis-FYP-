@@ -38,7 +38,7 @@ class Setting:
         cls.inclination_input.insert(0, "97")
         cls.inclination_input.grid(row=1, column=1)
         
-        cls.argument_of_perigee_label = tk.Label(cls.window, text="Satellite Argument Of Perigee (degree): ", anchor=tk.E, font=font, width=32, pady=3)
+        cls.argument_of_perigee_label = tk.Label(cls.window, text="Satellite Argument of Perigee (degree): ", anchor=tk.E, font=font, width=32, pady=3)
         cls.argument_of_perigee_label.grid(row=2, column=0)
         cls.argument_of_perigee_input = tk.Entry(cls.window, font=font, width=32)
         cls.argument_of_perigee_input.insert(0, "0")

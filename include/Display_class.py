@@ -416,8 +416,9 @@ class Display:
                         temp[2] = modelView[8]*dy + modelView[9]*dx
                         norm_xy = math.sqrt(temp[0]*temp[0] + temp[1]
                                             * temp[1] + temp[2]*temp[2])
-                        glRotatef(math.sqrt(dx*dx+dy*dy),
-                                temp[0]/norm_xy, temp[1]/norm_xy, temp[2]/norm_xy)
+                        if norm_xy != 0:
+                            glRotatef(math.sqrt(dx*dx+dy*dy),
+                                    temp[0]/norm_xy, temp[1]/norm_xy, temp[2]/norm_xy)
 
                     lastPosX = x
                     lastPosY = y
