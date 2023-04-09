@@ -62,7 +62,7 @@ class Setting:
         cls.orbit_size_input.insert(0, "9")
         cls.orbit_size_input.grid(row=5, column=1)
 
-        cls.sat_size_label = tk.Label(cls.window, text="Number of Satellite in Orbit: ", anchor=tk.E, font=font, width=32, pady=3)
+        cls.sat_size_label = tk.Label(cls.window, text="Number of Satellite in each Orbit: ", anchor=tk.E, font=font, width=32, pady=3)
         cls.sat_size_label.grid(row=6, column=0)
         cls.sat_size_input = tk.Entry(cls.window, font=font, width=32)
         cls.sat_size_input.insert(0, "25")

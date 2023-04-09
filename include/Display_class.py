@@ -56,7 +56,7 @@ class Display:
         height = 2
 
         # Orbit
-        textSurface = font.render("Orbit Base Path with Blue, Delay: " + str(cls._orbit_sat_commnicate_delay[-1]) + " sec", True, (0,191,255), (0, 0, 0))
+        textSurface = font.render("Orbit Base with Blue, Delay: " + str(cls._orbit_sat_commnicate_delay[-1]) + " sec", True, (0,191,255), (0, 0, 0))
         textData = pygame.image.tostring(textSurface, "RGBA", True)
         glWindowPos2d(2, height)
         glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
